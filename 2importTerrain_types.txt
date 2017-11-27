@@ -1,0 +1,6 @@
+INSERT INTO terrain_type VALUES ( 1, "Path", 2);
+INSERT INTO terrain_type VALUES ( 2, "Forest", 4);
+INSERT INTO terrain_type VALUES ( 3, "Mountains", 5);
+INSERT INTO terrain_type VALUES ( 4, "Beach", 3);
+INSERT INTO terrain_type VALUES ( 5, "Spruce Forest", 6);
+INSERT INTO terrain_type VALUES ( 6, "House", 1);

@@ -1,0 +1,1 @@
+INSERT INTO player VALUES(1,"Unknown",0,3,15,100,0,0,-6);

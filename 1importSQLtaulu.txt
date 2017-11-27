@@ -1,0 +1,117 @@
+DROP DATABASE IF EXISTS whispertest;
+CREATE DATABASE whispertest;
+USE whispertest;
+
+drop table if exists player;
+drop table if exists NPC;
+drop table if exists item;
+drop table if exists item_type;
+drop table if exists map;
+drop table if exists enemy;
+drop table if exists enemy_type;
+drop table if exists terrain_type;
+
+CREATE TABLE item_type(
+	id INT NOT NULL,
+	name varchar(20) NOT NULL,
+	att INT,
+	defense INT,
+	healing INT,
+	weight DECIMAL(10),
+	description VARCHAR(1000),
+  	PRIMARY KEY(id)
+);
+
+
+
+CREATE TABLE terrain_type
+(
+	id INT NOT NULL,
+	name VARCHAR(25) NOT NULL, 
+	movement_difficulty DECIMAL(10) NOT NULL,
+	PRIMARY KEY (id)
+	
+);
+
+CREATE TABLE enemy_type
+(
+	id INT NOT NULL,
+	name varchar(25) NOT NULL,
+	hp INT NOT NULL,
+	att INT NOT NULL,
+	speed DECIMAL(10) NOT NULL,
+	PRIMARY KEY (id)
+  
+);
+
+
+
+
+
+CREATE TABLE terrain_square
+(
+	x INT NOT NULL,
+	y INT NOT NULL,
+	type_id INT NOT NULL,
+	PRIMARY KEY (x, y),
+	FOREIGN KEY (type_id) REFERENCES terrain_type(id)
+);
+
+
+CREATE TABLE NPC
+(
+	id INT NOT NULL,
+	name varchar(20) NOT NULL,
+	att INT NOT NULL,
+	hp INT NOT NULL,
+	enemy INT NOT NULL,
+	x INT NOT NULL,
+	y INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y)
+);
+
+
+CREATE TABLE enemy
+(
+	id INT NOT NULL,
+	type_id INT NOT NULL,
+	x INT,
+	y INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (type_id) REFERENCES enemy_type(id),
+	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y)
+);
+
+
+
+CREATE TABLE player
+(
+	ID INT NOT NULL,
+	name VARCHAR(40) NOT NULL,
+	carry INT NOT NULL,
+	att INT,
+	speed DECIMAL(10),
+	hp INT NOT NULL,
+	fatigue INT NOT NULL,
+	x INT NOT NULL,
+	y INT NOT NULL,
+	PRIMARY KEY (id),
+	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y)
+);
+
+
+CREATE TABLE item
+(
+	id INT NOT NULL,
+	type_id INT NOT NULL,
+	x INT,
+	y INT,
+	player_ID INT,
+	PRIMARY KEY (id),
+	FOREIGN KEY (type_id) REFERENCES item_type(id),
+	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y),
+	FOREIGN KEY (player_ID) REFERENCES player(ID)
+);
+
+
