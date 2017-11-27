@@ -13,7 +13,7 @@ drop table if exists terrain_type;
 
 CREATE TABLE item_type(
 	id INT NOT NULL,
-	name varchar(20) NOT NULL,
+	name varchar(30) NOT NULL,
 	att INT,
 	defense INT,
 	healing INT,
@@ -53,6 +53,7 @@ CREATE TABLE terrain_square
 	x INT NOT NULL,
 	y INT NOT NULL,
 	type_id INT NOT NULL,
+	restriction VARCHAR(4),
 	PRIMARY KEY (x, y),
 	FOREIGN KEY (type_id) REFERENCES terrain_type(id)
 );
