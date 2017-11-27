@@ -1,0 +1,185 @@
+import mysql.connector
+from mysql.connector.errors import IntegrityError
+
+
+db = mysql.connector.connect(host="localhost",
+                             user="dbuser",
+                             passwd="dbpass",
+                             db="whispertest",
+                             buffered=True)
+
+cur=db.cursor()
+
+def split_line(text):
+    words = text.split()
+    return words
+def look():
+    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        print("North: " + res[0][0])
+    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        print("South: " + res[0][0])
+    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        print("East: " + res[0][0])
+    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        print("West: " + res[0][0])
+        
+def move_north():
+    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if "S" in res[0][1]:
+        print("You can't go through a wall, dummy")
+    else:
+        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
+        cur.execute(sql)
+        res=cur.fetchall()
+        print(res)
+        if len(res)>0:
+            if res[0][0]==5:
+                print("The forest is too thick, you cannot pass!")
+            elif "N" in res[0][1]:
+                  print("You can't go through a wall, dummy")
+            else:
+                sql= "UPDATE player SET player.y = player.y +1"
+                cur.execute(sql)
+                sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+                cur.execute(sql)
+                res=cur.fetchall()
+                currentSquare = res[0][0]
+                print("You entered a " + currentSquare)
+        else:
+            print("The ocean is that way,it would be suicide!")
+            
+def move_south():
+    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if "N" in res[0][1]:
+        print("You can't go through a wall, dummy")
+    else:
+        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
+        cur.execute(sql)
+        res=cur.fetchall()
+        if len(res)>0:
+            if res[0][0]==5:
+                print("The forest is too thick, you cannot pass!")
+            elif "S" in res[0][1]:
+                  print("You can't go through a wall, dummy")
+            else:
+                sql= "UPDATE player SET player.y = player.y -1"
+                cur.execute(sql)
+                sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+                cur.execute(sql)
+                res=cur.fetchall()
+                currentSquare = res[0][0]
+                print("You entered a " + currentSquare)
+        else:
+            print("The ocean is that way,it would be suicide!")
+            
+def move_east():
+    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if "W" in res[0][1]:
+        print("You can't go through a wall, dummy")
+    else:
+        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
+        cur.execute(sql)
+        res=cur.fetchall()
+        if len(res)>0:
+            if res[0][0]==5:
+                print("The forest is too thick, you cannot pass!")
+            if "E" in res[0][1]:
+                  print("You can't go through a wall, dummy")
+            else:
+                sql= "UPDATE player SET player.x = player.x -1"
+                cur.execute(sql)
+                sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+                cur.execute(sql)
+                res=cur.fetchall()
+                currentSquare = res[0][0]
+                print("You entered a " + currentSquare)
+        else:
+            print("The ocean is that way,it would be suicide!")
+            
+def move_west():
+    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if "E" in res[0][1]:
+        print("You can't go through a wall, dummy")
+    else:
+        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
+        cur.execute(sql)
+        res=cur.fetchall()
+        print(res)
+        if len(res)>0:
+            if res[0][0]==5:
+                print("The forest is too thick, you cannot pass!")
+            if "W" in res[0][1]:
+                print("You can't go through a wall, dummy")
+            else:
+                sql= "UPDATE player SET player.x = player.x -1"
+                cur.execute(sql)
+                sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+                cur.execute(sql)
+                res=cur.fetchall()
+                currentSquare = res[0][0]
+                print("You entered a " + currentSquare)        
+        else:
+            print("The ocean is that way,it would be suicide!")
+        
+def parse(playerInput):
+    playerCaps = playerInput.upper()
+    filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
+    filteredText = ''.join([c for c in playerCaps if c not in filter])
+    playerText = split_line(filteredText)
+    if len(playerText)<1:
+        print("Are you an empty vessel?")
+    elif playerText[0]== "N" or playerText[0]=="NORTH":
+        move_north()
+    elif (playerText[0])== "S" or playerText[0]=="SOUTH":
+        move_south()
+    elif (playerText[0])== "W" or playerText[0]=="WEST":
+        move_west()
+    elif (playerText[0])== "E" or playerText[0]=="EAST":
+        move_east()
+    elif (playerText[0])== "LOOK" or playerText[0]=="L" or playerText[0]=="WATCH" or playerText[0]=="SEE":
+        look()
+    #elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
+       # if(playerText[1])== "UP":
+            #if playertext[2] is an object in the current map square move item to inventory
+       # else:#if playertext[1] is an object in the current map square move item to inventory
+    #elif (playerText[0])== "KILL" or "ATTACK" or "ENGAGE" or "FIGHT" or "BATTLE":
+        #actions
+    #elif (playerText[0])== "I" or "INVENTORY" or "BAG" or "ITEMS":
+        #display inventory
+    #elif (playerText[0])== "STATS" or "PLAYER" or "CHARACTER" or "CHAR":
+        #display player info
+    #elif (playerText[0])== "EXAMINE" or "INSPECT" or "STUDY" or "ANALYZE":
+        #display info of enemy in the map
+    #elif (playerText[0])== "READ":
+        #display text
+    #elif (playerText[0])== "S" or "SOUTH":
+        #actions
+    #elif (playerText[0])== "S" or "SOUTH":
+        #actions
+
+def main():
+    while True:
+        playerInput = input()
+        parse(playerInput)
+    
+main()
