@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector.errors import IntegrityError
-
-
+import datetime
+import random
 db = mysql.connector.connect(host="localhost",
                              user="dbuser",
                              passwd="dbpass",
@@ -9,33 +9,100 @@ db = mysql.connector.connect(host="localhost",
                              buffered=True)
 
 cur=db.cursor()
+
+player_carry_capasity=150
+dt=datetime.datetime(1974,6,6,9,0)
+square_side=50 #m
+movement_multiplier=50
+def player_carry():
+    sql=("SELECT player.carry FROM player")
+    cur.execute(sql)
+    result=cur.fetchall()[0][0]
+    return result
+def out_of_breath():
+    running_multiplier=[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1]
+    multiplier=random.choice(running_multiplier)
+    return multiplier
+
 def inventory():
     sql="SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0"
     cur.execute(sql)
     result=cur.fetchall()
     
-    print("You have %d items in your inventory" % (len(result)))
-    print("Your items are following: ")
+    #print("You have %d items in your inventory" % (len(result)))
+    print("Your items(%d) are following: " % (len(result)))
     for i in range(len(result)):
         print(result[i][0])
+def add_time(distance,terrain_type_id):
+    
+    sql=("SELECT terrain_type.movement_difficulty FROM terrain_type WHERE terrain_type.id=%i" % terrain_type_id)
+    cur.execute(sql)
+    movement_dificulty=int(cur.fetchall()[0][0])
+    
+    sql=("SELECT player.speed FROM player")
+    cur.execute(sql)
+    speed=float(cur.fetchall()[0][0])
+    print(speed)
+    multiplier=out_of_breath()
+    x=speed*multiplier
+    print(x)
+    time=int((distance/(x/(movement_multiplier*movement_dificulty))))
+    tdelta=datetime.timedelta(seconds=time)
+    global dt
+    dt=(dt+tdelta)
+    
+def show_time():
+    print(dt)
+    
+def drop_item(item):
+    sql=("SELECT item_type.name,item.id FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0")
+    cur.execute(sql)
+    result=cur.fetchall()
+    for i in range(len(result)):
+        if result[i][0].upper()==item:
+            
+            item_id=result[i][1]
+            sql=("SELECT item_type.weight FROM item,item_type WHERE item.type_id=item_type.id and item.id=%i" % item_id)
+            cur.execute(sql)
+            item_weight=cur.fetchall()[0][0]
+            
+            totalWeight=(player_carry()-item_weight)
+            sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
+            cur.execute(sql)
+            
+            pos=player_position()
+            sql=("UPDATE item SET item.x=%i, item.y=%i, item.player_ID=NULL WHERE item.id=%i" % (pos[0][0],pos[0][1],item_id))
+            cur.execute(sql)
+            
+            print("You dropped", result[i][0])
+            break
+    
 def pick_up(item):
+    
     sql="SELECT item_type.name, item.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
     cur.execute(sql)
     result=cur.fetchall()
-    print(item)
     for i in range(len(result)):
-        print(result[i][0])
-        
         if result[i][0].upper()==item:
             item_id=result[i][1]
-            sql=("UPDATE item SET item.x=NULL, item.y=NULL, item.player_ID=1 WHERE item.id=%i" % item_id)
             
+            sql=("SELECT item_type.weight FROM item,item_type WHERE item.type_id=item_type.id and item.id=%i" % item_id)
             cur.execute(sql)
+            item_weight=cur.fetchall()[0][0]
             
-            print(sql)
-            print("ota")
+            totalWeight=(player_carry()+item_weight)
+            if totalWeight<player_carry_capasity:
+                sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
+                cur.execute(sql)
+            
+                sql=("UPDATE item SET item.x=NULL, item.y=NULL, item.player_ID=1 WHERE item.id=%i" % item_id)
+                cur.execute(sql)
+                print("You took", result[i][0])
+            else:
+                print("You cant get more weight to your poor back!")
             break
- def player_position():
+
+def player_position():
     sql="SELECT player.x,player.y FROM player"
     cur.execute(sql)
     result=cur.fetchall()
@@ -44,6 +111,7 @@ def pick_up(item):
 def split_line(text):
     words = text.split()
     return words
+
 def look():
     sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
     cur.execute(sql)
@@ -67,6 +135,7 @@ def look():
         print("West: " + res[0][0])
         
 def move_north():
+    
     sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
     res=cur.fetchall()
@@ -83,6 +152,7 @@ def move_north():
             elif "N" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -109,6 +179,7 @@ def move_south():
             elif "S" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y -1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -135,6 +206,7 @@ def move_east():
             if "E" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -152,7 +224,7 @@ def move_west():
     if "E" in res[0][1]:
         print("You can't go through a wall, dummy")
     else:
-        sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square. FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
+        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
         cur.execute(sql)
         res=cur.fetchall()
         print(res)
@@ -162,6 +234,7 @@ def move_west():
             if "W" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -191,12 +264,17 @@ def parse(playerInput):
         look()
     elif (playerText[0])=="I":
         inventory()
+    elif (playerText[0])=="DROP":
+        drop_item(playerText[1])
+    elif (playerText[0])=="TIME":
+        show_time()
     elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
         if(playerText[1])== "UP" and playerText[0]=="PICK":
             pick_up(playerText[2])
                 
         else:
             pick_up(playerText[1])
+    
     #elif (playerText[0])== "KILL" or "ATTACK" or "ENGAGE" or "FIGHT" or "BATTLE":
         #actions
     #elif (playerText[0])== "I" or "INVENTORY" or "BAG" or "ITEMS":
@@ -214,6 +292,8 @@ def parse(playerInput):
 
 def main():
     while True:
+        #out_of_breath()
+        #print(player_carry())
         playerInput = input()
         parse(playerInput)
     
