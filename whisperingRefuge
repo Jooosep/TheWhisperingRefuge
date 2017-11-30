@@ -189,7 +189,7 @@ def parse(playerInput):
         move_east()
     elif (playerText[0])== "LOOK" or playerText[0]=="L" or playerText[0]=="WATCH" or playerText[0]=="SEE":
         look()
-    elif (playerText[0]=="I"):
+    elif (playerText[0])=="I":
         inventory()
     elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
         if(playerText[1])== "UP" and playerText[0]=="PICK":
