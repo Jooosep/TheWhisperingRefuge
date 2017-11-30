@@ -67,7 +67,7 @@ INSERT INTO item_type VALUES (67, "empty letter", 0, 0, 0, 0, "There is no text 
 INSERT INTO item_type VALUES (68, "candle", 0, 0, 0, 0.06, "Crates light in the dark. Try lighting it with matchsticks. ");
 INSERT INTO item_type VALUES (69, "shears", 0, 0, 0, 2, "Even the strongest of bushes fear the power these shears hold. Player can clear small area of spruce forest.");
 INSERT INTO item_type VALUES (70, "key", 0, 0, 0, 0, "Found inside of an abandoned house. Seems to be for a big lock.");
-INSERT INTO item_type VALUES (71, "coffeecup", 0, 0, 0, 0.1, "Cup which is used to drink coffee or tea.")
-INSERT INTO item_type VALUES (72, "fork", 0, 0, 0, 0, "Stainless steel fork. Too small to be used in combat. ")
-INSERT INTO item_type VALUES (73, "painting", 0, 0, 0, 3, "Painting of an unknown artist. Displays a young girl with a dress.")
-INSERT INTO item_type VALUES (74, "old painting", 0, 0, 0, 3, "Displays two capercaillies fighting. Clearly a replica as it is too small to be authentic.")
+INSERT INTO item_type VALUES (71, "coffeecup", 0, 0, 0, 0.1, "Cup which is used to drink coffee or tea.");
+INSERT INTO item_type VALUES (72, "fork", 0, 0, 0, 0, "Stainless steel fork. Too small to be used in combat. ");
+INSERT INTO item_type VALUES (73, "painting", 0, 0, 0, 3, "Painting of an unknown artist. Displays a young girl with a dress.");
+INSERT INTO item_type VALUES (74, "old painting", 0, 0, 0, 3, "Displays two capercaillies fighting. Clearly a replica as it is too small to be authentic.");
