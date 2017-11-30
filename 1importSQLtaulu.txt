@@ -106,8 +106,8 @@ CREATE TABLE item
 (
 	id INT NOT NULL,
 	type_id INT NOT NULL,
-	x INT,
-	y INT,
+	x INT NOT NULL,
+	y INT NOT NULL,
 	player_ID INT NOT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (type_id) REFERENCES item_type(id),
