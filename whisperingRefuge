@@ -50,7 +50,7 @@ def move_north():
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
             elif "N" in res[0][1]:
-                  print("You can't go through a wall, dummy")
+                print("You can't go through a wall, dummy")
             else:
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
@@ -76,7 +76,7 @@ def move_south():
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
             elif "S" in res[0][1]:
-                  print("You can't go through a wall, dummy")
+                print("You can't go through a wall, dummy")
             else:
                 sql= "UPDATE player SET player.y = player.y -1"
                 cur.execute(sql)
@@ -102,7 +102,7 @@ def move_east():
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
             if "E" in res[0][1]:
-                  print("You can't go through a wall, dummy")
+                print("You can't go through a wall, dummy")
             else:
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
@@ -121,7 +121,7 @@ def move_west():
     if "E" in res[0][1]:
         print("You can't go through a wall, dummy")
     else:
-        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
+        sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square. FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
         cur.execute(sql)
         res=cur.fetchall()
         print(res)
@@ -158,9 +158,11 @@ def parse(playerInput):
         move_east()
     elif (playerText[0])== "LOOK" or playerText[0]=="L" or playerText[0]=="WATCH" or playerText[0]=="SEE":
         look()
-    #elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
-       # if(playerText[1])== "UP":
-            #if playertext[2] is an object in the current map square move item to inventory
+    elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
+        if(playerText[1])== "UP" and playerText[0]=="PICK":
+            if playertext[2] is an object in the current map square move item to inventory
+        else:
+            if playertext[1] is an object in the current map square move item to inventory
        # else:#if playertext[1] is an object in the current map square move item to inventory
     #elif (playerText[0])== "KILL" or "ATTACK" or "ENGAGE" or "FIGHT" or "BATTLE":
         #actions
