@@ -9,7 +9,38 @@ db = mysql.connector.connect(host="localhost",
                              buffered=True)
 
 cur=db.cursor()
-
+def inventory():
+    sql="SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0"
+    cur.execute(sql)
+    result=cur.fetchall()
+    
+    print("You have %d items in your inventory" % (len(result)))
+    print("Your items are following: ")
+    for i in range(len(result)):
+        print(result[i][0])
+def pick_up(item):
+    sql="SELECT item_type.name, item.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
+    cur.execute(sql)
+    result=cur.fetchall()
+    print(item)
+    for i in range(len(result)):
+        print(result[i][0])
+        
+        if result[i][0].upper()==item:
+            item_id=result[i][1]
+            sql=("UPDATE item SET item.x=NULL, item.y=NULL, item.player_ID=1 WHERE item.id=%i" % item_id)
+            
+            cur.execute(sql)
+            
+            print(sql)
+            print("ota")
+            break
+ def player_position():
+    sql="SELECT player.x,player.y FROM player"
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    
 def split_line(text):
     words = text.split()
     return words
@@ -158,12 +189,14 @@ def parse(playerInput):
         move_east()
     elif (playerText[0])== "LOOK" or playerText[0]=="L" or playerText[0]=="WATCH" or playerText[0]=="SEE":
         look()
+    elif (playerText[0]=="I"):
+        inventory()
     elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
         if(playerText[1])== "UP" and playerText[0]=="PICK":
-            if playertext[2] is an object in the current map square move item to inventory
+            pick_up(playerText[2])
+                
         else:
-            if playertext[1] is an object in the current map square move item to inventory
-       # else:#if playertext[1] is an object in the current map square move item to inventory
+            pick_up(playerText[1])
     #elif (playerText[0])== "KILL" or "ATTACK" or "ENGAGE" or "FIGHT" or "BATTLE":
         #actions
     #elif (playerText[0])== "I" or "INVENTORY" or "BAG" or "ITEMS":
