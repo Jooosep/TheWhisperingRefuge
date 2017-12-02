@@ -71,3 +71,4 @@ INSERT INTO item_type VALUES (71, "coffeecup", 0, 0, 0, 0.1, "Cup which is used 
 INSERT INTO item_type VALUES (72, "fork", 0, 0, 0, 0, "Stainless steel fork. Too small to be used in combat. ");
 INSERT INTO item_type VALUES (73, "painting", 0, 0, 0, 3, "Painting of an unknown artist. Displays a young girl with a dress.");
 INSERT INTO item_type VALUES (74, "old painting", 0, 0, 0, 3, "Displays two capercaillies fighting. Clearly a replica as it is too small to be authentic.");
+INSERT INTO item_type VALUES (76, "slingshot", 4, 0, 0, 0.5, "Try shooting small rocks with this.")
