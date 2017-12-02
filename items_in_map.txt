@@ -133,9 +133,9 @@ insert into item values (259, 12, -11, -6, NULL);
 insert into item values (260, 11, 3, -6, NULL);
 insert into item values (261, 11, -12, -7, NULL);
 insert into item values (262, 11, 6, -7, NULL);
-insert into item values (263, 58, 9, -7, NULL);
-insert into item values (264, 58, 10, -7, NULL);
-insert into item values (265, 58, 13, -7, NULL);
+insert into item values (263, 40, 9, -7, NULL);
+insert into item values (264, 12, 10, -7, NULL);
+insert into item values (265, 10, 13, -7, NULL);
 
 
 
