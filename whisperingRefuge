@@ -19,25 +19,33 @@ dt=datetime.datetime(1974,6,6,9,0)
 square_side=50 #m
 movement_multiplier=50
 
+def check_item_type(item):
+    sql = ("SELECT item_type.name FROM item_type WHERE item_type.name LIKE '"+item.lower()+"%'")
+    cur.execute(sql)
+    result = cur.fetchall()
+    for i in range(len(result)):
+        if result[i][0].upper() == item:
+            return True
+    print("There isn's such a item called:",item.lower())
+    return False      
 def player_carry():
     sql=("SELECT player.carry FROM player")
     cur.execute(sql)
     result=cur.fetchall()[0][0]
     return result
 def out_of_breath():
-    running_multiplier=[1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1]
-    multiplier=random.choice(running_multiplier)
+    potency = random.randrange(0, 15)
+    multiplier = 0.98 ** potency
     return multiplier
 
 def inventory():
-    sql="SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0"
+    sql = "SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0"
     cur.execute(sql)
-    result=cur.fetchall()
-    
-    #print("You have %d items in your inventory" % (len(result)))
+    result = cur.fetchall()
     print("Your items(%d) are following: " % (len(result)))
     for i in range(len(result)):
         print(result[i][0])
+        
 def add_time(distance,terrain_type_id):
     
     sql=("SELECT terrain_type.movement_difficulty FROM terrain_type WHERE terrain_type.id=%i" % terrain_type_id)
@@ -279,6 +287,14 @@ def move_west():
                 print("You entered a " + currentSquare)        
         else:
             print("The ocean is that way,it would be suicide!")
+def examine_area():
+    sql=("SELECT item_type.name FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y")
+    cur.execute(sql)
+    result=cur.fetchall()
+    if len(result)>0:
+        print("You found the following items when searching the area ")
+    for i in range(len(result)):
+        print(result[i][0])
         
 def parse(playerInput):
     playerCaps = playerInput.upper()
@@ -303,13 +319,32 @@ def parse(playerInput):
         drop_item(playerText[1])
     elif (playerText[0])=="TIME":
         show_time()
-    elif (playerText[0])== "TAKE" or "PICK" or "PICKUP" or "GRAB":
-        if(playerText[1])== "UP" and playerText[0]=="PICK":
-            pick_up(playerText[2])
-                
+    elif (playerText[0])== "EXAMINE":
+        if(playerText[1])== "AREA":
+            examine_area()
+    elif (playerText[0]) == "TAKE" or "PICK" or "PICKUP" or "GRAB":
+        item=""
+        if(playerText[1]) == "UP" and playerText[0] == "PICK":
+            for i in range(len(playerText)):
+                if i>=2:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            
+            if check_item_type(item)==True:
+                pick_up(item)
+            
         else:
-            pick_up(playerText[1])
-    
+            for i in range(len(playerText)):
+                if i>=1:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            
+            if check_item_type(item)==True:
+                pick_up(item)
     #elif (playerText[0])== "KILL" or "ATTACK" or "ENGAGE" or "FIGHT" or "BATTLE":
         #actions
     #elif (playerText[0])== "I" or "INVENTORY" or "BAG" or "ITEMS":
