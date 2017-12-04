@@ -1,5 +1,4 @@
-insert into item values (id, type_id, x, y, player)
-#1
+
 insert into item values (1, 23, -12, 8, NULL);
 insert into item values (2, 63, -12, 8, NULL);
 insert into item values (3, 21, -12, 8, NULL);
@@ -13,14 +12,14 @@ insert into item values (10, 42, -12, 8, NULL);
 insert into item values (11, 43, -12, 8, NULL);
 insert into item values (12, 48, -12, 8, NULL);
 
-#2
+
 insert into item values (13, 23, -12, 7, NULL);
 insert into item values (14, 41, -12, 7, NULL);
 insert into item values (15, 14, -12, 7, NULL);
 insert into item values (16, 9, -12, 7, NULL);
 insert into item values (17, 21, -12, 7, NULL);
 
-#3
+
 insert into item values (18, 70, -10, 7, NULL);
 insert into item values (19, 41, -10, 7, NULL);
 insert into item values (20, 51, -10, 7, NULL);
@@ -28,7 +27,7 @@ insert into item values (21, 30, -10, 7, NULL);
 insert into item values (22, 66, -10, 7, NULL);
 insert into item values (23, 23, -10, 7, NULL);
 
-#4
+
 insert into item values (24, 52, -9, 7, NULL);
 insert into item values (25, 35, -9, 7, NULL);
 insert into item values (26, 45, -9, 7, NULL);
@@ -36,7 +35,7 @@ insert into item values (27, 46, -9, 7, NULL);
 insert into item values (28, 67, -9, 7, NULL);
 insert into item values (29, 48, -9, 7, NULL);
 
-#5
+
 insert into item values (30, 15, -11, -3, NULL);
 insert into item values (31, 41, -11, -3, NULL);
 insert into item values (32, 29, -11, -3, NULL);
@@ -44,7 +43,7 @@ insert into item values (33, 27, -11, -3, NULL);
 insert into item values (34, 18, -11, -3, NULL);
 insert into item values (35, 17, -11, -3, NULL);
 
-#6
+
 insert into item values (36, 26, -12, -5, NULL);
 insert into item values (37, 41, -12, -5, NULL);
 insert into item values (38, 47, -12, -5, NULL);
@@ -56,7 +55,7 @@ insert into item values (43, 71, -12, -5, NULL);
 
 
 
-#7
+
 insert into item values (44, 17, -10, -5, NULL);
 insert into item values (45, 41, -10, -5, NULL);
 insert into item values (46, 64, -10, -5, NULL);
@@ -65,8 +64,7 @@ insert into item values (48, 6, -10, -5, NULL);
 insert into item values (49, 9, -10, -5, NULL);
 insert into item values (50, 61, -10, -5, NULL);
 
-#8
-insert into item values (50, 3, -10, -6, NULL);
+insert into item values (51, 3, -10, -6, NULL);
 insert into item values (52, 2, -10, -6, NULL);
 insert into item values (53, 9, -10, -6, NULL);
 insert into item values (54, 1, -10, -6, NULL);
@@ -76,7 +74,6 @@ insert into item values (57, 41, -10, -6, NULL);
 insert into item values (58, 72, -10, -6, NULL);
 
 
-#9
 insert into item values (59, 16, -11, -7, NULL);
 insert into item values (60, 60, -11, -7, NULL);
 insert into item values (61, 17, -11, -7, NULL);
@@ -87,7 +84,6 @@ insert into item values (65, 72, -11, -7, NULL);
 
 
 
-#10
 insert into item values (66, 2, -8, -6, NULL);
 insert into item values (67, 2, -8, -6, NULL);
 insert into item values (68, 2, -8, -6, NULL);
@@ -97,7 +93,6 @@ insert into item values (71, 6, -8, -6, NULL);
 insert into item values (72, 20, -8, -6, NULL);
 insert into item values (73, 48, -8, -6, NULL);
 
-#11
 insert into item values (74, 63, -1, -2, NULL);
 insert into item values (75, 64, -1, -2, NULL);
 insert into item values (76, 17, -1, -2, NULL);
@@ -109,7 +104,7 @@ insert into item values (81, 68, -1, -2, NULL);
 
 
 
-#12
+
 insert into item values (82, 41, 0, 7, NULL);
 insert into item values (83, 4, 0, 7, NULL);
 insert into item values (84, 2, 0, 7, NULL);
@@ -119,73 +114,71 @@ insert into item values (87, 74, 0, 7, NULL);
 
 
 
-#13
-insert into item values (83, 28, 2, 8, NULL);
-insert into item values (84, 41, 2, 8, NULL);
-insert into item values (85, 21, 2, 8, NULL);
-insert into item values (86, 19, 2, 8, NULL);
-insert into item values (87, 25, 2, 8, NULL);
-insert into item values (88, 4, 2, 8, NULL);
-insert into item values (89, 1, 2, 8, NULL);
-insert into item values (90, 2, 2, 8, NULL);
-insert into item values (91, 5, 2, 8, NULL);
-insert into item values (92, 40, 2, 8, NULL);
-insert into item values (93, 50, 2, 8, NULL);
-insert into item values (94, 55, 2, 8, NULL);
+
+insert into item values (88, 28, 2, 8, NULL);
+insert into item values (89, 41, 2, 8, NULL);
+insert into item values (90, 21, 2, 8, NULL);
+insert into item values (91, 19, 2, 8, NULL);
+insert into item values (92, 25, 2, 8, NULL);
+insert into item values (93, 4, 2, 8, NULL);
+insert into item values (94, 1, 2, 8, NULL);
+insert into item values (95, 2, 2, 8, NULL);
+insert into item values (96, 5, 2, 8, NULL);
+insert into item values (97, 40, 2, 8, NULL);
+insert into item values (98, 50, 2, 8, NULL);
+insert into item values (99, 55, 2, 8, NULL);
 
 
 
-#14
-insert into item values (95, 41, 2, 6, NULL);
-insert into item values (96, 17, 2, 6, NULL);
-insert into item values (97, 1, 2, 6, NULL);
-insert into item values (98, 2, 2, 6, NULL);
-insert into item values (99, 6, 2, 6, NULL);
-insert into item values (100, 9, 2, 6, NULL);
-insert into item values (101, 12, 2, 6, NULL);
-insert into item values (102, 64, 2, 6, NULL);
+
+insert into item values (100, 41, 2, 6, NULL);
+insert into item values (101, 17, 2, 6, NULL);
+insert into item values (102, 1, 2, 6, NULL);
+insert into item values (103, 2, 2, 6, NULL);
+insert into item values (104, 6, 2, 6, NULL);
+insert into item values (105, 9, 2, 6, NULL);
+insert into item values (106, 12, 2, 6, NULL);
+insert into item values (107, 64, 2, 6, NULL);
 
 
-#15
-insert into item values (103, 19, 12, 8, NULL);
-insert into item values (104, 17, 12, 8, NULL);
-insert into item values (105, 60, 12, 8, NULL);
-insert into item values (106, 45, 12, 8, NULL);
-insert into item values (107, 24, 12, 8, NULL);
-insert into item values (108, 41, 12, 8, NULL);
-insert into item values (109, 33, 12, 8, NULL);
-insert into item values (110, 32, 12, 8, NULL);
-insert into item values (111, 22, 12, 8, NULL);
-insert into item values (112, 48, 12, 8, NULL);
-insert into item values (113, 63, 12, 8, NULL);
-insert into item values (114, 36, 12, 8, NULL);
-insert into item values (115, 37, 12, 8, NULL);
-insert into item values (116, 37, 12, 8, NULL);
-insert into item values (117, 37, 12, 8, NULL);
-insert into item values (118, 37, 12, 8, NULL);
-insert into item values (119, 37, 12, 8, NULL);
-insert into item values (120, 46, 12, 8, NULL);
-insert into item values (121, 51, 12, 8, NULL);
-insert into item values (122, 50, 12, 8, NULL);
+insert into item values (108, 19, 12, 8, NULL);
+insert into item values (109, 17, 12, 8, NULL);
+insert into item values (110, 60, 12, 8, NULL);
+insert into item values (111, 45, 12, 8, NULL);
+insert into item values (112, 24, 12, 8, NULL);
+insert into item values (113, 41, 12, 8, NULL);
+insert into item values (114, 33, 12, 8, NULL);
+insert into item values (115, 32, 12, 8, NULL);
+insert into item values (116, 22, 12, 8, NULL);
+insert into item values (117, 48, 12, 8, NULL);
+insert into item values (118, 63, 12, 8, NULL);
+insert into item values (119, 36, 12, 8, NULL);
+insert into item values (120, 37, 12, 8, NULL);
+insert into item values (121, 37, 12, 8, NULL);
+insert into item values (122, 37, 12, 8, NULL);
+insert into item values (123, 37, 12, 8, NULL);
+insert into item values (124, 37, 12, 8, NULL);
+insert into item values (125, 46, 12, 8, NULL);
+insert into item values (126, 51, 12, 8, NULL);
+insert into item values (127, 50, 12, 8, NULL);
 
 
 
-#16
-insert into item values (123, 25, 10, -1, NULL);
-insert into item values (124, 4, 10, -1, NULL);
-insert into item values (125, 14, 10, -1, NULL);
-insert into item values (126, 45, 10, -1, NULL);
+insert into item values (128, 25, 10, -1, NULL);
+insert into item values (129, 4, 10, -1, NULL);
+insert into item values (130, 14, 10, -1, NULL);
+insert into item values (131, 45, 10, -1, NULL);
 
 
-#17
-insert into item values (127, 24, 11, -2, NULL);
-insert into item values (128, 17, 11, -2, NULL);
-insert into item values (129, 66, 11, -2, NULL);
-insert into item values (130, 5, 11, -2, NULL);
-insert into item values (131, 12, 11, -2, NULL);
-insert into item values (132, 2, 11, -2, NULL);
-insert into item values (133, 41, 11, -2, NULL);
-insert into item values (134, 27, 11, -2, NULL);
+
+insert into item values (132, 24, 11, -2, NULL);
+insert into item values (133, 17, 11, -2, NULL);
+insert into item values (134, 66, 11, -2, NULL);
+insert into item values (135, 5, 11, -2, NULL);
+insert into item values (136, 12, 11, -2, NULL);
+insert into item values (137, 2, 11, -2, NULL);
+insert into item values (138, 41, 11, -2, NULL);
+insert into item values (139, 27, 11, -2, NULL);
 
 
 
