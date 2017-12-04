@@ -316,7 +316,16 @@ def parse(playerInput):
     elif (playerText[0])=="I":
         inventory()
     elif (playerText[0])=="DROP":
-        drop_item(playerText[1])
+        item=""       
+        print(playerText)
+        for i in range(len(playerText)):
+            if i>=1:
+                if i<(len(playerText)-1):
+                    item+=(playerText[i]+" ")
+                else:
+                    item+=(playerText[i])
+            drop_item(item)
+        
     elif (playerText[0])=="TIME":
         show_time()
     elif (playerText[0])== "EXAMINE":
