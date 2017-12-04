@@ -1,6 +1,11 @@
-INSERT INTO terrain_type VALUES ( 1, "Path", 2);
-INSERT INTO terrain_type VALUES ( 2, "Forest", 4);
-INSERT INTO terrain_type VALUES ( 3, "Mountains", 5);
-INSERT INTO terrain_type VALUES ( 4, "Beach", 3);
-INSERT INTO terrain_type VALUES ( 5, "Spruce Forest", 6);
-INSERT INTO terrain_type VALUES ( 6, "House", 1);
+INSERT INTO `terrain_type` (`id`, `name`, `movement_difficulty`, `description`) VALUES
+	(1, 'Path', 2, 'a path, where you can travel with ease.'),
+	(2, 'Forest', 4, 'a forest made of tall pine trees.'),
+	(3, 'Mountains', 5, 'a mountainside with dangerous cliffs.'),
+	(4, 'Beach', 3, 'a beach with some fine sand.'),
+	(5, 'Spruce Forest', 6, 'a forest made of spruces so thick that only the tiniest critters can pass.'),
+	(6, 'Small House', 1, 'a small house built from wood.'),
+	(7, 'Shack', 1, 'a tiny shack made of straw.'),
+	(8, 'Radio Tower', 1, 'a radio tower over 20 meters tall, there is a building at the base.'),
+	(9, 'Sturdy Building', 1, 'a steel building that is quite low but sizeable.'),
+	(10, 'Church Building', 1, 'a church that is very small and poorly constructed.');
