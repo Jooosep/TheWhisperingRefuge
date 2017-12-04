@@ -316,8 +316,7 @@ def parse(playerInput):
     elif (playerText[0])=="I":
         inventory()
     elif (playerText[0])=="DROP":
-        item=""       
-        print(playerText)
+        item=""
         for i in range(len(playerText)):
             if i>=1:
                 if i<(len(playerText)-1):
