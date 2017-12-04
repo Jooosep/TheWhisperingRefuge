@@ -19,6 +19,19 @@ dt=datetime.datetime(1974,6,6,9,0)
 square_side=50 #m
 movement_multiplier=50
 
+def read(item):
+    sql="SELECT item_type.name, item.id,item_type.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
+    cur.execute(sql)
+    result=cur.fetchall()
+    for i in range(len(result)):
+        if result[i][0].upper() == item:
+            item_id=result[i][2]
+    sql = "Select item_type.text FROM item_type, item where item_type.ID = item.type_id and item.type_ID='"+ str(item_id) +"'"
+    cur.execute(sql)
+    res = cur.fetchall()
+    print(res)
+    print(res[0][0]
+
 def check_item_type(item):
     sql = ("SELECT item_type.name FROM item_type WHERE item_type.name LIKE '"+item.lower()+"%'")
     cur.execute(sql)
@@ -361,8 +374,16 @@ def parse(playerInput):
         #display player info
     #elif (playerText[0])== "EXAMINE" or "INSPECT" or "STUDY" or "ANALYZE":
         #display info of enemy in the map
-    #elif (playerText[0])== "READ":
-        #display text
+    elif (playerText[0])== "READ":
+        item=""
+        for i in range(1,len(playerText)):
+            if i<(len(playerText)-1):
+                item+=(playerText[i]+" ")
+            else:
+                item+=(playerText[i])
+        print(item)
+        if check_item_type(item)==True:
+            read(item)
     #elif (playerText[0])== "S" or "SOUTH":
         #actions
     #elif (playerText[0])== "S" or "SOUTH":
