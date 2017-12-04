@@ -4,6 +4,7 @@ insert into item values (267, 58, -7, 9, NULL);
 insert into item values (268, 58, 13, 9, NULL);
 insert into item values (269, 58, 13, 8, NULL);
 insert into item values (270, 58, -8, 7, NULL);
+insert into item values (271, 77, -1, -3, NULL);
 insert into item values (140, 58, 11, 7, NULL);
 insert into item values (141, 58, -11, 6, NULL);
 insert into item values (142, 58, -6, 6, NULL);
