@@ -10,10 +10,15 @@ db = mysql.connector.connect(host="localhost",
 
 cur=db.cursor()
 
+NewAreaDescription = [0,"You have arrived at some sort of village, there are multiple small buildings, but no-ones around", "area description","area description","You see a small church building nearby, it is in very poor condition."]
+KnownAreaDescription = [0,"You arrive at some kind of small village, you have been here before ","area description", "area description", "You have returned to a familiar area, there is a small church building nearby"]
+visitCounter = [0,0,0,0,0,0]
+
 player_carry_capasity=150
 dt=datetime.datetime(1974,6,6,9,0)
 square_side=50 #m
 movement_multiplier=50
+
 def player_carry():
     sql=("SELECT player.carry FROM player")
     cur.execute(sql)
@@ -135,112 +140,142 @@ def look():
         print("West: " + res[0][0])
         
 def move_north():
+    global visitCounter
     
-    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
     res=cur.fetchall()
+    oldAreaCode=res[0][2]
     if "S" in res[0][1]:
         print("You can't go through a wall, dummy")
     else:
-        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
+        sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
         cur.execute(sql)
         res=cur.fetchall()
-        print(res)
+        newAreaCode = res[0][2]
         if len(res)>0:
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
             elif "N" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
-                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
-                sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+                sql="select terrain_type.name,terrain_square.area from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                if newAreaCode != None and oldAreaCode != newAreaCode:
+                    if visitCounter[newAreaCode]<1:
+                        print(NewAreaDescription[newAreaCode])
+                        visitCounter[newAreaCode]=1
+                    else:
+                        print(KnownAreaDescription[newAreaCode])
                 print("You entered a " + currentSquare)
         else:
             print("The ocean is that way,it would be suicide!")
             
 def move_south():
-    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    global visitCounter
+    sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
     res=cur.fetchall()
+    oldAreaCode = res[0][2]
     if "N" in res[0][1]:
         print("You can't go through a wall, dummy")
     else:
-        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
+        sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
         cur.execute(sql)
         res=cur.fetchall()
+        newAreaCode = res[0][2]
         if len(res)>0:
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
             elif "S" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
-                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y -1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                if newAreaCode != None and oldAreaCode != newAreaCode:
+                    if visitCounter[newAreaCode]<1:
+                        print(NewAreaDescription[newAreaCode])
+                        visitCounter[newAreaCode]=1
+                    else:
+                        print(KnownAreaDescription[newAreaCode])
                 print("You entered a " + currentSquare)
         else:
             print("The ocean is that way,it would be suicide!")
             
 def move_east():
-    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    global visitCounter
+    sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
     res=cur.fetchall()
+    oldAreaCode=res[0][2]
     if "W" in res[0][1]:
         print("You can't go through a wall, dummy")
     else:
-        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
+        sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
         cur.execute(sql)
         res=cur.fetchall()
+        newAreaCode = res[0][2]
         if len(res)>0:
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
-            if "E" in res[0][1]:
+            elif "E" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
-                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                if newAreaCode != None and oldAreaCode != newAreaCode:
+                    if visitCounter[newAreaCode]<1:
+                        print(NewAreaDescription[newAreaCode])
+                        visitCounter[newAreaCode]=1
+                    else:
+                        print(KnownAreaDescription[newAreaCode])
                 print("You entered a " + currentSquare)
         else:
             print("The ocean is that way,it would be suicide!")
             
 def move_west():
-    sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    global visitCounter
+    sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
     res=cur.fetchall()
+    oldAreaCode=res[0][2]
     if "E" in res[0][1]:
         print("You can't go through a wall, dummy")
     else:
-        sql ="Select terrain_type.Id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
+        sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
         cur.execute(sql)
         res=cur.fetchall()
-        print(res)
+        newAreaCode = res[0][2]
         if len(res)>0:
             if res[0][0]==5:
                 print("The forest is too thick, you cannot pass!")
-            if "W" in res[0][1]:
+            elif "W" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
-                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                if newAreaCode != None and oldAreaCode != newAreaCode:
+                    if visitCounter[newAreaCode]<1:
+                        print(NewAreaDescription[newAreaCode])
+                        visitCounter[newAreaCode]=1
+                    else:
+                        print(KnownAreaDescription[newAreaCode])
                 print("You entered a " + currentSquare)        
         else:
             print("The ocean is that way,it would be suicide!")
