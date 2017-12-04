@@ -11,27 +11,27 @@ drop table if exists enemy;
 drop table if exists enemy_type;
 drop table if exists terrain_type;
 
-CREATE TABLE item_type(
-	id INT NOT NULL,
-	name varchar(30) NOT NULL,
-	att INT,
-	defense INT,
-	healing INT,
-	weight DECIMAL(10),
-	description VARCHAR(2000),
-  	PRIMARY KEY(id)
-);
+CREATE TABLE IF NOT EXISTS `item_type` (
+  `id` int(11) NOT NULL,
+  `name` varchar(30) NOT NULL,
+  `att` int(11) DEFAULT NULL,
+  `defense` int(11) DEFAULT NULL,
+  `healing` int(11) DEFAULT NULL,
+  `weight` decimal(10,0) DEFAULT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  `text` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
-CREATE TABLE terrain_type
-(
-	id INT NOT NULL,
-	name VARCHAR(25) NOT NULL, 
-	movement_difficulty DECIMAL(10) NOT NULL,
-	PRIMARY KEY (id)
-	
-);
+CREATE TABLE IF NOT EXISTS `terrain_type` (
+  `id` int(11) NOT NULL,
+  `name` varchar(25) NOT NULL,
+  `movement_difficulty` decimal(10,0) NOT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE enemy_type
 (
@@ -48,15 +48,17 @@ CREATE TABLE enemy_type
 
 
 
-CREATE TABLE terrain_square
-(
-	x INT NOT NULL,
-	y INT NOT NULL,
-	type_id INT NOT NULL,
-	restriction VARCHAR(4),
-	PRIMARY KEY (x, y),
-	FOREIGN KEY (type_id) REFERENCES terrain_type(id)
-);
+CREATE TABLE IF NOT EXISTS `terrain_square` (
+  `x` int(11) NOT NULL,
+  `y` int(11) NOT NULL,
+  `type_id` int(11) NOT NULL,
+  `restriction` varchar(4) DEFAULT NULL,
+  `area` int(11) DEFAULT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`x`,`y`),
+  KEY `type_id` (`type_id`),
+  CONSTRAINT `terrain_square_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `terrain_type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 CREATE TABLE NPC
