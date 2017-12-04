@@ -1,74 +1,78 @@
-INSERT INTO item_type VALUES (1, "rabbit meat", 0, 0, 5, 0.3, "Very nutritious piece of meat. High on protein and low on fat. Heals player for 5 hit points.");
-INSERT INTO item_type VALUES (2, "wild hog meat", 0, 0, 15, 2, "This hog lived happily before it met you. Heals player for 15 hit points.");
-INSERT INTO item_type VALUES (3, "squirrel meat", 0, 0, 5, 0.1, "Squirrels are small animals, so you don´t get much from them. Heals player for 5 hit points.");
-INSERT INTO item_type VALUES (4, "rat meat", 0, 0, 1, 0.2, "These rodents are often avoided because they often carry deadly diseases. Heals player for 1 hit point.");
-INSERT INTO item_type VALUES (5, "meat form cannibal", 0, 0, -5, 1.2, "You killed a human and took their flesh. Maybe you´re cannibal too? Player loses 5 hit points if eaten.");
-INSERT INTO item_type VALUES (6, "duct tape", 0, 0, 0, 0.2, "Good old duct tape. There is nothing it cannot fix. Created by Gods.");
-INSERT INTO item_type VALUES (7, "watch", 0, 0, 0, 0, "Your reliable watch. Used to check time.");
-INSERT INTO item_type VALUES (8, "plank", 0, 0, 0, 4, "Wooden plank. Used in construction.");
-INSERT INTO item_type VALUES (9, "knife", 40, 0, 0, 0.2, "Blade is approximately 14cm long and has sharp and serrated edge. Can be used in hand to hand combat. Just don´t bring it to a gun fight. Deals 40 damage.");
-INSERT INTO item_type VALUES (10, "sharp rock", 0, 0, 0, 0.1, "This rock can be deadly when used in the right way.");
-INSERT INTO item_type VALUES (11, "small rocks", 0, 0, 0, 0.2, "These are just regular rocks, there is nothing special to them. Maybe you can use them as bullets.");
-INSERT INTO item_type VALUES (12, "hammer", 25, 0, 0, 0.3, "This type hammer can be found in construction sites and hardware stores around the globe. Not as good as knife or sword in combat. Deals 25 damage.");
-INSERT INTO item_type VALUES (13, "box of nails", 0, 0, 0, 0.1, "Nail is a pin shaped metallic object used to fasten thing together. Generally, nails have sharp and flat ends. Unfortunately, this box does not have lot of nails.");
-INSERT INTO item_type VALUES (14, "book", 0, 0, 0, 0, "' The tests of the new the antidote seems to be effective on rats. They are not as aggressive as before and it seems that they are getting their intelligence back. After few days we have changed the formula and the new antidote works perfectly on rats. The next step with this project is to test it on humans.'");
-INSERT INTO item_type VALUES (15, "torn piece of paper", 0, 0, 0, 0, "Paper with writing on it, the text says:' This is your new security code for the Northwest gate: 720' Code remains incomplete as rest of the paper is torn.");
-INSERT INTO item_type VALUES (16, "piece of paper", 0, 0, 0, 0, "Paper with writing on it but first part of the paper is torn. '54. Keep in mind that these codes are personal, and misuse is a crime.'");
-INSERT INTO item_type VALUES (17, "newspaper", 0, 0, 0, 0, "Newspaper of unknown publisher, it is dated June 5th, 1987 and front page is about bestselling book from the era.");
-INSERT INTO item_type VALUES (18, "letter from a friend", 0, 0, 0, 0, "The letter says:' We are getting worried about you. There hasn´t been any contact lately. I hope you are ok. Answer me whenever you can.'");
-INSERT INTO item_type VALUES (19, "sword", 55, 0, 0, 3.2, "Medieval sword with engraving on it. The engraving says' fus ro dah' Deals 55 damage.");
-INSERT INTO item_type VALUES (20, "shovel", 15, 0, 0, 2, "Shovel is used to dig up or move materials such as soil and gravel. But you already knew that didn´t you. Deals 15 damage.");
-INSERT INTO item_type VALUES (21, "syringe", 0, 0, 0, 0, "This syringe was used by scientist to inject various substances to patients.");
-INSERT INTO item_type VALUES (22, "rake", 5, 0, 0, 1, "Have you tried to clean your yard from leaves without a rake? It is not that easy or fun. Rake is not the most ideal weapon in combat. Deals 5 damage.");
-INSERT INTO item_type VALUES (23, "antidote", 0, 0, 0, 0.1, "This antidote was designed to be cure for the disease toxoplasma canniba. You need a syringe to apply the antidote.");
-INSERT INTO item_type VALUES (24, "engine", 0, 0, 0, 65, "Outboard motor that was once used in a boat. It is still in working condition. ");
-INSERT INTO item_type VALUES (25, "body armor", 0, 50, 0, 4.2, "Body armor with strong ceramic plating to add more protection. Gives player a defense rating of 50.");
-INSERT INTO item_type VALUES (26, "glass cutter", 0, 0, 0, 0.2, "This device is mostly used by criminals to break into houses.");
-INSERT INTO item_type VALUES (27, "plate", 0, 0, 0, 0.1, "Plate with flower painted on it. On the back it says' Borgsten 1950'");
-INSERT INTO item_type VALUES (28, "gasoline canister", 0, 0, 0, 5, "Regular unleaded gasoline.");
-INSERT INTO item_type VALUES (29, "candlestick", 0, 0, 0, 0.6, "Bronze candlestick. Now all you need are candles.");
-INSERT INTO item_type VALUES (30, "superglue", 0, 0, 0, 0.1, "Super sticky and dries fast. This superglue is so strong it can hold an adult from a ceiling.");
-INSERT INTO item_type VALUES (31, "rubber band", 0, 0, 0, 0, "Loop of rubber used to hold two or more things together.");
-INSERT INTO item_type VALUES (32, "whistle", 0, 0, 0, 0.1, "Steel whistle. Produces loud noise that can be used to attract and scare animals.");
-INSERT INTO item_type VALUES (33, "magnifying glass", 0, 0, 0, 0.1, "This magnifying glass can be used to start a fire. However, the more common use is to magnify small things.");
-INSERT INTO item_type VALUES (34, "box of match sticks", 0, 0, 0, 0.1, "The main point of matchstick is to create a fire, but you already knew that.");
-INSERT INTO item_type VALUES (35, "water bottle", 0, 0, 4, 0.5, "The water found on this island is not safe to drink. Luckily there are water bottles with clean water. Heals player for 4 hit points.");
-INSERT INTO item_type VALUES (36, "bow", 0, 0, 0, 0.2, "Bow is used to shoot arrows and deal damage. Can be shot from long distance.");
-INSERT INTO item_type VALUES (37, "arrow", 20, 0, 0, 0.05, "Ammunition for bow. Arrows are crafted by combining sharp rock and sticks. Deals 20 damage.");
-INSERT INTO item_type VALUES (38, "plant", 0, 0, 0, 0.1, "This plant smells like death. Try combining it with arrows.");
-INSERT INTO item_type VALUES (39, "poison arrow", 25, 0, 0, 0.05, "More deadly than regular arrow. Deals 25 damage.");
-INSERT INTO item_type VALUES (40, "night vision goggles", 0, 0, 0, 0.6, "Mark3 night vision goggles designed to be lightweight and comfortable. Clearly manufactured for military. ");
-INSERT INTO item_type VALUES (41, "bed", 0, 0, 0, 1000, "Bed with mattress and pillow. Maybe you can use it to get some rest. Too big to be moved");
-INSERT INTO item_type VALUES (42, "sleeping bag", 0, 0, 0, 1.3, "Green and warm what else do you need to know.");
-INSERT INTO item_type VALUES (43, "can opener", 0, 0, 0, 0, "With this you can open your canned foods.");
-INSERT INTO item_type VALUES (44, "lockpick", 0, 0, 0, 0, "Criminals favourite tool. Used to open regular locks without key.");
-INSERT INTO item_type VALUES (45, "memorycard", 0, 0, 0, 0, "Small compact card with lots of data on it.");
-INSERT INTO item_type VALUES (46, "video camera", 0, 0, 0, 0.9, "Camera with a memory card slot and a small display.");
-INSERT INTO item_type VALUES (47, "fish", 0, 0, 10, 0.6, "Looks like salmon with two extra fins and bigger tooth. Heals player for 10 hit points.");
-INSERT INTO item_type VALUES (48, "canned food", 0, 0, 20, 0.3, "There is label on this can saying beans. Heals player for 20hp.");
-INSERT INTO item_type VALUES (49, "med kit", 0, 0, 100, 0.2, "Can be used for healing player. Heals player to maximum health.");
-INSERT INTO item_type VALUES (50, "axe", 26, 0, 0, 1.5, "It may be rusty, but it will do the job. Capable of chopping wood. Deals 26 damage.");
-INSERT INTO item_type VALUES (51, "lantern", 0, 0, 0, 0.4, "Old lantern capable of lighting your surroundings at night.");
-INSERT INTO item_type VALUES (52, "small pump", 0, 0, 0, 0.4, "This pump should be enough to inflate your raft.");
-INSERT INTO item_type VALUES (54, "backpack", 0, 0, 0, 0.4, "Large backpack able to hold items of various sizes. Some say it is bottomless.");
-INSERT INTO item_type VALUES (55, "flute", 0, 0, 0, 0.1, "Old mysterious looking flute with red and white colours. Found inside an abandoned house.");
-INSERT INTO item_type VALUES (56, "mirror", 0, 0, 0, 0.1, "Small mirror used by women when applying makeup. could be used to make a fire.");
-INSERT INTO item_type VALUES (57, "string", 0, 0, 0, 0.1, "String that is strong enough to lift an adult.");
-INSERT INTO item_type VALUES (58, "branches", 0, 0, 0, 2, "Branches from a tree. Could be used to make a campfire.");
-INSERT INTO item_type VALUES (59, "letter", 0, 0, 0, 0, "The letter says:' All citizens are ordered to evacuate as soon as possible. There has been nuclear disaster nearby. The radioactive cloud is heading towards our location. It is predicted to reach us in couple of days. Pack what is necessary.'");
-INSERT INTO item_type VALUES (60, "stained letter", 0, 0, 0, 0, "'We have managed to cure the disease from human, but the major side effect is the loss of intelligence these “volunteers' are suffering.' ");
-INSERT INTO item_type VALUES (61, "bloody letter", 0, 0, 0, 0, "The letter says:' One of the patients broke from the holding cage and tried to escape. It took several people to take them down.' ");
-INSERT INTO item_type VALUES (62, "top secret letter", 0, 0, 0, 0, "The letter says: 'Wuld nah kest' What could it mean? ");
-INSERT INTO item_type VALUES (63, "book of scientist", 0, 0, 0, 0, "'The rats are turning aggressive, because of the disease. They are also growing. It seems that they are losing their capability of doing simple tasks. It doesn´t take long until we start testing this disease on other animals.'");
-INSERT INTO item_type VALUES (64, "scientist´s book", 0, 0, 0, 0, "'The size of rats is doubled, and they are showing signs of cannibalism. We will start the antidote treatment as soon as we are given the required permission.'");
-INSERT INTO item_type VALUES (65, "book of a dead scientist", 0, 0, 0, 0, "'The treatment has not been effective, all the test subjects have died, because of heart failure. The dose could be too high, or we are using completely wrong formula.'");
-INSERT INTO item_type VALUES (66, "stained book", 0, 0, 0, 0, "'After many failed attempts with rats and other animals, we succeeded with the treatment and soon we switched to testing on humans. At first the patients lost the capability to speak and soon after they began to turn aggressive towards us and other patients. '");
-INSERT INTO item_type VALUES (67, "empty letter", 0, 0, 0, 0, "There is no text on this paper. ");
-INSERT INTO item_type VALUES (68, "candle", 0, 0, 0, 0.06, "Crates light in the dark. Try lighting it with matchsticks. ");
-INSERT INTO item_type VALUES (69, "shears", 0, 0, 0, 2, "Even the strongest of bushes fear the power these shears hold. Player can clear small area of spruce forest.");
-INSERT INTO item_type VALUES (70, "key", 0, 0, 0, 0, "Found inside of an abandoned house. Seems to be for a big lock.");
-INSERT INTO item_type VALUES (71, "coffeecup", 0, 0, 0, 0.1, "Cup which is used to drink coffee or tea.");
-INSERT INTO item_type VALUES (72, "fork", 0, 0, 0, 0, "Stainless steel fork. Too small to be used in combat. ");
-INSERT INTO item_type VALUES (73, "painting", 0, 0, 0, 3, "Painting of an unknown artist. Displays a young girl with a dress.");
-INSERT INTO item_type VALUES (74, "old painting", 0, 0, 0, 3, "Displays two capercaillies fighting. Clearly a replica as it is too small to be authentic.");
-INSERT INTO item_type VALUES (76, "slingshot", 4, 0, 0, 0.5, "Try shooting small rocks with this.")
+INSERT INTO `item_type` (`id`, `name`, `att`, `defense`, `healing`, `weight`, `description`, `text`) VALUES
+	(1, 'rabbit meat', 0, 0, 5, 0, 'Very nutritious piece of meat. High on protein and low on fat. Heals player for 5 hit points.', NULL),
+	(2, 'wild hog meat', 0, 0, 15, 2, 'This hog lived happily before it met you. Heals player for 15 hit points.', NULL),
+	(3, 'squirrel meat', 0, 0, 5, 0, 'Squirrels are small animals, so you don´t get much from them. Heals player for 5 hit points.', NULL),
+	(4, 'rat meat', 0, 0, 1, 0, 'These rodents are often avoided because they often carry deadly diseases. Heals player for 1 hit point.', NULL),
+	(5, 'meat form cannibal', 0, 0, -5, 1, 'You killed a human and took their flesh. Maybe you´re cannibal too? Player loses 5 hit points if eaten.', NULL),
+	(6, 'duct tape', 0, 0, 0, 0, 'Good old duct tape. There is nothing it cannot fix. Created by Gods.', NULL),
+	(7, 'watch', 0, 0, 0, 0, 'Your reliable watch. Used to check time.', NULL),
+	(8, 'plank', 0, 0, 0, 4, 'Wooden plank. Used in construction.', NULL),
+	(9, 'knife', 40, 0, 0, 0, 'Blade is approximately 14cm long and has sharp and serrated edge. Can be used in hand to hand combat. Just don´t bring it to a gun fight. Deals 40 damage.', NULL),
+	(10, 'sharp rock', 0, 0, 0, 0, 'This rock can be deadly when used in the right way.', NULL),
+	(11, 'small rocks', 0, 0, 0, 0, 'These are just regular rocks, there is nothing special to them. Maybe you can use them as bullets.', NULL),
+	(12, 'hammer', 25, 0, 0, 0, 'This type hammer can be found in construction sites and hardware stores around the globe. Not as good as knife or sword in combat. Deals 25 damage.', NULL),
+	(13, 'box of nails', 0, 0, 0, 0, 'Nail is a pin shaped metallic object used to fasten thing together. Generally, nails have sharp and flat ends. Unfortunately, this box does not have lot of nails.', NULL),
+	(14, 'book', 0, 0, 0, 0, '\' The tests of the new the antidote seems to be effective on rats. They are not as aggressive as before and it seems that they are getting their intelligence back. After few days we have changed the formula and the new antidote works perfectly on rats. The next step with this project is to test it on humans.\'', NULL),
+	(15, 'torn piece of paper', 0, 0, 0, 0, 'Paper with writing on it, the text says:\' This is your new security code for the Northwest gate: 720\' Code remains incomplete as rest of the paper is torn.', NULL),
+	(16, 'piece of paper', 0, 0, 0, 0, 'Paper with writing on it but first part of the paper is torn. \'54. Keep in mind that these codes are personal, and misuse is a crime.\'', NULL),
+	(17, 'newspaper', 0, 0, 0, 0, 'Newspaper of unknown publisher, it is dated June 5th, 1987 and front page is about bestselling book from the era.', NULL),
+	(18, 'letter from a friend', 0, 0, 0, 0, 'The letter says:\' We are getting worried about you. There hasn´t been any contact lately. I hope you are ok. Answer me whenever you can.\'', NULL),
+	(19, 'sword', 55, 0, 0, 3, 'Medieval sword with engraving on it. The engraving says\' fus ro dah\' Deals 55 damage.', NULL),
+	(20, 'shovel', 15, 0, 0, 2, 'Shovel is used to dig up or move materials such as soil and gravel. But you already knew that didn´t you. Deals 15 damage.', NULL),
+	(21, 'syringe', 0, 0, 0, 0, 'This syringe was used by scientist to inject various substances to patients.', NULL),
+	(22, 'rake', 5, 0, 0, 1, 'Have you tried to clean your yard from leaves without a rake? It is not that easy or fun. Rake is not the most ideal weapon in combat. Deals 5 damage.', NULL),
+	(23, 'antidote', 0, 0, 0, 0, 'This antidote was designed to be cure for the disease toxoplasma canniba. You need a syringe to apply the antidote.', NULL),
+	(24, 'engine', 0, 0, 0, 65, 'Outboard motor that was once used in a boat. It is still in working condition. ', NULL),
+	(25, 'body armor', 0, 50, 0, 4, 'Body armor with strong ceramic plating to add more protection. Gives player a defense rating of 50.', NULL),
+	(26, 'glass cutter', 0, 0, 0, 0, 'This device is mostly used by criminals to break into houses.', NULL),
+	(27, 'plate', 0, 0, 0, 0, 'Plate with flower painted on it. On the back it says\' Borgsten 1950\'', NULL),
+	(28, 'gasoline canister', 0, 0, 0, 5, 'Regular unleaded gasoline.', NULL),
+	(29, 'candlestick', 0, 0, 0, 1, 'Bronze candlestick. Now all you need are candles.', NULL),
+	(30, 'superglue', 0, 0, 0, 0, 'Super sticky and dries fast. This superglue is so strong it can hold an adult from a ceiling.', NULL),
+	(31, 'rubber band', 0, 0, 0, 0, 'Loop of rubber used to hold two or more things together.', NULL),
+	(32, 'whistle', 0, 0, 0, 0, 'Steel whistle. Produces loud noise that can be used to attract and scare animals.', NULL),
+	(33, 'magnifying glass', 0, 0, 0, 0, 'This magnifying glass can be used to start a fire. However, the more common use is to magnify small things.', NULL),
+	(34, 'box of match sticks', 0, 0, 0, 0, 'The main point of matchstick is to create a fire, but you already knew that.', NULL),
+	(35, 'water bottle', 0, 0, 4, 1, 'The water found on this island is not safe to drink. Luckily there are water bottles with clean water. Heals player for 4 hit points.', NULL),
+	(36, 'bow', 0, 0, 0, 0, 'Bow is used to shoot arrows and deal damage. Can be shot from long distance.', NULL),
+	(37, 'arrow', 20, 0, 0, 0, 'Ammunition for bow. Arrows are crafted by combining sharp rock and sticks. Deals 20 damage.', NULL),
+	(38, 'plant', 0, 0, 0, 0, 'This plant smells like death. Try combining it with arrows.', NULL),
+	(39, 'poison arrow', 25, 0, 0, 0, 'More deadly than regular arrow. Deals 25 damage.', NULL),
+	(40, 'night vision goggles', 0, 0, 0, 1, 'Mark3 night vision goggles designed to be lightweight and comfortable. Clearly manufactured for military. ', NULL),
+	(41, 'bed', 0, 0, 0, 1000, 'Bed with mattress and pillow. Maybe you can use it to get some rest. Too big to be moved', NULL),
+	(42, 'sleeping bag', 0, 0, 0, 1, 'Green and warm what else do you need to know.', NULL),
+	(43, 'can opener', 0, 0, 0, 0, 'With this you can open your canned foods.', NULL),
+	(44, 'lockpick', 0, 0, 0, 0, 'Criminals favourite tool. Used to open regular locks without key.', NULL),
+	(45, 'memorycard', 0, 0, 0, 0, 'Small compact card with lots of data on it.', NULL),
+	(46, 'video camera', 0, 0, 0, 1, 'Camera with a memory card slot and a small display.', NULL),
+	(47, 'fish', 0, 0, 10, 1, 'Looks like salmon with two extra fins and bigger tooth. Heals player for 10 hit points.', NULL),
+	(48, 'canned food', 0, 0, 20, 0, 'There is label on this can saying beans. Heals player for 20hp.', NULL),
+	(49, 'med kit', 0, 0, 100, 0, 'Can be used for healing player. Heals player to maximum health.', NULL),
+	(50, 'axe', 26, 0, 0, 2, 'It may be rusty, but it will do the job. Capable of chopping wood. Deals 26 damage.', NULL),
+	(51, 'lantern', 0, 0, 0, 0, 'Old lantern capable of lighting your surroundings at night.', NULL),
+	(52, 'small pump', 0, 0, 0, 0, 'This pump should be enough to inflate your raft.', NULL),
+	(54, 'backpack', 0, 0, 0, 0, 'Large backpack able to hold items of various sizes. Some say it is bottomless.', NULL),
+	(55, 'flute', 0, 0, 0, 0, 'Old mysterious looking flute with red and white colours. Found inside an abandoned house.', NULL),
+	(56, 'mirror', 0, 0, 0, 0, 'Small mirror used by women when applying makeup. could be used to make a fire.', NULL),
+	(57, 'string', 0, 0, 0, 0, 'String that is strong enough to lift an adult.', NULL),
+	(58, 'branches', 0, 0, 0, 2, 'Branches from a tree. Could be used to make a campfire.', NULL),
+	(59, 'letter', 0, 0, 0, 0, 'The letter says:\' All citizens are ordered to evacuate as soon as possible. There has been nuclear disaster nearby. The radioactive cloud is heading towards our location. It is predicted to reach us in couple of days. Pack what is necessary.\'', NULL),
+	(60, 'stained letter', 0, 0, 0, 0, '\'We have managed to cure the disease from human, but the major side effect is the loss of intelligence these “volunteers\' are suffering.\' ', NULL),
+	(61, 'bloody letter', 0, 0, 0, 0, 'The letter says:\' One of the patients broke from the holding cage and tried to escape. It took several people to take them down.\' ', NULL),
+	(62, 'top secret letter', 0, 0, 0, 0, 'The letter says: \'Wuld nah kest\' What could it mean? ', NULL),
+	(63, 'book of scientist', 0, 0, 0, 0, '\'The rats are turning aggressive, because of the disease. They are also growing. It seems that they are losing their capability of doing simple tasks. It doesn´t take long until we start testing this disease on other animals.\'', NULL),
+	(64, 'scientist´s book', 0, 0, 0, 0, '\'The size of rats is doubled, and they are showing signs of cannibalism. We will start the antidote treatment as soon as we are given the required permission.\'', NULL),
+	(65, 'book of a dead scientist', 0, 0, 0, 0, '\'The treatment has not been effective, all the test subjects have died, because of heart failure. The dose could be too high, or we are using completely wrong formula.\'', NULL),
+	(66, 'stained book', 0, 0, 0, 0, '\'After many failed attempts with rats and other animals, we succeeded with the treatment and soon we switched to testing on humans. At first the patients lost the capability to speak and soon after they began to turn aggressive towards us and other patients. \'', NULL),
+	(67, 'empty letter', 0, 0, 0, 0, 'There is no text on this paper. ', NULL),
+	(68, 'candle', 0, 0, 0, 0, 'Crates light in the dark. Try lighting it with matchsticks. ', NULL),
+	(69, 'shears', 0, 0, 0, 2, 'Even the strongest of bushes fear the power these shears hold. Player can clear small area of spruce forest.', NULL),
+	(70, 'key', 0, 0, 0, 0, 'Found inside of an abandoned house. Seems to be for a big lock.', NULL),
+	(71, 'coffeecup', 0, 0, 0, 0, 'Cup which is used to drink coffee or tea.', NULL),
+	(72, 'fork', 0, 0, 0, 0, 'Stainless steel fork. Too small to be used in combat. ', NULL),
+	(73, 'painting', 0, 0, 0, 3, 'Painting of an unknown artist. Displays a young girl with a dress.', NULL),
+	(74, 'old painting', 0, 0, 0, 3, 'Displays two capercaillies fighting. Clearly a replica as it is too small to be authentic.', NULL),
+	(76, 'slingshot', 4, 0, 0, 1, 'Try shooting small rocks with this.', NULL),
+	(77, 'sign', NULL, NULL, NULL, 1000, NULL, 'Come one Come all!'),
+	(78, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH'),
+	(79, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH');
