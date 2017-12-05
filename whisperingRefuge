@@ -14,10 +14,17 @@ NewAreaDescription = [0,"You have arrived at some sort of village, there are mul
 KnownAreaDescription = [0,"You arrive at some kind of small village, you have been here before ","area description", "area description", "You have returned to a familiar area, there is a small church building nearby"]
 visitCounter = [0,0,0,0,0,0]
 
-player_carry_capasity=150
+
 dt=datetime.datetime(1974,6,6,9,0)
 square_side=50 #m
 movement_multiplier=50
+
+#player max stats
+player_carry_capasity=150
+player_max_healt=100
+player_max_fatique=100
+player_max_speed=15
+player_max_attack=100
 def help():
     print('''
 HERE 
@@ -48,10 +55,10 @@ def check_item_type(item):
             return True
     print("There isn's such a item called:",item.lower())
     return False      
-def player_carry():
-    sql=("SELECT player.carry FROM player")
+def player_carry_att_speed_hp_fatique():
+    sql=("SELECT player.carry,player.att,player.speed,player.hp,player.fatigue FROM player")
     cur.execute(sql)
-    result=cur.fetchall()[0][0]
+    result=cur.fetchall()
     return result
 def out_of_breath():
     potency = random.randrange(0, 15)
@@ -89,8 +96,25 @@ def add_time(distance,terrain_type_id):
 def show_time():
     print(dt)
 def update_player_weight(totalWeight):
-    sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
+    if player_carry_capasity<=totalWeight:
+        sql=(("UPDATE player SET player.carry=%d WHERE player.ID=1") % totalWeight)
+        cur.execute(sql)
+def update_player_healt(totalHealt):
+    
+    sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % totalHealt)
     cur.execute(sql)
+def update_player_fatique(totalFatique):
+    if player_max_fatique<=totalFatique:
+        sql=(("UPDATE player SET player.fatique=%d WHERE player.ID=1") % totalFatique)   
+        cur.execute(sql)
+def update_player_speed(totalSpeed):
+    if player_max_speed<=totalSpeed:
+        sql=(("UPDATE player SET player.speed=%d WHERE player.ID=1") % totalSpeed) 
+        cur.execute(sql)
+def update_player_attack(totalAttack):
+    if player_max_attack<=totalAttack:
+        sql=(("UPDATE player SET player.att=%d WHERE player.ID=1") % totalAttack)
+        cur.execute(sql)
 def drop_item(item):
     sql=("SELECT item_type.name,item.id FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0")
     cur.execute(sql)
@@ -103,7 +127,7 @@ def drop_item(item):
             cur.execute(sql)
             item_weight=cur.fetchall()[0][0]
             
-            totalWeight=(player_carry()-item_weight)
+            totalWeight=(player_carry_att_speed_hp_fatique()[0][0]-item_weight)
             update_player_weight(totalWeight)
             
             pos=player_position()
@@ -126,7 +150,7 @@ def pick_up(item):
             cur.execute(sql)
             item_weight=cur.fetchall()[0][0]
             
-            totalWeight=(player_carry()+item_weight)
+            totalWeight=(player_carry_att_speed_hp_fatique()[0][0]+item_weight)
             if totalWeight<player_carry_capasity:
                 sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
                 cur.execute(sql)
