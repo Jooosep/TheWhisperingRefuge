@@ -498,7 +498,20 @@ def extended_look(direction):
                 else:
                     extended_look_desription(0, distance,lastResult[0][0])
             else:
-                print("There is %s blocking your vission" % result[0][0])        
+                print("There is %s blocking your vission" % result[0][0])    
+def player_stats():
+    sql=("SELECT player.carry, player.att,player.speed,player.hp,player.fatigue FROM player")
+    cur.execute(sql)
+    result=cur.fetchall()
+    print(('''
+==============
+|Healt    %s     
+|Carrying %s   
+|Attack   %s   
+|Fatiogue %s
+|Speed    %s   
+==============   
+    ''') % (result[0][3],result[0][0],result[0][1],result[0][4],result[0][2]))
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
@@ -535,8 +548,11 @@ def parse(playerInput):
     elif (playerText[0])=="TIME":
         show_time()
     elif (playerText[0])== "EXAMINE":
-        if(playerText[1])== "AREA":
-            examine_area()
+        if len(playerText)>1:
+            if(playerText[1])== "AREA":
+                    examine_area()
+    elif (playerText[0])=="STATS":
+        player_stats()
     elif (playerText[0]) == "TAKE" or "PICK" or "PICKUP" or "GRAB":
         item=""
         if(playerText[1]) == "UP" and playerText[0] == "PICK":
