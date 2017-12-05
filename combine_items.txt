@@ -1,0 +1,16 @@
+sharp rock + branches = arrow
+arrow + plant = poison arrow
+sring + branches = bow
+branches + knife = spear
+
+
+
+
+Alla on ehdotuksia mitä voisi tapahtua, noita esineitä kyttää tai yhdistelee.
+	small rocks + slingshot = molemmat tarvitaan jos haluaa ampua, kuluttaa yhden kiven
+	memorycard + video camera = TIETOA TARINASTA
+	bow + arrow = molemmat tarvitaan jos haluaa ampua, kuluttaa yhden nuolen
+	bow + poison arrow = molemmat tarvitaan jos haluaa ampua, kuluttaa yhden nuolen
+	can opener + canned food = pystyy syömään 
+	candle + box of match sticks = sytyttää kynttilän
+	lantern + box of match sticks = sytyttää lyhdyn
