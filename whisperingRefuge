@@ -51,16 +51,15 @@ def out_of_breath():
     return multiplier
 
 def inventory():
-    sql = "SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0"
+    sql = "SELECT item_type.name, COUNT(*) FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 GROUP BY item_type.name"
     cur.execute(sql)
     result = cur.fetchall()
     if len(result)>0:
-        print("Your items(%d) are following: " % (len(result)))
+        print("You are carrying")
         for i in range(len(result)):
-            print(result[i][0])
+            print((result[i][0]+"(%s)")%(result[i][1]))
     else:
-        print("You don't carry any items with you")  
-        
+        print("You don't carry any items with you")   
 def add_time(distance,terrain_type_id):
     
     sql=("SELECT terrain_type.movement_difficulty FROM terrain_type WHERE terrain_type.id=%i" % terrain_type_id)
