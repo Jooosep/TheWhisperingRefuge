@@ -127,7 +127,7 @@ def drop_item(item):
             cur.execute(sql)
             item_weight=cur.fetchall()[0][0]
             
-            totalWeight=(player_carry_att_speed_hp_fatique()[0][0]-item_weight)
+            totalWeight=((player_carry_att_speed_hp_fatique()[0][0])-item_weight)
             update_player_weight(totalWeight)
             
             pos=player_position()
@@ -150,7 +150,7 @@ def pick_up(item):
             cur.execute(sql)
             item_weight=cur.fetchall()[0][0]
             
-            totalWeight=(player_carry_att_speed_hp_fatique()[0][0]+item_weight)
+            totalWeight=((player_carry_att_speed_hp_fatique()[0][0])+item_weight)
             if totalWeight<player_carry_capasity:
                 sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
                 cur.execute(sql)
