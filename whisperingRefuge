@@ -96,23 +96,23 @@ def add_time(distance,terrain_type_id):
 def show_time():
     print(dt)
 def update_player_weight(totalWeight):
-    if player_carry_capasity<=totalWeight:
+    if totalWeight<=player_carry_capasity:
         sql=(("UPDATE player SET player.carry=%d WHERE player.ID=1") % totalWeight)
         cur.execute(sql)
 def update_player_healt(totalHealt):
-    
-    sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % totalHealt)
-    cur.execute(sql)
+    if totalHealt<=player_max_healt:
+        sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % totalHealt)
+        cur.execute(sql)
 def update_player_fatique(totalFatique):
-    if player_max_fatique<=totalFatique:
+    if totalFatique<=player_max_fatique:
         sql=(("UPDATE player SET player.fatique=%d WHERE player.ID=1") % totalFatique)   
         cur.execute(sql)
 def update_player_speed(totalSpeed):
-    if player_max_speed<=totalSpeed:
+    if totalSpeed<=player_max_speed:
         sql=(("UPDATE player SET player.speed=%d WHERE player.ID=1") % totalSpeed) 
         cur.execute(sql)
 def update_player_attack(totalAttack):
-    if player_max_attack<=totalAttack:
+    if totalAttack<=player_max_attack:
         sql=(("UPDATE player SET player.att=%d WHERE player.ID=1") % totalAttack)
         cur.execute(sql)
 def drop_item(item):
