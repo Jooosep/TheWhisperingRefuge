@@ -18,7 +18,15 @@ player_carry_capasity=150
 dt=datetime.datetime(1974,6,6,9,0)
 square_side=50 #m
 movement_multiplier=50
-
+def help():
+    print('''
+HERE 
+COMES 
+COMMANDS
+    
+    
+    
+    ''')
 def read(item):
     sql="SELECT item_type.name, item.id,item_type.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
     cur.execute(sql)
@@ -552,6 +560,8 @@ def parse(playerInput):
                     examine_area()
     elif (playerText[0])=="STATS":
         player_stats()
+    elif (playerText[0])=="HELP":
+        help()
     elif (playerText[0]) == "TAKE" or "PICK" or "PICKUP" or "GRAB":
         item=""
         if(playerText[1]) == "UP" and playerText[0] == "PICK":
