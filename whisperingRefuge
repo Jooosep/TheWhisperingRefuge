@@ -320,7 +320,182 @@ def examine_area():
         print("You found the following items when searching the area ")
     for i in range(len(result)):
         print(result[i][0])
+def extended_look_desription(terrainTypeId,distance,frontTerraintypeId):
+    x=random.randint(1,2)
+    place=((distance*square_side)-(square_side/2))
+    if terrainTypeId==0:
+        if frontTerraintypeId==3:
+            print("There is fall about %im away" % place)
+        else:
+            print("There is water about %im away" % (place))
+    elif terrainTypeId==1:
+        if x==1:
+            print("ja noin %im paassa nakyy pienta avartunutta valoa" % (place))
+        elif x==2:
+            print("ja valo pilkistaa noin %im paasta" % (place))
+    elif terrainTypeId==2:
+        print("Forest starts about %im away" % (place))
+    elif terrainTypeId==3:
+        print("There is mountains about %im away" % place)
+    elif terrainTypeId==4:
+        if frontTerraintypeId==1:
+            print("There starts beach about %im away" % place)
+        else:
+            print("There is something yellow on background about %im away" % (place))
+    elif terrainTypeId==5:
+        if frontTerraintypeId==2:
+            print("Forest go thicker %im away" % place)
+        else:
+            print("There is starts thick Spruce Forest %im away" % place)
+    elif terrainTypeId==10 or terrainTypeId==6 or terrainTypeId==7 or terrainTypeId==8 or terrainTypeId==9:
+        print("There is some kind of large object blocking the view %im away" % place)
+def extended_look(direction):
+    getTerraintypeId=0
+    distance=0
+    if direction.upper()=="NORTH":
         
+        sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y+1 and terrain_square.x=player.x")
+        cur.execute(sql)
+        result2=cur.fetchall()
+        if len(result2)>0:
+            for i in range(1,100):
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y+%i and terrain_square.x=player.x" % i)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    if i==1:
+                        getTerraintypeId=result[0][0]
+                    if getTerraintypeId==result[0][0]:
+                        distance+=1
+                    else:
+                        break
+
+            distance+=1       
+            sql=("SELECT terrain_type.name FROM terrain_type WHERE terrain_type.id=%i" % getTerraintypeId)
+            cur.execute(sql)
+            result=cur.fetchall()
+            lastResult=result
+                
+                
+            if getTerraintypeId==1 or getTerraintypeId==2 or getTerraintypeId==3 or getTerraintypeId==4:
+                print("Front of you there is",lastResult[0][0])
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y+%i and terrain_square.x=player.x" % distance)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    extended_look_desription(result[0][0],distance,lastResult[0][0])
+                else:
+                    extended_look_desription(0, distance,lastResult[0][0])
+            else:
+                print("There is %s blocking your vission" % result[0][0])
+    if direction.upper()=="SOUTH":
+        
+        sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y-1 and terrain_square.x=player.x")
+        cur.execute(sql)
+        result2=cur.fetchall()
+        if len(result2)>0:
+            for i in range(1,100):
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y-%i and terrain_square.x=player.x" % i)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    if i==1:
+                        getTerraintypeId=result[0][0]
+                    if getTerraintypeId==result[0][0]:
+                        distance+=1
+                    else:
+                        break
+
+            distance+=1       
+            sql=("SELECT terrain_type.name FROM terrain_type WHERE terrain_type.id=%i" % getTerraintypeId)
+            cur.execute(sql)
+            result=cur.fetchall()
+            lastResult=result
+                
+                
+            if getTerraintypeId==1 or getTerraintypeId==2 or getTerraintypeId==3 or getTerraintypeId==4:
+                print("Front of you there is",lastResult[0][0])
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y-%i and terrain_square.x=player.x" % distance)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    extended_look_desription(result[0][0],distance,lastResult[0][0])
+                else:
+                    extended_look_desription(0, distance,lastResult[0][0])
+            else:
+                print("There is %s blocking your vission" % result[0][0])
+    if direction.upper()=="WEST":
+        
+        sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1")
+        cur.execute(sql)
+        result2=cur.fetchall()
+        if len(result2)>0:
+            for i in range(1,100):
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-%i" % i)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    if i==1:
+                        getTerraintypeId=result[0][0]
+                    if getTerraintypeId==result[0][0]:
+                        distance+=1
+                    else:
+                        break
+
+            distance+=1       
+            sql=("SELECT terrain_type.name FROM terrain_type WHERE terrain_type.id=%i" % getTerraintypeId)
+            cur.execute(sql)
+            result=cur.fetchall()
+            lastResult=result
+                
+                
+            if getTerraintypeId==1 or getTerraintypeId==2 or getTerraintypeId==3 or getTerraintypeId==4:
+                print("Front of you there is",lastResult[0][0])
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-%i" % distance)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    extended_look_desription(result[0][0],distance,lastResult[0][0])
+                else:
+                    extended_look_desription(0, distance,lastResult[0][0])
+            else:
+                print("There is %s blocking your vission" % result[0][0])
+    if direction.upper()=="EAST":
+        
+        sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1")
+        cur.execute(sql)
+        result2=cur.fetchall()
+        if len(result2)>0:
+            for i in range(1,100):
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+%i" % i)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    if i==1:
+                        getTerraintypeId=result[0][0]
+                    if getTerraintypeId==result[0][0]:
+                        distance+=1
+                    else:
+                        break
+
+            distance+=1       
+            sql=("SELECT terrain_type.name FROM terrain_type WHERE terrain_type.id=%i" % getTerraintypeId)
+            cur.execute(sql)
+            result=cur.fetchall()
+            lastResult=result
+                
+                
+            if getTerraintypeId==1 or getTerraintypeId==2 or getTerraintypeId==3 or getTerraintypeId==4:
+                print("Front of you there is",lastResult[0][0])
+                sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+%i" % distance)
+                cur.execute(sql)
+                result=cur.fetchall()
+                if len(result)>0:
+                    extended_look_desription(result[0][0],distance,lastResult[0][0])
+                else:
+                    extended_look_desription(0, distance,lastResult[0][0])
+            else:
+                print("There is %s blocking your vission" % result[0][0])        
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
@@ -337,7 +512,11 @@ def parse(playerInput):
     elif (playerText[0])== "E" or playerText[0]=="EAST":
         move_east()
     elif (playerText[0])== "LOOK" or playerText[0]=="L" or playerText[0]=="WATCH" or playerText[0]=="SEE":
-        look()
+        if len(playerText)>1:
+            if (playerText[0])=="LOOK" and (playerText[1])=="NORTH" or (playerText[1])=="SOUTH" or (playerText[1])=="WEST" or (playerText[1])=="EAST":
+                extended_look(playerText[1])
+        else:
+            look()
     elif (playerText[0])=="I":
         inventory()
     elif (playerText[0])=="DROP":
