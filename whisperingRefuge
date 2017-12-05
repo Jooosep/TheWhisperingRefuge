@@ -88,7 +88,9 @@ def add_time(distance,terrain_type_id):
     
 def show_time():
     print(dt)
-    
+def update_player_weight(totalWeight):
+    sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
+    cur.execute(sql)
 def drop_item(item):
     sql=("SELECT item_type.name,item.id FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0")
     cur.execute(sql)
@@ -102,8 +104,7 @@ def drop_item(item):
             item_weight=cur.fetchall()[0][0]
             
             totalWeight=(player_carry()-item_weight)
-            sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
-            cur.execute(sql)
+            update_player_weight(totalWeight)
             
             pos=player_position()
             sql=("UPDATE item SET item.x=%i, item.y=%i, item.player_ID=NULL WHERE item.id=%i" % (pos[0][0],pos[0][1],item_id))
