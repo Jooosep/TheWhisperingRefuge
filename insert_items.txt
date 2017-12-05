@@ -75,4 +75,5 @@ INSERT INTO `item_type` (`id`, `name`, `att`, `defense`, `healing`, `weight`, `d
 	(76, 'slingshot', 4, 0, 0, 1, 'Try shooting small rocks with this.', NULL),
 	(77, 'sign', NULL, NULL, NULL, 1000, NULL, 'Come one Come all!'),
 	(78, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH'),
-	(79, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH');
+	(79, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH')
+	(80, 'spear', 16, 0, 0, 1.5, 'Long pointy weapon made from a stick and a knife.', NULL);
