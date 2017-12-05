@@ -99,10 +99,15 @@ def update_player_weight(totalWeight):
     if totalWeight<=player_carry_capasity:
         sql=(("UPDATE player SET player.carry=%d WHERE player.ID=1") % totalWeight)
         cur.execute(sql)
+    if totalWeight<0:
+        sql=(("UPDATE player SET player.carry=0 WHERE player.ID=1"))
+        cur.execute(sql)
 def update_player_healt(totalHealt):
-    if totalHealt<=player_max_healt:
+    if totalHealt<=player_max_healt and totalHealt>=0:
         sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % totalHealt)
         cur.execute(sql)
+    elif totalHealt<0:
+        print("You lost the game!")
     else:
         sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % player_max_healt)
         cur.execute(sql)
@@ -547,6 +552,28 @@ def player_stats():
 |Speed    %s   
 ==============   
     ''') % (result[0][3],result[0][0],result[0][1],result[0][4],result[0][2]))
+def eat(foodName):
+    sql=(("SELECT item_type.name,item.id,item_type.healing,item_type.weight, COUNT(*) FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name LIKE '"+foodName.lower()+"%' GROUP BY item_type.name"))
+    cur.execute(sql)
+    result=cur.fetchall()
+    if len(result)>0:
+        if result[0][2]!=0:
+            itemID=result[0][1]
+            
+            itemHealing=result[0][2]
+            totalHealt=((player_carry_att_speed_hp_fatique()[0][3])+itemHealing)
+            update_player_healt(totalHealt)
+            
+            item_weight=result[0][3]
+            totalWeight=((player_carry_att_speed_hp_fatique()[0][0])-item_weight)
+            update_player_weight(totalWeight)
+            
+            sql=(("DELETE FROM item WHERE item.id=%i") % itemID)
+            cur.execute(sql)
+        else:
+            print("You can't eat %s or do you have metal teeth or something?" % result[0][0])
+    else:
+        print(("You don't have item called %s in your inventory") % (foodName.lower()))
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
@@ -578,7 +605,7 @@ def parse(playerInput):
                     item+=(playerText[i]+" ")
                 else:
                     item+=(playerText[i])
-            drop_item(item)
+        drop_item(item)
         
     elif (playerText[0])=="TIME":
         show_time()
@@ -590,6 +617,18 @@ def parse(playerInput):
         player_stats()
     elif (playerText[0])=="HELP":
         help()
+    elif (playerText[0])=="EAT":
+        item=""
+        if len(playerText)>1:
+            for i in range(len(playerText)):
+                if i>=1:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            eat(item)
+        else:
+            print("You ment? eat 'name of item'")
     elif (playerText[0]) == "TAKE" or "PICK" or "PICKUP" or "GRAB":
         item=""
         if(playerText[1]) == "UP" and playerText[0] == "PICK":
