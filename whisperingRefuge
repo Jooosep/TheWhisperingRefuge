@@ -54,9 +54,12 @@ def inventory():
     sql = "SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0"
     cur.execute(sql)
     result = cur.fetchall()
-    print("Your items(%d) are following: " % (len(result)))
-    for i in range(len(result)):
-        print(result[i][0])
+    if len(result)>0:
+        print("Your items(%d) are following: " % (len(result)))
+        for i in range(len(result)):
+            print(result[i][0])
+    else:
+        print("You don't carry any items with you")  
         
 def add_time(distance,terrain_type_id):
     
