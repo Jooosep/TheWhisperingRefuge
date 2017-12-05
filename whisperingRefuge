@@ -103,6 +103,9 @@ def update_player_healt(totalHealt):
     if totalHealt<=player_max_healt:
         sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % totalHealt)
         cur.execute(sql)
+    else:
+        sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % player_max_healt)
+        cur.execute(sql)
 def update_player_fatique(totalFatique):
     if totalFatique<=player_max_fatique:
         sql=(("UPDATE player SET player.fatique=%d WHERE player.ID=1") % totalFatique)   
