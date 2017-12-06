@@ -53,7 +53,7 @@ def check_item_type(item):
     for i in range(len(result)):
         if result[i][0].upper() == item:
             return True
-    print("There isn's such a item called:",item.lower())
+    
     return False      
 def player_carry_att_speed_hp_fatique():
     sql=("SELECT player.carry,player.att,player.speed,player.hp,player.fatigue FROM player")
@@ -697,6 +697,8 @@ def parse(playerInput):
             
             if check_item_type(item)==True:
                 pick_up(item)
+            else:
+              print("There isn's such a item")
     #elif (playerText[0])== "KILL" or "ATTACK" or "ENGAGE" or "FIGHT" or "BATTLE":
         #actions
     #elif (playerText[0])== "I" or "INVENTORY" or "BAG" or "ITEMS":
