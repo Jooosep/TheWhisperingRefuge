@@ -84,10 +84,10 @@ def add_time(distance,terrain_type_id):
     sql=("SELECT player.speed FROM player")
     cur.execute(sql)
     speed=float(cur.fetchall()[0][0])
-    print(speed)
+    #print(speed)
     multiplier=out_of_breath()
     x=speed*multiplier
-    print(x)
+    #print(x)
     time=int((distance/(x/(movement_multiplier*movement_dificulty))))
     tdelta=datetime.timedelta(seconds=time)
     global dt
@@ -226,6 +226,7 @@ def move_north():
             elif "N" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
                 sql="select terrain_type.name, terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -263,6 +264,7 @@ def move_south():
             elif "S" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y -1"
                 cur.execute(sql)
                 sql="select terrain_type.name,terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -300,6 +302,7 @@ def move_east():
             elif "E" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name,terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -337,6 +340,7 @@ def move_west():
             elif "W" in res[0][1]:
                 print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name,terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -574,6 +578,41 @@ def eat(foodName):
             print("You can't eat %s or do you have metal teeth or something?" % result[0][0])
     else:
         print(("You don't have item called %s in your inventory") % (foodName.lower()))
+def sleep(hours):
+    global dt
+    if hours>12:
+        hours=12
+    if hours<0:
+        hours=0
+    itemIshere=0
+    sql=(("SELECT item_type.id,item_type.name  FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"))
+    cur.execute(sql)
+    itemsIdsINarea=cur.fetchall()
+    checkItemsId=[41,42]
+    sql=(("Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"))
+    cur.execute(sql)
+    terrainTypeId=cur.fetchall()
+    
+    if (terrainTypeId[0][0])==10 or (terrainTypeId[0][0])==6 or (terrainTypeId[0][0])==7 or (terrainTypeId[0][0])==8 or (terrainTypeId[0][0])==9:
+        for i in range(len(itemsIdsINarea)):
+            for x in range(len(checkItemsId)):
+                if (itemsIdsINarea[i][0])==checkItemsId[x]:
+                    itemIshere=1
+                    if dt.hour>=22 and dt.hour<=23 or dt.hour>=0 and dt.hour<=8:
+                        
+                        time=(60*60*hours)
+                        tdelta=datetime.timedelta(seconds=time)
+                    
+                        dt=(dt+tdelta)
+                        print("You slept %ih and time is now %s" % (hours,dt))
+                        break
+                    else:
+                        print("You can't sleep now there is still light")
+                        break
+        if itemIshere==0:
+            print("There is nothing where you can lay on")
+    else:
+        print("Here is not safe to sleep")       
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
@@ -629,6 +668,12 @@ def parse(playerInput):
             eat(item)
         else:
             print("You ment? eat 'name of item'")
+    elif (playerText[0])=="SLEEP":
+        if len(playerText)>1:
+            
+            sleep(int(playerText[1]))
+        else:
+            sleep(6)
     elif (playerText[0]) == "TAKE" or "PICK" or "PICKUP" or "GRAB":
         item=""
         if(playerText[1]) == "UP" and playerText[0] == "PICK":
