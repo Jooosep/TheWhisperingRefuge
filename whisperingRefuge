@@ -47,6 +47,7 @@ def read(item):
     print(res[0][0])
 
 def check_item_type(item):
+    item=item.upper()
     sql = ("SELECT item_type.name FROM item_type WHERE item_type.name LIKE '"+item.lower()+"%'")
     cur.execute(sql)
     result = cur.fetchall()
