@@ -245,6 +245,7 @@ def move_north():
                 else:
                     print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
                 sql="select terrain_type.name, terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -287,6 +288,7 @@ def move_south():
                 else:
                     print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y -1"
                 cur.execute(sql)
                 sql="select terrain_type.name,terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -329,6 +331,7 @@ def move_east():
                 else:
                     print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x +1"
                 cur.execute(sql)
                 sql="select terrain_type.name,terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -371,6 +374,7 @@ def move_west():
                 else:
                     print("You can't go through a wall, dummy")
             else:
+                add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
                 cur.execute(sql)
                 sql="select terrain_type.name,terrain_square.description from terrain_type, terrain_square, player where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
