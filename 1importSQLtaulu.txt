@@ -33,16 +33,15 @@ CREATE TABLE IF NOT EXISTS `terrain_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE enemy_type
-(
-	id INT NOT NULL,
-	name varchar(25) NOT NULL,
-	hp INT NOT NULL,
-	att INT NOT NULL,
-	speed DECIMAL(10) NOT NULL,
-	PRIMARY KEY (id)
-  
-);
+CREATE TABLE IF NOT EXISTS `enemy_type` (
+  `id` int(11) NOT NULL,
+  `name` varchar(25) NOT NULL,
+  `hp` int(11) NOT NULL,
+  `att` int(11) NOT NULL,
+  `speed` decimal(10,0) NOT NULL,
+  `description` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
 
