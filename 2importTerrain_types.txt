@@ -8,4 +8,5 @@ INSERT INTO `terrain_type` (`id`, `name`, `movement_difficulty`, `description`) 
 	(7, 'Shack', 1, 'a tiny shack made of straw.'),
 	(8, 'Radio Tower', 1, 'a radio tower over 20 meters tall, there is a building at the base.'),
 	(9, 'Sturdy Building', 1, 'a steel building that is quite low but sizeable.'),
-	(10, 'Church Building', 1, 'a church that is very small and poorly constructed.');
+	(10, 'Church Building', 1, 'a church that is very small and poorly constructed.'),
+	(11, 'Shed', 1, 'a storage room for various tools and goods');
