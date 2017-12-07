@@ -741,7 +741,78 @@ def sleep(hours):
         if itemIshere==0:
             print("There is nothing where you can lay on")
     else:
-        print("Here is not safe to sleep")       
+        print("Here is not safe to sleep")
+def combineITEMS(itemId1,itemId2):
+    itemids=[itemId1,itemId2]
+    itemids.sort()
+    #item1=0
+    #item2=0
+    #combineItems=[58,10,37,38,57]
+    searchProduct={(37,38):39,(57,58):36,(9,58):19}#19 => sword its should be spear
+    
+    try:
+        productId=searchProduct[itemids[0],itemids[1]]
+        return productId
+    except:
+        return False
+        
+    return False
+def combine(twoItems):
+    print(twoItems)
+    itemnames=[]
+    for i in range(len(twoItems)):
+        itemnames.append(twoItems[i].lower())
+    print(itemnames)
+    if (check_item_type(itemnames[0]))==True and (check_item_type(itemnames[1]))==True:
+        
+        sql=(("SELECT item_type.name,item_type.id FROM item_type,item WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name like '"+itemnames[0]+"%'"))
+        cur.execute(sql)
+        item1=cur.fetchall()
+        sql=(("SELECT item_type.name,item_type.id FROM item_type,item WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name like '"+itemnames[1]+"%'"))
+        cur.execute(sql)
+        item2=cur.fetchall()
+        #print(item1[0][1])
+        totalLen=(len(item1)+len(item2))
+        if totalLen>1:
+            try:
+                productId=combineITEMS(item1[0][1], item2[0][1])
+            except:
+                print("You need to have both items in your inventory to able to craft")
+                productId=0
+            if productId>0:
+                sql=("SELECT MAX(item.id) FROM item")
+                cur.execute(sql)
+                maxId=cur.fetchall()[0][0]
+                newItemsID=(maxId+1)
+                sql=(("SELECT item_type.name,item_type.weight FROM item_type WHERE item_type.id=%i") % productId)
+                cur.execute(sql)
+                result=cur.fetchall()
+                newItemsName=result[0][0]
+                #new Item made for player inv(below)
+                sql=(("INSERT INTO item VALUES (%i,%i,0,0,1)") % (newItemsID,productId))
+                cur.execute(sql)
+                
+                sql=(("SELECT item.id,item_type.name,item_type.weight FROM item,item_type WHERE item.type_id=item_type.id and item_type.name like '"+itemnames[0]+"%' and item.player_ID>0"))
+                cur.execute(sql)
+                fItemID=cur.fetchall()
+                sql=(("SELECT item.id,item_type.name,item_type.weight FROM item,item_type WHERE item.type_id=item_type.id and item_type.name like '"+itemnames[1]+"%' and item.player_ID>0"))
+                cur.execute(sql)
+                sItemID=cur.fetchall()
+                
+                sql=(("DELETE FROM item WHERE item.id=%i")% (fItemID[0][0]))
+                cur.execute(sql)
+                sql=(("DELETE FROM item WHERE item.id=%i")% (sItemID[0][0]))
+                cur.execute(sql)
+                
+                totalWeight=(((player_carry_att_speed_hp_fatique()[0][0])-(fItemID[0][2]+sItemID[0][2]))+result[0][1])
+                print(totalWeight)
+                update_player_weight(totalWeight)
+                
+                print("You crafted",newItemsName)
+        else:
+            print("You need to have both items in your inventory to able to craft")
+    else:
+        print("There isn's such a item(s)")    
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
@@ -774,7 +845,41 @@ def parse(playerInput):
                 else:
                     item+=(playerText[i])
         drop_item(item)
-        
+    elif (playerText[0])=="COMBINE":
+        if len(playerText)>1:
+            item=""
+            for i in range(len(playerText)):
+                if i>=1:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            pos=item.find("+")
+            if item[(pos-1)]==" " and item[(pos+1)]==" ":
+                newitem=item[:(pos-1)]+item[pos:]
+                print("newitem",newitem)
+                newitem2=newitem[:(pos)]+newitem[(pos+1):]
+            
+            elif item[(pos-1)]==" " and item[(pos+1)]!=" ":
+                newitem=item[:(pos-1)]+item[pos:]
+                print("newitem",newitem)
+                newitem2=newitem[:(pos)]+newitem[(pos):]
+            
+            elif item[(pos-1)]!=" " and item[(pos+1)]==" ":
+                newitem=item[:(pos)]+item[pos:]
+                print("newitem",newitem)
+                newitem2=newitem[:(pos+1)]+newitem[(pos+2):]
+            else:
+                newitem2=item
+            
+            pos2=newitem2.find("+")    
+            item1=newitem2[0:pos2]
+            item2=newitem2[(pos2+1):len(newitem2)]
+            
+            list=[item1,item2]
+            combine(list)
+        else:
+            print("You ment? combine item+item")       
     elif (playerText[0])=="TIME":
         show_time()
     elif (playerText[0])== "EXAMINE":
