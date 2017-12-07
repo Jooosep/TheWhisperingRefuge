@@ -112,6 +112,7 @@ CREATE TABLE item
 	x INT,
 	y INT,
 	player_ID INT,
+	`equipped` INT(11) NULL DEFAULT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (type_id) REFERENCES item_type(id),
 	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y),
