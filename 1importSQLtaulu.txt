@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS `item_type` (
   `defense` int(11) DEFAULT NULL,
   `healing` int(11) DEFAULT NULL,
   `weight` decimal(10,0) DEFAULT NULL,
+  `part` VARCHAR(10) NULL DEFAULT NULL,
   `description` varchar(1000) DEFAULT NULL,
   `text` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`id`)
