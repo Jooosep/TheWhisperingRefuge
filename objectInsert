@@ -1,0 +1,2 @@
+INSERT INTO `object` (`Id`, `name`, `x`, `y`, `key_item_id`, `open`, `description`) VALUES
+	(1, 'freezer', -8, -6, NULL, 0, NULL);
