@@ -141,11 +141,62 @@ def inventory():
     sql = "SELECT item_type.name, COUNT(*) FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 GROUP BY item_type.name"
     cur.execute(sql)
     result = cur.fetchall()
-    if len(result)>0:
-        print("You are carrying")
-        for i in range(len(result)):
-            print((result[i][0]+"(%s)")%(result[i][1]))
+    sql=(("SELECT item_type.name,item_type.part FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 GROUP BY item_type.name"))
+    cur.execute(sql)
+    result2=cur.fetchall()
+    if (len(result))>0 or (len(result2))>0:
+        if len(result)>0:
+            print("==You are carrying==")
+            for i in range(len(result)):
+                print(("|"+result[i][0]+"(%s)")%(result[i][1]))
+        if len(result2)>0:
+
+            sql=(("SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part LIKE 'head%'"))
+            cur.execute(sql)
+            head=cur.fetchall()
+            if len(head)>0:
+                head=head[0][0]
+            else:
+                head=""
+            sql=(("SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part LIKE 'body%'"))
+            cur.execute(sql)
+            body=cur.fetchall()
+            if len(body)>0:
+                body=body[0][0]
+            else:
+                body=""
+            sql=(("SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part LIKE 'hand%'"))
+            cur.execute(sql)
+            hand=cur.fetchall()
+            if len(hand)>0:
+                hand=hand[0][0]
+            else:
+                hand=""
+            sql=(("SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part LIKE 'leg%'"))
+            cur.execute(sql)
+            leg=cur.fetchall()
+            if len(leg)>0:
+                leg=leg[0][0]
+            else:
+                leg=""
+            sql=(("SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part LIKE 'feet%'"))
+            cur.execute(sql)
+            feet=cur.fetchall()
+            if len(feet)>0:
+                feet=feet[0][0]
+            else:
+                feet=""
+            print(''' ====Equipped====
+|Head: %s     
+|Body: %s   
+|Hand: %s   
+|Legs: %s
+|Feet: %s   
+================ 
+            ''' % (head,body,hand,leg,feet))
+            
     else:
+        
         print("You don't carry any items with you")   
 def add_time(distance,terrain_type_id):
     
@@ -812,7 +863,77 @@ def combine(twoItems):
         else:
             print("You need to have both items in your inventory to able to craft")
     else:
-        print("There isn's such a item(s)")    
+        print("There isn's such a item(s)")
+def equip(item):
+    item=item.lower()
+    sql=(("SELECT item.id,item_type.name,item_type.att,item_type.defense,item.type_id,item_type.part FROM item, item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name LIKE '"+item+"%'"))
+    #print(sql)
+    cur.execute(sql)
+    itemINFO=cur.fetchall()
+    
+    if len(itemINFO)>0:
+        itemTypeID=itemINFO[0][4]
+        itemID=itemINFO[0][0]
+        itemName=itemINFO[0][1]
+        itemAtt=itemINFO[0][2]
+        itemDEFF=itemINFO[0][3]
+        itemPart=itemINFO[0][5]
+        
+        if itemPart=="feet" or itemPart=="leg" or itemPart=="body" or itemPart=="head" or itemPart=="hand" or itemAtt>0 or itemDEFF>0:
+            sql=(("SELECT item_type.name FROM item, item_type WHERE item.type_id=item_type.id and item.equipped=1 and item_type.part like '"+itemPart+"%'"))
+            #print(sql)
+            cur.execute(sql)
+            eqPart=cur.fetchall()
+            if len(eqPart)<1:
+                sql=(("UPDATE item SET item.player_ID=NULL, item.equipped=1 WHERE item.id=%i") % itemID)
+                cur.execute(sql)
+                
+                totalHP=(player_carry_att_speed_hp_fatique()[0][3]+itemDEFF)
+                global player_max_healt
+                player_max_healt+=itemDEFF
+                update_player_healt(totalHP)
+                
+                totalAtt=(player_carry_att_speed_hp_fatique()[0][1]+itemAtt)
+                update_player_attack(totalAtt)
+                print("You have just equipped",itemName)
+                
+            else:
+                print("You have equipment in that slot already")
+        else:
+            print("You can't equip that")
+    else:
+        print("You don't have item in your inventory") 
+def unEquip(item):
+    item=item.lower()
+    sql=(("SELECT item.id,item_type.name,item_type.att,item_type.defense,item.type_id,item_type.part FROM item, item_type WHERE item.type_id=item_type.id and item.equipped=1 and item_type.name like '"+item+"%'"))
+    cur.execute(sql)
+    itemINFO=cur.fetchall()
+    
+    if len(itemINFO)>0:
+        itemTypeID=itemINFO[0][4]
+        itemID=itemINFO[0][0]
+        itemName=itemINFO[0][1]
+        itemAtt=itemINFO[0][2]
+        itemDEFF=itemINFO[0][3]
+        itemPart=itemINFO[0][5]
+        
+        sql=(("UPDATE item SET item.player_ID=1, item.equipped=NULL WHERE item.id=%i") % itemID)
+        cur.execute(sql)
+        
+        totalHP=(player_carry_att_speed_hp_fatique()[0][3]-itemDEFF)
+        global player_max_healt
+        
+        if totalHP<1:
+            update_player_healt(1)
+        else:
+            update_player_healt(totalHP)
+        player_max_healt-=itemDEFF
+        totalAtt=(player_carry_att_speed_hp_fatique()[0][1]-itemAtt)
+        update_player_attack(totalAtt)
+        print("You have just unequipped",itemName)
+        
+    else:
+        print("You don't have that item equipped")
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":"," an "," a ","move ", "go ", " in ", " out ", " the ", " and "]
@@ -882,6 +1003,31 @@ def parse(playerInput):
             print("You ment? combine item+item")       
     elif (playerText[0])=="TIME":
         show_time()
+    elif (playerText[0])=="EQUIP":
+        item=""
+        if len(playerText)>1:
+            for i in range(len(playerText)):
+                if i>=1:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            equip(item)
+        else:
+            print("You meant equip item?")
+    elif (playerText[0])=="UNEQUIP":
+        item=""
+        if len(playerText)>1:
+            for i in range(len(playerText)):
+                if i>=1:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            unEquip(item)
+        else:
+            print("You meant unequip item?")
+        
     elif (playerText[0])== "EXAMINE":
         if len(playerText)>1:
             if(playerText[1])== "AREA":
