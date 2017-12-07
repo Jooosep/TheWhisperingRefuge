@@ -747,8 +747,8 @@ def combineITEMS(itemId1,itemId2):
     itemids.sort()
     #item1=0
     #item2=0
-    #combineItems=[58,10,37,38,57]
-    searchProduct={(37,38):39,(57,58):36,(9,58):19}#19 => sword its should be spear
+    #combineItems=[58,10,37,38,57,31,50,6]
+    searchProduct={(37,38):39,(57,58):36,(9,58):80,(38,80):81,(31,58):76,(38,50):82,(19,38):83,(20,38):84,(22,38):85,(6,10):86}
     
     try:
         productId=searchProduct[itemids[0],itemids[1]]
