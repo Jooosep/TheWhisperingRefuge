@@ -10,12 +10,12 @@ db = mysql.connector.connect(host="localhost",
 
 cur=db.cursor()
 
-#Area 1 on tiedemieskylä
-#Area 2 on kannibaalikylä
+#Area 1 on tiedemieskyla
+#Area 2 on kannibaalikyla
 #Area 3 on pikkusaari
 #Area 4 on kirkon alue
 
-#erityisestot on merkitään numerolla terrain_square.restriction kolumnissa
+#erityisestot on merkitaan numerolla terrain_square.restriction kolumnissa
 #esto 1 on porttikoodi
 #esto 2 on avainlukitus1
 #esto 3 on avainlukitus2
@@ -29,6 +29,9 @@ visitCounter = [0,0,0,0,0,0]
 dt=datetime.datetime(1974,6,6,9,0)
 square_side=50 #m
 movement_multiplier=50
+infection_time = dt
+infected = True
+infection_message=0
 
 #player max stats
 player_carry_capasity=150
@@ -45,6 +48,62 @@ COMMANDS
     
     
     ''')
+def infect():
+    global infected
+    global infection_time
+    sql="UPDATE player SET infection = 1"
+    cur.execute(sql)
+    infection_time = dt
+    infected=True
+    
+def update_infection(*x):
+    global infection_message
+    global infection_time
+    sql="select player.infection from player"
+    cur.execute(sql)
+    res=cur.fetchall()
+    status=res[0][0]
+    increase = 0
+    if len(x)<1:
+        if dt-infection_time>=datetime.timedelta(hours=12):
+            increase=4
+            sql="UPDATE player SET infection = infection+4"
+            cur.execute(sql)
+            infection_time=dt
+        if dt-infection_time>=datetime.timedelta(hours=9):
+            increase=3
+            sql="UPDATE player SET infection = infection+3"
+            cur.execute(sql)
+            infection_time=dt
+        if dt-infection_time>=datetime.timedelta(hours=6):
+            increase=2
+            sql="UPDATE player SET infection = infection+2"
+            cur.execute(sql)
+            infection_time=dt
+        if dt-infection_time>=datetime.timedelta(hours=3):
+            increase=1
+            sql="UPDATE player SET infection = infection+1"
+            cur.execute(sql)
+            infection_time=dt
+    else:
+        increase=x[0]
+        sql=(("UPDATE player SET infection = infection+%d")%increase)
+        cur.execute(sql)
+    if 25>status+increase>1 and infection_message==0:
+        print("You aren't quite yourself today, perhaps this island is getting to you...")
+        infection_message+=1
+    elif 50>status+increase>25 and infection_message==1:
+        print("You are starting to forget the simplest things, something is definitely wrong with you...")
+        infection_message+=1
+    elif 75>status+increase>50 and infection_message==2:
+        print("Your mind is starting to betray you, it's like someone else is in control...")
+        infection_message+=1
+    elif 100>status+increase>75 and infection_message==3:
+        print("You have forgotten your name and all of your past, all you have is a desire to gnaw on some raw flesh, you are on the verge of losing your humanity...")
+        infection_message+=1
+    elif status+increase>100:
+        print("You have lost your body, mind and soul to this island, someone else has taken the reigns and you have no say what happens next... Game Over")
+        
 def read(item):
     sql="SELECT item_type.name, item.id,item_type.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
     cur.execute(sql)
@@ -67,6 +126,7 @@ def check_item_type(item):
             return True
     
     return False      
+
 def player_carry_att_speed_hp_fatique():
     sql=("SELECT player.carry,player.att,player.speed,player.hp,player.fatigue FROM player")
     cur.execute(sql)
@@ -261,6 +321,8 @@ def move_north():
                         print(KnownAreaDescription[newAreaCode])
                 if res[0][1]!= None:
                     print(res[0][1])
+                if infected:
+                    update_infection()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -304,6 +366,8 @@ def move_south():
                         print(KnownAreaDescription[newAreaCode])
                 if res[0][1]!= None:        
                     print(res[0][1])
+                if infected:
+                    update_infection()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -347,6 +411,8 @@ def move_east():
                         print(KnownAreaDescription[newAreaCode])
                 if res[0][1]!= None:
                     print(res[0][1])
+                if infected:
+                    update_infection()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -389,7 +455,9 @@ def move_west():
                     else:
                         print(KnownAreaDescription[newAreaCode]) 
                 if res[0][1]!= None:
-                    print(res[0][1])     
+                    print(res[0][1])
+                if infected:
+                    update_infection()  
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -591,10 +659,11 @@ def player_stats():
 ==============   
     ''') % (result[0][3],result[0][0],result[0][1],result[0][4],result[0][2]))
 def eat(foodName):
-    sql=(("SELECT item_type.name,item.id,item_type.healing,item_type.weight, COUNT(*) FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name LIKE '"+foodName.lower()+"%' GROUP BY item_type.name"))
+    sql=(("SELECT item_type.name,item.id,item_type.healing,item_type.weight, COUNT(*),item_type.id FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name LIKE '"+foodName.lower()+"%' GROUP BY item_type.name"))
     cur.execute(sql)
     result=cur.fetchall()
     if len(result)>0:
+        random=random.randrange(0,100)
         if result[0][2]!=0:
             itemID=result[0][1]
             
@@ -608,6 +677,30 @@ def eat(foodName):
             
             sql=(("DELETE FROM item WHERE item.id=%i") % itemID)
             cur.execute(sql)
+            
+            if result[0][5]==2:
+                if random<25:
+                    if infected:
+                        update_infection()
+                    else:
+                        infect()
+            elif result[0][5]==1:
+                if random<20:
+                    if infected:
+                        update_infection()
+                    else:
+                        infect()
+            elif result[0][5]==3:
+                if random<50:
+                    if infected:
+                        update_infection(3)
+                    else:
+                        infect()
+            elif result[0][5]==4:
+                    if infected:
+                        update_infection(10)
+                    else:
+                        infect()
         else:
             print("You can't eat %s or do you have metal teeth or something?" % result[0][0])
     else:
@@ -638,6 +731,8 @@ def sleep(hours):
                         tdelta=datetime.timedelta(seconds=time)
                     
                         dt=(dt+tdelta)
+                        if infected:
+                            update_infection()
                         print("You slept %ih and time is now %s" % (hours,dt))
                         break
                     else:
