@@ -52,9 +52,11 @@ CREATE TABLE IF NOT EXISTS `terrain_square` (
   `x` int(11) NOT NULL,
   `y` int(11) NOT NULL,
   `type_id` int(11) NOT NULL,
-  `restriction` varchar(4) DEFAULT NULL,
+  `restriction` varchar(5) DEFAULT NULL,
   `area` int(11) DEFAULT NULL,
   `description` varchar(1000) DEFAULT NULL,
+  `visitcounter` int(1) DEFAULT 0,
+  `1stvisit` varchar(1000) DEFAULT 'Hmm... You havent been here before.',
   PRIMARY KEY (`x`,`y`),
   KEY `type_id` (`type_id`),
   CONSTRAINT `terrain_square_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `terrain_type` (`id`)
