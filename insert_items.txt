@@ -76,4 +76,10 @@ INSERT INTO `item_type` (`id`, `name`, `att`, `defense`, `healing`, `weight`, `d
 	(77, 'sign', NULL, NULL, NULL, 1000, NULL, 'Come one Come all!'),
 	(78, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH'),
 	(79, 'sign', NULL, NULL, NULL, 1000, NULL, 'NO TRESPASSING UNDER THREAT OF DEATH')
-	(80, 'spear', 16, 0, 0, 1.5, 'Long pointy weapon made from a stick and a knife.', NULL);
+	(80, 'spear', 16, 0, 0, 1.5, 'Long pointy weapon made from a stick and a knife.', NULL)
+	(81, 'toxic spear', 21, 0, 0, 1.5, 'Even deadlier version of spear. Deals 21 damage.', NULL),
+	(82, 'toxic axe', 31, 0, 0, 1.5, 'The toxin on this axe deals extra damage increasing the overall damage to 31.', NULL ),
+	(83, 'poisoned blade', 60, 0, 0, 3.2, 'This sword is even deadlier than before. Deals 60 damage.', NULL),
+	(84, 'poisoned shovel', 20, 0, 0, 2, 'The poison enhanced the damage of this shovel. Deals 20 damage.', NULL),
+	(85, 'poisoned rake', 10, 0, 0, 1, 'Even with poison this rake is not the best weapon. Deals 10 damage.', NULL),
+	(86, 'paperweight', 0, 0, 0, 2, 'Not very good looking paperweight. But what did you expect when you used a rock and duct tape', NULL);
