@@ -118,5 +118,22 @@ CREATE TABLE item
 	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y),
 	FOREIGN KEY (player_ID) REFERENCES player(ID)
 );
+CREATE TABLE IF NOT EXISTS `object` (
+  `Id` int(11) NOT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `x` int(11) NOT NULL,
+  `y` int(11) NOT NULL,
+  `key_item_id` int(11) DEFAULT NULL,
+  `open` int(11) DEFAULT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`Id`),
+  KEY `x` (`x`,`y`),
+  KEY `key_item_id` (`key_item_id`),
+  CONSTRAINT `object_ibfk_1` FOREIGN KEY (`x`, `y`) REFERENCES `terrain_square` (`x`, `y`),
+  CONSTRAINT `object_ibfk_2` FOREIGN KEY (`key_item_id`) REFERENCES `item_type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- Dumping data for table whispertest.object: ~1 rows (suunnilleen)
+/*!40000 ALTER TABLE `object` DISABLE KEYS */;
 
 
