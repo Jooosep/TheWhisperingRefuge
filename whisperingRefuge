@@ -33,6 +33,10 @@ infection_time = dt
 infected = True
 infection_message=0
 
+objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
+storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
+locked=["BRIEFCASE","DRAWER"]
+
 #player max stats
 player_carry_capasity=150
 player_max_healt=100
