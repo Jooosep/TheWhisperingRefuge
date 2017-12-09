@@ -159,11 +159,17 @@ def inventory():
     sql=(("SELECT item_type.name,item_type.part FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 GROUP BY item_type.name"))
     cur.execute(sql)
     result2=cur.fetchall()
-    if (len(result))>0 or (len(result2))>0:
+    sql="SELECT object.name FROM player,object WHERE object.player_id=player.id"
+    cur.execute(sql)
+    res=cur.fetchall
+    if len(result)>0 or len(res)>0 or len(result2)>0:
+        print("You are carrying")
         if len(result)>0:
-            print("==You are carrying==")
             for i in range(len(result)):
-                print(("|"+result[i][0]+"(%s)")%(result[i][1]))
+                print((result[i][0]+"(%s)")%(result[i][1]))
+        if len(res)>0:
+            for i in range(len(result)):
+                print(result[i][0])
         if len(result2)>0:
 
             sql=(("SELECT item_type.name FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part LIKE 'head%'"))
@@ -407,6 +413,7 @@ def store(useable,item):
                 print(("you stored the %s")%(result[i][0]))
                 break
         print("You don't even have that")
+        
 def object_is_open(useable):
     sql=(("select object.open from object where object.name='%s'")%(useable.lower()))
     cur.execute(sql)
@@ -926,6 +933,38 @@ def move_west():
                     update_infection()  
         else:
             print("The ocean is that way,it would be suicide!")
+            
+def specific_item_check(name):
+    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='%s'"%name
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        return True
+    else:
+        return False
+    
+def check_object(useable,item="default"):
+    if item=="default":
+        sql=(("SELECT item_type.name, item_type.description, object.open FROM object,item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and item.objectID=object.ID and object.name='%s'")%(useable.lower()))
+        cur.execute(sql)
+        result=cur.fetchall()
+        if result[0][2]==1:
+            if len(result)>1:
+                print("You found the following items in the '%s'"% useable)
+                for i in range(len(result)):
+                    print(result[i][0]+" (" + result[i][0] + ")")
+            else:        
+                print("Its empty!")
+        else:
+            print("The %s is closed"%useable)
+    else:
+        sql=(("SELECT item_type.name FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and player.y=object.y and item.x=object.x and item.y=object.y and object.name=%s and item_type.name = %s")%(useable,item))
+        cur.execute(sql)
+        result=cur.fetchall()
+        if len(result)>0:
+            return True
+        else:
+            return False
             
 def examine_area():
     sql=("SELECT item_type.name FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y")
