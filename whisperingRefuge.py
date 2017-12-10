@@ -271,6 +271,9 @@ def update_player_attack(totalAttack):
     if totalAttack<=player_max_attack:
         sql=(("UPDATE player SET player.att=%d WHERE player.ID=1") % totalAttack)
         cur.execute(sql)
+    if totalAttack<0:
+        sql=(("UPDATE player SET player.att=0 WHERE player.ID=1"))
+        cur.execute(sql)
 def drop_item(item):
     sql=("SELECT item_type.name,item.id FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0")
     cur.execute(sql)
