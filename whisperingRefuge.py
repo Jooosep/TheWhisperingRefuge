@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector.errors import IntegrityError
 import datetime
 import random
+from Tekstipeli.Main import specific_item_check
 db = mysql.connector.connect(host="localhost",
                              user="dbuser",
                              passwd="dbpass",
@@ -19,7 +20,8 @@ cur=db.cursor()
 #esto 1 on porttikoodi
 #esto 2 on avainlukitus1
 #esto 3 on avainlukitus2
-#jne.
+#esto 4 on ikkuna
+#esto 5 on rikkinainen riippusilta
 
 NewAreaDescription = [0,"You have arrived at some sort of village, there are multiple small buildings, but no-ones around", "area description","area description","You see a small church building nearby, it is in very poor condition."]
 KnownAreaDescription = [0,"You arrive at some kind of small village, you have been here before ","area description", "area description", "You have returned to a familiar area, there is a small church building nearby"]
@@ -32,6 +34,7 @@ movement_multiplier=50
 infection_time = dt
 infected = True
 infection_message=0
+missingPlanks=7
 
 objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
@@ -45,27 +48,27 @@ player_max_speed=15
 player_max_attack=100
 def help():
     print('''    
-HELP									                 -Displays all available commands
-N, NORTH								               -Player moves North
-S, SOUTH 								               -Player moves South
-E, EAST									               -Player moves East
-W, WEST									               -player moves West
-LOOK, L, WATCH, SEE 					         -Tells player's current location
-LOOK <compass point>					         -Tells player about the area of compass point 
-I, INVENTORY, BAG, ITEMS				       -Prints a list of items player is currently carrying
-DROP <ITEM> 							             -Drops the selected item
-COMBINE <ITEM> <ITEM>					         -Combines two items to create a new one
-TIME 									                 -Tells time to player
-EQUIP <ITEM>							             -Player equips selected item for example equip shirt    
-UNEQUIP <ITEM>							           -Player unequips selected item for example unequip shirt
-EXAMINE, INSPECT, STUDY, ANALYZE 		   -Tells player info about the enemies
-EXAMINE AREA							             -Tells player about the current area they are in
-STATS, PLAYER, CHARACTER, CHAR			   -Prints current stats of the player
-EAT <ITEM> 								             -Player eats selected item for example eat apple
-SLEEP <how long>						           -Player sleeps for selected time
-TAKE, PICK, PICKUP, GRAB <ITEM>			   -Player picks up the item and it is placed in inventory
-KILL, ATTACK, ENGAGE, FIGHT, BATTLE		 -These commands are used in combat to fight enemies
-READ <ITEM>   							           -Prints the discription of the item    
+HELP                                                     -Displays all available commands
+N, NORTH                                               -Player moves North
+S, SOUTH                                                -Player moves South
+E, EAST                                                   -Player moves East
+W, WEST                                                   -player moves West
+LOOK, L, WATCH, SEE                              -Tells player's current location
+LOOK <compass point>                             -Tells player about the area of compass point 
+I, INVENTORY, BAG, ITEMS                       -Prints a list of items player is currently carrying
+DROP <ITEM>                                          -Drops the selected item
+COMBINE <ITEM> <ITEM>                             -Combines two items to create a new one
+TIME                                                      -Tells time to player
+EQUIP <ITEM>                                         -Player equips selected item for example equip shirt    
+UNEQUIP <ITEM>                                       -Player unequips selected item for example unequip shirt
+EXAMINE, INSPECT, STUDY, ANALYZE            -Tells player info about the enemies
+EXAMINE AREA                                         -Tells player about the current area they are in
+STATS, PLAYER, CHARACTER, CHAR               -Prints current stats of the player
+EAT <ITEM>                                              -Player eats selected item for example eat apple
+SLEEP <how long>                                   -Player sleeps for selected time
+TAKE, PICK, PICKUP, GRAB <ITEM>               -Player picks up the item and it is placed in inventory
+KILL, ATTACK, ENGAGE, FIGHT, BATTLE         -These commands are used in combat to fight enemies
+READ <ITEM>                                          -Prints the discription of the item    
     ''')
 def infect():
     global infected
@@ -518,8 +521,6 @@ def mangleWithObjects(command,useable):
                     print("You took the briefcase with you!")
                 else:
                     print("That's too much weight on your back!!")
-                break
-                
                 
             else:
                 print("Your asking for too much here!")
@@ -717,6 +718,107 @@ def open_door2():
             return
         else:
             print("Input \"y\" or \"n\"!")
+            
+def fixBridge(amount=4):
+    global missingPlanks
+    amountToFix=missingPlanks-3
+    if player_position()[0][0]==-6 and player_position()[0][1]==7:
+        if missingPlanks==0:
+            print("The bridge is already intact.")
+        else:
+            if not specific_item_check("plank"):
+                print("You lack the materials!")
+            elif not specific_item_check("hammer"):
+                print("You need a hammer to make those planks stick")
+            elif not specific_item_check("box of nails"):
+                print("You need some nails to hammer the planks in")
+            else:
+                if count_item("plank")==1 or (count_item("plank")>0 and amount==1):
+                    print("You nail in a plank")
+                    missingPlanks-=1
+                    if missingPlanks>3:
+                        print("But theres still too big of a gap.")
+                    elif missingPlanks==3:
+                        print("The gap is now small enough that you can safely cross the bridge.")
+                elif count_item("plank")==2:
+                    if missingPlanks==1:
+                        missingPlanks-=1
+                        print("You nail in a plank and make the bridge is now complete.")
+                    elif amountToFix==0:
+                        print("You nail in two planks.")
+                        missingPlanks-=2
+                    elif amountToFix==1:
+                        print("You nail in a plank")
+                        missingPlanks-=1
+                        print("The gap is now small enough that you can safely cross the bridge.")
+                    elif amountToFix==2:
+                        print("You nail in two planks")
+                        missingPlanks-=2
+                        print("The gap is now small enough that you can safely cross the bridge.")    
+                    elif amountToFix>2:
+                        print("You nail in two planks")
+                        missingPlanks-=2
+                        print("But theres still too big of a gap.")
+                elif count_item("plank")==3:
+                    if missingPlanks==1:
+                        missingPlanks-=1
+                        print("You nail in a plank and make the bridge is now complete.")
+                    elif missingPlanks==2:
+                        print("You nail in two planks")
+                        missingPlanks-=2
+                        print("The bridge is now complete.")    
+                    elif amountToFix==0:
+                        print("You nail in three planks.")
+                        missingPlanks-=3
+                        print("The bridge is now complete.")
+                    elif amountToFix==1:
+                        print("You nail in a plank")
+                        missingPlanks-=1
+                        print("The gap is now small enough that you can safely cross the bridge.")
+                    elif amountToFix==2:
+                        print("You nail in two planks")
+                        missingPlanks-=2
+                        print("The gap is now small enough that you can safely cross the bridge.")   
+                    elif amountToFix==3:
+                        print("You nail in three planks")
+                        missingPlanks-=3
+                        print("The gap is now small enough that you can safely cross the bridge.")  
+                    elif amountToFix>3:
+                        print("You nail in three planks")
+                        missingPlanks-=3
+                        print("But theres still too big of a gap.")
+                elif count_item("plank")==4:
+                    if missingPlanks==1:
+                        missingPlanks-=1
+                        print("You nail in a plank and make the bridge is now complete.")
+                    elif missingPlanks==2:
+                        print("You nail in two planks")
+                        missingPlanks-=2
+                        print("The bridge is now complete.")    
+                    elif amountToFix==0:
+                        print("You nail in three planks.")
+                        missingPlanks-=3
+                        print("The bridge is now complete.")
+                    elif amountToFix==1:
+                        print("You nail in a plank")
+                        missingPlanks-=1
+                        print("The gap is now small enough that you can safely cross the bridge.")
+                    elif amountToFix==2:
+                        print("You nail in two planks")
+                        missingPlanks-=2
+                        print("The gap is now small enough that you can safely cross the bridge.")   
+                    elif amountToFix==3:
+                        print("You nail in three planks")
+                        missingPlanks-=3
+                        print("The gap is now small enough that you can safely cross the bridge.")  
+                    elif amountToFix>3:
+                        print("You nail in four planks")
+                        missingPlanks-=4
+                        print("But theres still too big of a gap.")
+                        print("The gap is now small enough that you can safely cross the bridge.")
+        
+    else:
+        print("Can't do that right now!")
                             
 def move_north():
     global visitCounter
@@ -910,6 +1012,8 @@ def move_west():
                         open_door2()
                     elif "W4" in res[0][1]:
                         window_enter(res,"W")
+                    elif "5" in res[0][1]:
+                        print("The bridge is missing too many planks, you need to add some planks to cross the bridge!")
                 else:
                     print("You can't go through a wall, dummy")
             else:
@@ -938,6 +1042,41 @@ def move_west():
         else:
             print("The ocean is that way,it would be suicide!")
             
+def count_item(name):
+    sql="select COUNT(*) FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='%s'"%name
+    cur.execute(sql)
+    res=cur.fetchall()
+    return res[0][0]
+def item_delete(name,amount=1):
+    print("your a cunt")
+    sql="SELECT item.id FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='branches'"
+    cur.execute(sql)
+    res=cur.fetchall()
+    print(res)
+    if amount==1 and len(res)>0:
+        sql=("Update item set item.player_id=NULL where item.id=%i"%res[0][0])
+        cur.execute(sql)
+        db.commit()
+        sql="SELECT item.id FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='branches'"
+        cur.execute(sql)
+        res=cur.fetchall()
+        print(res)
+    elif amount==2 and len(res)>1:
+        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i"%res[0][0],res[1][0])
+        cur.execute(sql)
+    elif amount==3 and len(res)>2:
+        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i and item.id=%i"%res[0][0],res[1][0],res[2][0])
+        cur.execute(sql)
+    elif amount==4 and len(res)>3:
+        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i and item.id=%i and item.id=%i"%res[0][0],res[1][0],res[2][0],res[3][0])
+        cur.execute(sql)
+    elif amount==5 and len(res)>4:
+        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i and item.id=%i and item.id=%i and item.id=%i"%res[0][0],res[1][0],res[2][0],res[3][0],res[4][0])
+        cur.execute(sql)
+    elif amount=="all" and len(res)>0:
+        sql="Update item set item.player_id=NULL where item.id in(select ID from (select item.id as ID from item,item_type where item.type_id=item_type.id and item_type.name='%s')as c)"%name
+    db.commit()
+        
 def specific_item_check(name):
     sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='%s'"%name
     cur.execute(sql)
@@ -1409,7 +1548,8 @@ def parse(playerInput):
     
     if len(playerText)<1:
         print("Are you an empty vessel?")
-        
+    elif playerText[0]== "K":
+        item_delete("branches")
     elif playerText[len(playerText)-2] != "FROM" and playerText[len(playerText)-2] != "IN" and playerText[len(playerText)-1] in objects:
         print("we found an object")
         mangleWithObjects(playerText[:(len(playerText)-1)],playerText[len(playerText)-1].lower())
@@ -1428,6 +1568,27 @@ def parse(playerInput):
                 extended_look(playerText[1])
         else:
             look()
+    elif playerText[0]=="USE":
+        if playerText[1]=="PLANK":
+            fixBridge(1)
+        elif playerText[1]=="PLANKS":
+            fixBridge()
+     #   elif playerText[1]=="":
+            
+        else:
+            print("Can't use that!")
+    elif playerText[0]=="ADD":
+        if playerText[1]=="PLANK":
+            fixBridge(1)
+        elif playerText[1]=="PLANKS":
+            fixBridge()
+        else:
+            print("Can't add that to anything right now!")
+    elif playerText[0]=="FIX":
+        if playerText[1]=="BRIDGE":
+            fixBridge()
+        else:
+            print("Can't fix that!")
     elif (playerText[0])=="I":
         inventory()
     elif (playerText[0])=="DROP":
@@ -1610,13 +1771,13 @@ def parse(playerInput):
             read(item)
             
     else:
-        print("Not understood")
-        
+        print("Not understood")      
 def main():
+    item_delete("branches",1)
     while True:
         #out_of_breath()
         #print(player_carry())
         playerInput = input()
         parse(playerInput)
-    
+   
 main()
