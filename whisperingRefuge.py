@@ -722,6 +722,46 @@ def open_door2():
         else:
             print("Input \"y\" or \"n\"!")
             
+def fix_bridge(amount=4):
+    global missingPlanks
+    amountToFix=missingPlanks-3
+    if amount>=count_item("plank"):
+        planks=count_item("plank") 
+    else: 
+        planks=amount
+    if player_position()[0][0]==-6 and player_position()[0][1]==7:
+        if missingPlanks==0:
+            print("The bridge is already intact.")
+        else:
+            if not specific_item_check("plank"):
+                print("You lack the materials!")
+            elif not specific_item_check("hammer"):
+                print("You need a hammer to make those planks stick")
+            elif not specific_item_check("box of nails"):
+                print("You need some nails to hammer the planks in")
+            else:
+                planksNailed=0
+                if amountToFix>0:
+                    if amountToFix-planks<0:
+                        planksNailed=amountToFix
+                    else:
+                        planksNailed=planks
+                else:
+                    if missingPlanks-planks<0:
+                        planksNailed=missingPlanks
+                    else:
+                        planksNailed=planks
+                missingPlanks-=planksNailed
+                amountToFix=missingPlanks-3
+                print("You nail in a plank") if planksNailed==1 else print("You nail in %i planks"%planksNailed)
+                if amountToFix==0:
+                    print("The gap is now small enough that you can safely cross the bridge.")   
+                elif amountToFix>0:
+                    print("But there's still too big of a gap.")
+                if missingPlanks==0:
+                    print("The bridge is now complete.")
+                    
+                    
 def fixBridge(amount=4):
     global missingPlanks
     amountToFix=missingPlanks-3
@@ -1776,7 +1816,7 @@ def parse(playerInput):
     else:
         print("Not understood")      
 def main():
-    item_delete("branches",1)
+    fix_bridge(1)
     while True:
         #out_of_breath()
         #print(player_carry())
