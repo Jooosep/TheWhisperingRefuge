@@ -66,27 +66,27 @@ player_position_x=None
 player_position_y=None
 def help():
     print('''    
-HELP                                                     -Displays all available commands
-N, NORTH                                               -Player moves north
-S, SOUTH                                                -Player moves south
-E, EAST                                                   -Player moves east
-W, WEST                                                   -player moves west
-LOOK, L, WATCH, SEE                              -Tells player's current location
-LOOK <compass point>                             -Tells player about the area of compass point 
-I, INVENTORY, BAG, ITEMS                       -Prints a list of items player is currently carrying
-DROP <ITEM>                                          -Drops the selected item
-COMBINE <ITEM> <ITEM>                             -Combines two items to create a new one
-TIME                                                      -Tells time to player
-EQUIP <ITEM>                                         -Player equips selected item for example equip shirt    
-UNEQUIP <ITEM>                                       -Player unequips selected item for example unequip shirt
-EXAMINE, INSPECT, STUDY, ANALYZE            -Tells player info about the enemies
-EXAMINE AREA                                         -Tells player about the current area they are in
-STATS, PLAYER, CHARACTER, CHAR               -Prints current stats of the player
-EAT <ITEM>                                              -Player eats selected item for example eat apple
-SLEEP <how long>                                   -Player sleeps for selected time
-TAKE, PICK, PICKUP, GRAB <ITEM>               -Player picks up the item and it is placed in inventory
-KILL, ATTACK, ENGAGE, FIGHT, BATTLE         -These commands are used in combat to fight enemies
-READ <ITEM>                                          -Prints the discription of the item    
+HELP                                    -Displays all available commands
+N, NORTH                                -Player moves north
+S, SOUTH                                -Player moves south
+E, EAST                                 -Player moves east
+W, WEST                                 -player moves west
+LOOK, L, WATCH, SEE                     -Tells player's current location
+LOOK <compass point>                    -Tells player about the area of compass point 
+I, INVENTORY, BAG, ITEMS                -Prints a list of items player is currently carrying
+DROP <ITEM>                             -Drops the selected item
+COMBINE <ITEM> <ITEM>                   -Combines two items to create a new one
+TIME                                    -Tells time to player
+EQUIP <ITEM>                            -Player equips selected item for example equip shirt    
+UNEQUIP <ITEM>                          -Player unequips selected item for example unequip shirt
+EXAMINE, INSPECT, STUDY, ANALYZE        -Tells player info about the enemies
+EXAMINE <AREA>/<ITEM>/<ENEMY>           -Tells player about the current area they are in
+STATS, PLAYER, CHARACTER, CHAR          -Prints current stats of the player
+EAT <ITEM>                              -Player eats selected item for example eat apple
+SLEEP <how long> default=6h             -Player sleeps for selected time
+TAKE, PICK, PICKUP, GRAB <ITEM>         -Player picks up the item and it is placed in inventory
+KILL, ATTACK, ENGAGE, FIGHT, BATTLE     -These commands are used in combat to fight enemies
+READ <ITEM>                             -Prints the discription of the item    
     ''')
 def infect():
     global infected
