@@ -1724,6 +1724,7 @@ def sleep(hours):
                         if infected:
                             update_infection()
                         print("You slept %ih and time is now %s" % (hours,dt))
+                        update_player_fatique(0)
                         break
                     else:
                         print("You can't sleep now there is still light")
