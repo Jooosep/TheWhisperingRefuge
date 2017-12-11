@@ -1915,8 +1915,8 @@ def combat(enemyName):
     sql=("SELECT item.type_id FROM item WHERE item.equipped>0")
     if len(enemyINFO)>0:
         print("Attack is starting...")
-        hpBuff=((random.randint(1,15))/100+1)
-        attBuff=((random.randint(1,20))/100+1)
+        hpBuff=((random.randint(1,50))/100+1)
+        attBuff=((random.randint(1,30))/100+1)
         speedBuff=((random.randint(1,20))/100+1)
         enemyTypeID=enemyINFO[0][1]
         enemyID=enemyINFO[0][0]
@@ -1953,9 +1953,7 @@ def combat(enemyName):
                     ammoName="noammo"
                     ammoAtt=0
         x="."
-        for i in range(1,4):
-            time.sleep(0.6)
-            print(x*i)
+        timedelay(3, 0.6)
         print("You are in combat with",enemyName)
         if playerSpeed>enemySpeed:
             print("and you were faster than opponent, you hit",enemyName)
@@ -2016,7 +2014,7 @@ def combat(enemyName):
                     print("You hit with your poor range weapon to "+enemyName+" and killed it")
             else:
                 print("You killed "+enemyName+" with single blow")
-            
+            enemyDrops(enemyTypeID)
             removeEnemy(enemyID)
             update_player_healt(playerHP)
             
@@ -2072,9 +2070,7 @@ def combat(enemyName):
                     xx=1
                 else:
                     x="."
-                    for i in range(1,4):
-                        time.sleep(0.5)
-                        print(x*i)
+                    timedelay(3, 0.5)
                     print("\n"*100)
                 print("You are in combat with the",enemyName)
                 print()
@@ -2084,12 +2080,14 @@ def combat(enemyName):
                 pbodyHit=95*playerHitchangeTarget
                 plegsHit=70*playerHitchangeTarget
                 pfeetHit=20*playerHitchangeTarget
-                if enemyTypeID in [1,2]:
+                if enemyTypeID in [1,2,11]:
                     print(human)
                     hitlist=["head","hand","body","legs","feet","hands","leg"]
                     damageMultiplier=1
                     if enemySpeed<3:
                         damageMultiplier=1.9
+                    elif enemySpeed>15:
+                        damageMultiplier=1.5
                     headHit=80*playerHitchangeTarget
                     handHit=70*playerHitchangeTarget
                     bodyHit=95*playerHitchangeTarget
@@ -2163,7 +2161,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=headHit:
                             enemyHP-=damage
-                            if ammoName!="You have no ammo.":
+                            if ammoName!="noammo":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -2174,7 +2172,7 @@ def combat(enemyName):
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
                                 
-                            print("you hit the enemies head for %i damage",(int(damage)))
+                            print("you hit the enemies head for %i damage" % (int(damage)))
                         else:
                             print("You missed")
                     elif playerINPUT=="feet" and playerINPUT in hitlist:
@@ -2185,7 +2183,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=feetHit:
                             enemyHP-=damage
-                            if ammoName!="You have no ammo.":
+                            if ammoName!="noammo":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -2195,7 +2193,7 @@ def combat(enemyName):
                                 else:
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
-                            print("you hit the enemies feet for %i",(int(damage)))
+                            print("you hit the enemies feet for %i" % (int(damage)))
                         else:
                             print("You missed")
                         
@@ -2207,7 +2205,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=legsHit:
                             enemyHP-=damage
-                            if ammoName!="You have no ammo.":
+                            if ammoName!="noammo":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -2229,7 +2227,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=bodyHit:
                             enemyHP-=damage
-                            if ammoName!="You have no ammo.":
+                            if ammoName!="noammo":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -2239,32 +2237,32 @@ def combat(enemyName):
                                 else:
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
-                            print("you hit the enemies body for %i damage",(int(damage)))
+                            print("you hit the enemies body for %i damage" % (int(damage)))
                         else:
                             print("You missed")
                     elif playerINPUT=="run":
                         if enemyHitchange>=30:
                             playerHP-=(playerHP*0.1+enemyAtt)
-                            for i in range(1,4):
-                                time.sleep(0.5)
-                                print(x*i)
+                            timedelay(3, 0.5)
                             print("You escaped from %s but you got hit by %i" % (enemyName,(playerHP*0.1+enemyAtt)))
                         else:
-                            for i in range(1,4):
-                                time.sleep(0.5)
-                                print(x*i)
+                            timedelay(3, 0.5)
                             print("You escaped from the ",enemyName)
-                        removeEnemy(enemyID)
+                        if enemyID==11:
+                            sql=(("UPDATE player SET player.x=4, player.y=7 WHERE player.ID=1"))
+                            cur.execute(sql)
+                            print('''But..
+You wake up on the beach, hear the Ocean waves crashing in the shore.
+                            
+                            ''')
+                        else:
+                            removeEnemy(enemyID)
                         update_player_healt(playerHP)
                         break
-                    for i in range(1,4):
-                        time.sleep(0.5)
-                        print(x*i)
+                    timedelay(3, 0.5)
                     if enemyHP>0:
                         print("Opponent's turn")
-                        for i in range(1,4):
-                            time.sleep(0.5)
-                            print(x*i)
+                        timedelay(3, 0.5)
                         
                         enemyHit=random.choice(["head","hands","hands","body","body","body","legs","legs","feet","miss"])
                         if enemyHit=="head":
@@ -2326,14 +2324,13 @@ def combat(enemyName):
                         elif enemyHit=="miss":
                             print("You managed to dodge the opponents attack")
                         
-                        for i in range(1,4):
-                            time.sleep(0.5)
-                            print(x*i)
+                        timedelay(3, 0.5)
                         print("Your turn is coming...")
                     
-                    if playerHP<0 or enemyHP<0:
+                    if playerHP<=0 or enemyHP<=0:
                         if playerHP>0:
                             print("You killed the ",enemyName)
+                            enemyDrops(enemyTypeID)
                         else:
                             print("You died")
                             game_over()
@@ -2345,8 +2342,155 @@ def combat(enemyName):
             
         
     else:   
-        print("There isn't that kind of character in area") 
+        print("There isn't that kind of character in area")
         
+def itemDrop(type_id,x,y):
+    
+    xx=random.randint(1000,9999)
+    sql=("SELECT MAX(item.id) FROM item")
+    cur.execute(sql)
+    maxId=cur.fetchall()
+    if len(maxId)>0:
+        newId=(int((maxId[0][0]))+xx)
+    else:
+        newId=100
+    
+    sql=("INSERT INTO item VALUES (%i,%i,%i,%i,NULL,NULL,NULL)" % (newId,type_id,x,y))
+    cur.execute(sql)
+def itemName(type_id):
+    sql=("SELECT item_type.name FROM item_type WHERE item_type.id=%i" % type_id)
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result[0][0]
+def enemyDrops(enemy_type_id):
+    x=player_position()[0][0]
+    y=player_position()[0][1]
+    rand=random.choice([1,2,3,4,5,6,7,8,9,10])
+    itemDropList=[]
+    if enemy_type_id==1: #cannibal
+        itemDrop(5,x,y)
+        itemDropList.append(itemName(5))
+        if rand==1:
+            itemDrop(9,x,y)
+            itemDropList.append(itemName(9))
+        elif rand==2:
+            itemDrop(106,x,y)
+            itemDropList.append(itemName(106))
+        elif rand==3:
+            itemDrop(114,x,y)
+            itemDropList.append(itemName(114))
+        elif rand==4:
+            itemDrop(115,x,y)
+            itemDropList.append(itemName(115))
+        elif rand==5:
+            itemDrop(113,x,y)
+            itemDropList.append(itemName(113))
+    elif enemy_type_id==2: #bulky cannibal
+        itemDrop(5,x,y)
+        itemDropList.append(itemName(5))
+        if rand==1:
+            itemDrop(34,x,y)
+            itemDropList.append(itemName(34))
+        elif rand==2:
+            itemDrop(103,x,y)
+            itemDropList.append(itemName(103))
+        elif rand==3:
+            itemDrop(115,x,y)
+            itemDropList.append(itemName(115))
+        elif rand==4:
+            itemDrop(106,x,y)
+            itemDropList.append(itemName(106))
+        elif rand==5:
+            itemDrop(44,x,y)
+            itemDropList.append(itemName(44))
+        elif rand==6:
+            itemDrop(89,x,y)
+            itemDropList.append(itemName(89))
+    elif enemy_type_id==3: #leggless cannibal
+        itemDrop(5,x,y)
+        itemDropList.append(itemName(5))
+        if rand==1:
+            itemDrop(9,x,y)
+            itemDropList.append(itemName(9))
+        elif rand==2:
+            itemDrop(88,x,y)
+            itemDropList.append(itemName(88))
+        elif rand==3:
+            itemDrop(114,x,y)
+            itemDropList.append(itemName(114))
+        elif rand==4:
+            itemDrop(13,x,y)
+            itemDropList.append(itemName(13))
+        elif rand==5:
+            itemDrop(113,x,y)
+            itemDropList.append(itemName(113))
+    elif enemy_type_id==4: #handdles cannibal
+        itemDrop(5,x,y)
+        itemDropList.append(itemName(5))
+        if rand==1:
+            itemDrop(9,x,y)
+            itemDropList.append(itemName(9))
+        elif rand==2:
+            itemDrop(106,x,y)
+            itemDropList.append(itemName(106))
+        elif rand==3:
+            itemDrop(107,x,y)
+            itemDropList.append(itemName(107))
+        elif rand==4:
+            itemDrop(109,x,y)
+            itemDropList.append(itemName(109))
+        elif rand==5:
+            itemDrop(112,x,y)
+            itemDropList.append(itemName(112))
+    elif enemy_type_id==5: #wild hog meat
+        itemDrop(113,x,y)
+        itemDropList.append(itemName(113))
+        itemDrop(2,x,y)
+        itemDropList.append(itemName(2))
+    elif enemy_type_id==6: #dog
+        itemDrop(125,x,y)
+        itemDropList.append(itemName(125))
+        if rand==1 or rand==2 or rand==3:
+            itemDrop(113,x,y)
+            itemDropList.append(itemName(113))
+    elif enemy_type_id==7: #cannibal dog
+        itemDrop(125,x,y)
+        itemDropList.append(itemName(125))
+        if rand==1 or rand==2 or rand==3:
+                itemDrop(113,x,y)
+                itemDropList.append(itemName(113))
+    elif enemy_type_id==8: #squirrel
+        itemDrop(3,x,y)
+        itemDropList.append(itemName(3))
+        if rand==1 or rand==2 or rand==3:
+            itemDrop(113,x,y)
+            itemDropList.append(itemName(113))
+    elif enemy_type_id==9: #rat
+        itemDrop(4,x,y)
+        itemDropList.append(itemName(4))
+    elif enemy_type_id==10: #owl
+        itemDrop(112,x,y)
+        itemDropList.append(itemName(112))
+        if rand==1 or rand==3:
+            itemDrop(57,x,y)
+            itemDropList.append(itemName(57))
+        elif rand==2:
+            itemDrop(7,x,y)
+            itemDropList.append(itemName(7))
+    elif enemy_type_id==11:
+        itemDrop(60,x,y)
+        itemDropList.append(itemName(60))
+        itemDrop(103,x,y)
+        itemDropList.append(itemName(103))
+        itemDrop(5,x,y)
+        itemDropList.append(itemName(5))
+        itemDrop(52,x,y)
+        itemDropList.append(itemName(52))
+    if len(itemDropList)>0:
+        print("It dropped the following items: ")
+        for i in range(len(itemDropList)):
+            print(itemDropList[i])
+                        
 def enemySpawn():
     global despawnCountX
     
@@ -2354,11 +2498,40 @@ def enemySpawn():
         sql="DELETE FROM enemy WHERE enemy.spawned>0"
         cur.execute(sql)
     
-    neutralEnemiesIds=[5,8,10,9]
+    neutralEnemiesIds=[5,8,10]
     sql=(("SELECT enemy.id,enemy_type.id, enemy_type.name,enemy_type.hp,enemy_type.att,enemy_type.speed, terrain_square.type_id, enemy_type.description, enemy_type.description2,enemy_type.seen FROM enemy,enemy_type,player,terrain_square WHERE enemy.type_id=enemy_type.id and player.x=terrain_square.x and player.y=terrain_square.y and enemy.x=terrain_square.x and enemy.y=terrain_square.y"))    
     cur.execute(sql)
     enemies=cur.fetchall()
-    
+    if len(enemies)>0:
+        if enemies[0][1]==11:
+            sql=("SELECT MAX(item_type.att) FROM item_type")
+            cur.execute(sql)
+            maxDamage=cur.fetchall()
+            if len(maxDamage)>0:
+                maxDamage=(maxDamage[0][0]-10)
+            else:
+                maxDamage=50
+                
+            if player_carry_att_speed_hp_fatique()[0][1]>=maxDamage:
+                print(maxDamage)
+                print('''
+You face the cannibal king, good Luck!                
+                ''')
+                attack()
+            else:
+                print(maxDamage)
+                sql=(("UPDATE player SET player.x=-1, player.y=-2 WHERE player.ID=1"))
+                cur.execute(sql)
+                print('''
+Cannibal King: \"You no worthy challenger!\"
+The Cannibal King strikes you down before you have time to blink.
+                ''')
+                time.sleep(2)
+                timedelay(3, 1)
+                print(''' 
+You wake up in the church with a headache, turns out the Cannibal King is a good christian not a murderous beast.                
+                ''')
+                return
     sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x")
     cur.execute(sql)
     result=cur.fetchall()
@@ -2374,7 +2547,7 @@ def enemySpawn():
         cur.execute(sql)
         res=cur.fetchall()
         if len(res)>0:
-            print(res)
+            #print(res)
             try:
                 newId=((res[0][0])+(random.randint(100,9999)))
             except:
@@ -2404,16 +2577,34 @@ def enemySpawn():
         timeToReachPlayer=distanceBetweenYou/(enemies[0][5]) #seconds
         
         if (enemies[0][1]) in neutralEnemiesIds:
-            action=random.randint(1,3)
+            action=random.randint(1,10)
+            rand=random.choice([1,2,3,4])
             if action==1:
                 print("There is a"+enemies[0][2]+" passing you")
             elif action==2:
                 if (enemies[0][1])!=10:
-                    print("a"+enemies[0][2]+" is running away from you")
+                    print("a "+enemies[0][2]+" is running away from you")
                 else:
-                    print("a"+enemies[0][2]+" is flying past you")
+                    print("a "+enemies[0][2]+" is flying past you")
+            elif action!=1 or action!=2 or action!=3 or action!=4:
+                if enemyTypeId==8: # squirrle
+                    if rand==1:
+                        print("a "+enemies[0][2]+" walk past you")
+                    elif rand==2:
+                        print("a "+enemies[0][2]+" is looking at you")
+                    else:
+                        print("a "+enemies[0][2]+" is climbing on a tree")
+                
+                elif enemyTypeId==10: #owl
+                    if rand==1:
+                        print("a "+enemies[0][2]+" flew fast passed you")
+                    elif rand==2:
+                        print("a "+enemies[0][2]+" is looking at you weird sitting on the branch ")
+                    else:
+                        print("a "+enemies[0][2]+" is looking at you like it would like to eat you")
+                  
             else:
-                print("a"+enemies[0][2]+" is standing still and looking at you")
+                print("a "+enemies[0][2]+" is standing still and looking at you")
             
         else:
             #print(str(timeToReachPlayer)+"s")
@@ -2421,9 +2612,9 @@ def enemySpawn():
             
             if distanceBetweenYou<=15:
                 if seen>0:
-                    print("the"+enemies[0][2]+" sees you")
+                    print("the "+enemies[0][2]+" sees you")
                 else:
-                    print("the"+str(enemies[0][7])+" sees you")
+                    print(str(enemies[0][7])+" sees you")
                 if timeToReachPlayer<=10:
                     if (enemies[0][1])!=3:
                         xxx=1
@@ -2432,10 +2623,8 @@ def enemySpawn():
                         xxx=random.randint(1,2)
                         print("it is crawling towards you aggressively, you don't have time to react")
                     if enemies[0][1]==3 and xxx==2:
-                        x="."
-                        for i in range(1,4):
-                            time.sleep(1)
-                            print(x*i)
+                        
+                        timedelay(3, 0.5)
                         print("but thank god this creature fell in to a hole next to it")
                     else:   
                         combat(enemies[0][2])
@@ -2445,11 +2634,71 @@ def enemySpawn():
                           
             else:
                 if seen>0:
-                    print(enemies[0][2]+" is too far away from you to see")
+                    rand=random.choice([1,2,3,4])
+                    if enemies[0][1]==1: #cannibal
+                        if rand==1:  
+                            print("a "+enemies[0][2]+" is hitting themeself")
+                        else:
+                            print("a "+enemies[0][2]+" is eating meat")
+                    elif enemies[0][1]==2: #bulky cannibal
+                        if rand==1:
+                            print("a "+enemies[0][2]+" is flexing")
+                        elif rand==2:
+                            print("a "+enemies[0][2]+" is doing pushups nearby")
+                        elif rand==3:
+                            print("a "+enemies[0][2]+" rolled away from you")
+                        else:
+                            print("a "+enemies[0][2]+" eating meat")
+                    elif enemies[0][1]==3: #legless cannibal
+                        if rand==1:
+                            print("a "+enemies[0][2]+" is hitting themself")
+                        elif rand==2:
+                            print("a "+enemies[0][2]+" is hitting their head")
+                        elif rand==3:
+                            print("a "+enemies[0][2]+" is stuck in a pit")
+                        else:
+                            print("a "+enemies[0][2]+" is eating meat")
+                    elif enemies[0][1]==4: #handdles cannibal
+                        if rand==1:
+                            print("a "+enemies[0][2]+" fell over")
+                        elif rand==2:
+                            print("a "+enemies[0][2]+" is jumping in circles")
+                        elif rand==3 and result[0][0]==2:
+                            print("a "+enemies[0][2]+" hitting their head on a tree")
+                        else:
+                            print("a "+enemies[0][2]+" is eating meat")
+                    elif enemies[0][1]==5: # wild hog
+                        if rand==1:
+                            print("a "+enemies[0][2]+" made sound \"oink oink\" nearby")
+                        elif rand==2:
+                            print("a "+enemies[0][2]+" squaled nearby")
+                        else:
+                            print("a "+enemies[0][2]+" noticed you and ran away")
+                    elif enemies[0][1]==6 or enemies[0][1]==7: # dog            
+                        if rand==1:
+                            print("there is a "+enemies[0][2]+" looking at you nearby")
+                        elif rand==2:
+                            print("you can hear a "+enemies[0][2]+" panting")
+                        elif rand==3:
+                            print("you hear a woof nearby!")
+                        elif rand==4:
+                            print("you hear \"Hau hau!\"")
+                        else:
+                            print("a "+enemies[0][2]+" is eating meat")
+                    elif enemies[0][1]==9:
+                        if rand==1:
+                            print("a "+enemies[0][2]+" eating a squirrel nearby")
+                        elif rand==2:
+                            print("a "+enemies[0][2]+" is jumping on its hindlegs nearby")   
+                        else:
+                            print("a "+enemies[0][2]+" walked past you")
+                    else:
+                        print(enemies[0][2]+" is too far away from you to see")
+                        
                 else:
                     print(str(enemies[0][7])+" is too far away from you to see")
-    else:
-        print("No enemy")
+    #else:
+        #print("No enemy")
 def itemString(playerText):
     item=""
     for i in range(len(playerText)):
@@ -2465,9 +2714,36 @@ def examine_item(item):
     cur.execute(sql)
     result=cur.fetchall()
     if len(result)>0:
+        
         print(result[0][0])
     else:
-        print("You don't have that kind of item in your inventory")        
+        print("You don't have that kind of item in your inventory")
+def examine_enemy(enemy_type):
+    sql=(("SELECT enemy_type.description FROM enemy_type WHERE enemy_type.name LIKE '"+enemy_type+"%'"))
+    print(sql)
+    cur.execute(sql)
+    result=cur.fetchall()
+    
+    if len(result)>0:
+        print(result[0][0])
+    else:
+        print("There isn't that kind of enemy around.")
+def check_enemy_type(enemy_type):
+    enemy_type=enemy_type.upper()
+    sql = ("SELECT enemy_type.name FROM enemy_type WHERE enemy_type.name LIKE '"+enemy_type+"%'")
+    cur.execute(sql)
+    result = cur.fetchall()
+    for i in range(len(result)):
+        if result[i][0].upper() == enemy_type:
+            return True
+    
+    return False
+def randomItemDrops():
+    x=player_position()
+    trashItemIds=[58,86,38,17,13,11,10,4,3,2,1,89]
+    commonItemIds=[8,67,12,57,48,35,31,88,91,72,69,34,98,99,106,107,109,110,111]
+    rareItemIds=[6,9,71,47,44,37,76,22,20,50,5,92,93,95,103,105,108]
+    legendaryItemIds=[25,19,9,90,49,42,97,100,101,102,104]     
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
@@ -2608,11 +2884,12 @@ def parse(playerInput):
                 item=itemString(playerText)
                 if check_item_type(item)==True:
                     examine_item(item)
+                elif check_enemy_type(item)==True:
+                    examine_enemy(item)
                 else:
-                    print("You meant examine <area>/<item>")
+                    print("You meant examine <area>/<item>/<enemy>")
         else:
-            print("You meant examine <area>/<item>")
-               
+            print("You meant examine <area>/<item>/<enemy>")
     elif (playerText[0])=="STATS":
         player_stats()
     elif (playerText[0])=="HELP":
