@@ -1653,7 +1653,7 @@ def eat(foodName):
     cur.execute(sql)
     result=cur.fetchall()
     if len(result)>0:
-        random=random.randrange(0,100)
+        rand=random.randint(1,100)
         if result[0][2]!=0:
             itemID=result[0][1]
             
@@ -1669,19 +1669,19 @@ def eat(foodName):
             cur.execute(sql)
             
             if result[0][5]==2:
-                if random<25:
+                if rand<25:
                     if infected:
                         update_infection()
                     else:
                         infect()
             elif result[0][5]==1:
-                if random<20:
+                if rand<20:
                     if infected:
                         update_infection()
                     else:
                         infect()
             elif result[0][5]==3:
-                if random<50:
+                if rand<50:
                     if infected:
                         update_infection(3)
                     else:
