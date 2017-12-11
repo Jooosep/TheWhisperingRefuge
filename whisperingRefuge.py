@@ -133,7 +133,11 @@ def game_over():
     gameOver=1
     time.sleep(2)
     
-    
+def timedelay(howMany,delay):
+    x="."
+    for i in range(1,howMany+1):
+        time.sleep(delay)
+        print(x*i)    
 def update_infection(*x):
     global infection_message
     global infection_time
