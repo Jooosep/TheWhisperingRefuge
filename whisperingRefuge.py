@@ -301,7 +301,24 @@ def refresh_spawnrate(reduce=0):
         return
     if spawnReduction==0:
         enemySpawnRate=10
-                
+timeNOWhour=0
+
+def change_spawnrate():
+    global enemySpawnRate
+    if dt.hour>=22 and dt.hour<23 or dt.hour>=0 and dt.hour<=7:
+        enemySpawnRate=45
+    else:
+        enemySpawnRate=enemySpawnRate
+        
+def change_fatigue():
+    global timeNOWhour
+    
+    if timeNOWhour!=dt.hour:
+        totalspeed=(float(player_carry_att_speed_hp_fatique()[0][2])*(0.98**player_carry_att_speed_hp_fatique()[0][4]))
+        update_player_speed(totalspeed)
+        totalfatigue=player_carry_att_speed_hp_fatique()[0][4]+1
+        update_player_fatique(totalfatigue)
+    timeNOWhour=dt.hour                               
 def add_time(distance,terrain_type_id):
     sql=("SELECT terrain_type.movement_difficulty FROM terrain_type WHERE terrain_type.id=%i" % terrain_type_id)
     cur.execute(sql)
@@ -340,7 +357,10 @@ def update_player_healt(totalHealt):
         cur.execute(sql)
 def update_player_fatique(totalFatique):
     if totalFatique<=player_max_fatique:
-        sql=(("UPDATE player SET player.fatique=%d WHERE player.ID=1") % totalFatique)   
+        sql=(("UPDATE player SET player.fatigue=%d WHERE player.ID=1") % totalFatique)   
+        cur.execute(sql)
+    if totalFatique>=10:
+        sql=(("UPDATE player SET player.fatigue=10 WHERE player.ID=1") )   
         cur.execute(sql)
 def update_player_speed(totalSpeed):
     if totalSpeed<=player_max_speed:
@@ -2714,6 +2734,8 @@ def main():
             #print(player_carry())
             playerInput = input()
             parse(playerInput)
+            change_spawnrate()
+            change_fatigue()
         else:
             return  
 main()
