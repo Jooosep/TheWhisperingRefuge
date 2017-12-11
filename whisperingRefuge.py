@@ -1,8 +1,14 @@
 import mysql.connector
-from mysql.connector.errors import IntegrityError
 import datetime
 import random
-from Tekstipeli.Main import specific_item_check
+from random import randrange
+import time
+import sys
+import msvcrt
+import os
+
+msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
+
 db = mysql.connector.connect(host="localhost",
                              user="dbuser",
                              passwd="dbpass",
@@ -22,6 +28,7 @@ cur=db.cursor()
 #esto 3 on avainlukitus2
 #esto 4 on ikkuna
 #esto 5 on rikkinainen riippusilta
+#esto 6 on tiirikoitava ovi
 
 NewAreaDescription = [0,"You have arrived at some sort of village, there are multiple small buildings, but no-ones around", "area description","area description","You see a small church building nearby, it is in very poor condition."]
 KnownAreaDescription = [0,"You arrive at some kind of small village, you have been here before ","area description", "area description", "You have returned to a familiar area, there is a small church building nearby"]
@@ -35,6 +42,7 @@ infection_time = dt
 infected = True
 infection_message=0
 missingPlanks=7
+gameOver=0
 
 objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
@@ -77,6 +85,38 @@ def infect():
     cur.execute(sql)
     infection_time = dt
     infected=True
+
+def game_over():
+    global gameOver
+    print("G",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("a",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("m",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("e",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print(" ",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("O",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("v",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("e",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("r",end = "")
+    sys.stdout.flush()
+    gameOver=1
+    time.sleep(2)
+    
     
 def update_infection(*x):
     global infection_message
@@ -335,8 +375,6 @@ def split_line(text):
     return words
 
 def look():
-    global x,y
-    print("x: %d, y= %d",x,y)
     sql = "Select terrain_type.description FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
     res = cur.fetchall()
@@ -423,7 +461,44 @@ def store(useable,item):
                 print(("you stored the %s")%(result[i][0]))
                 break
         print("You don't even have that")
-        
+def npc_check():
+    sql="select npc.id from npc, player where npc.x=player.x and npc.y=player.y" 
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        return res[0][0]   
+    else:
+        return 0   
+def talk(ID):
+    print("What will you ask?")
+    if ID==1:
+        while True:
+            print("\t1) Who are you?")
+            print("\t2) What are you working on here?")
+            print("\t3) What the hell are you doing here?")
+            print("\t4) Can I help you?")
+            print()
+            ans=input()
+            if ans=="1":
+                print("\"Who am I!? I am Robert Zuul, one of the greatest scientists of our time. I work here in secrecy, but the whole world might one day face my creation, MUHAHAHAHAAAAHAHA!\"")
+                print()
+                return
+            elif ans=="2":
+                print("\"I am working on some microparasites here my friend, in fact some might be in you right now if you haven't been careful with what you've been eating here, MUHAHAHHAHAHAHAHAA!\"")
+                print()
+                return
+            elif ans=="3":
+                print("\"You intrude in my laboratory and disrespect me!? I will murder you!\"")
+                print()
+                print("Oh oh, the mad scientist is charging at you with some acid!")
+                return
+            elif ans=="4":
+                print("\"Yes, BY GETTING THE HELL OUT OF MY LABORATORY!\"")
+                print()
+                return
+            else:
+                print("You must choose one of the options.")
+                
 def object_is_open(useable):
     sql=(("select object.open from object where object.name='%s'")%(useable.lower()))
     cur.execute(sql)
@@ -632,6 +707,71 @@ def window_enter(res,compasspoint):
     else:
         print("Input \"y\" or \"n\"!")
         
+def open_lockpickable(res,compasspoint):
+    print("The door is locked")
+    while True:
+        answer1=input("Will you attempt to open it?(y/n)")
+        if answer1 == "y":
+            while True:
+                answer2=input("what do you want to try?")
+                if quickParse(answer2)[0]=="USE":
+                    if quickParse(answer2)[1]=="LOCKPICK":
+                        if specific_item_check("lockpick"):
+                            rand=randrange(0,10)
+                            if rand>2:
+                                print("It took you a while but you picked the lock, the door is now open!")
+                                if compasspoint=="N":
+                                    filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
+                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x and terrain_square.y=player.y+1"%filtered
+                                    cur.execute(sql)
+                                    
+                                elif compasspoint=="S":
+                                    filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
+                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x and terrain_square.y=player.y-1"%filtered
+                                    cur.execute(sql)
+                                    
+                                elif compasspoint=="W":  
+                                    filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
+                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x-1 and terrain_square.y=player.y"%filtered
+                                    cur.execute(sql)
+                                
+                                elif compasspoint=="E":  
+                                    filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
+                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x+1 and terrain_square.y=player.y"%filtered
+                                    cur.execute(sql)
+                                return
+                            else:
+                                print("Oh shoot, you broke the lockpick!")
+                                item_delete("lockpick")
+                        else:
+                            print("You don't have any lockpicks!")                                        
+                    elif quickParse(answer2)[1]=="OLD" and quickParse(answer2)[2]=="KEY":
+                        if specific_item_check("old key"):
+                            print("That's not the right key!")
+                        else:
+                            print("you don't have such a key!")
+                    elif quickParse(answer2)[1]=="TITANIUM" and quickParse(answer2)[2]=="KEY":
+                        if specific_item_check("titanium key"):
+                            print("That key didn't fit in the keyhole!")
+                        else:
+                            print("you don't have such a key!")
+                    elif quickParse(answer2)[1]=="KEY":
+                        print("You have to be more specific.")
+                    else:
+                        print("That didn't work")
+                    while True:
+                        answer3 = input("The door remains closed, want to try something else?(y/n)")
+                        if answer3=="n":
+                            return
+                        elif answer3!="y":
+                            print("Input \"y\" or \"n\"!")
+                        else:
+                            break
+        elif answer1=="n":
+            return
+        else:
+            print("Input \"y\" or \"n\"!")
+        
 def open_door1():
     print("The door is locked")
     while True:
@@ -654,8 +794,6 @@ def open_door1():
                         if specific_item_check("titanium key"):
                             print("That was the right key, you proceed to open the door!")
                             sql="Update terrain_square set restriction='WES' where terrain_square.x=-12 and terrain_square.y=8"
-                            cur.execute(sql)
-                            sql="Update terrain_square set restriction='NE' where terrain_square.x=-12 and terrain_square.y=7"
                             cur.execute(sql)
                             return
                         else:
@@ -694,8 +832,6 @@ def open_door2():
                         if specific_item_check("old key"):
                             print("That was the right key, you proceed to open the door!")
                             sql="Update terrain_square set restriction='NES' where terrain_square.x=-9 and terrain_square.y=4"
-                            cur.execute(sql)
-                            sql="Update terrain_square set restriction='SW' where terrain_square.x=-10 and terrain_square.y=4"
                             cur.execute(sql)
                             return
                         else:
@@ -752,117 +888,24 @@ def fix_bridge(amount=4):
                     else:
                         planksNailed=planks
                 missingPlanks-=planksNailed
+                item_delete("plank",planksNailed)
                 amountToFix=missingPlanks-3
-                print("You nail in a plank") if planksNailed==1 else print("You nail in %i planks"%planksNailed)
+                print("You nail in a plank.") if planksNailed==1 else print("You nail in %i planks"%planksNailed)
                 if amountToFix==0:
+                    sql="Update terrain_square set restriction='U' where x=-7 and y=7"
+                    cur.execute(sql)
                     print("The gap is now small enough that you can safely cross the bridge.")   
                 elif amountToFix>0:
                     print("But there's still too big of a gap.")
                 if missingPlanks==0:
                     print("The bridge is now complete.")
-                    
-                    
-def fixBridge(amount=4):
-    global missingPlanks
-    amountToFix=missingPlanks-3
-    if player_position()[0][0]==-6 and player_position()[0][1]==7:
-        if missingPlanks==0:
-            print("The bridge is already intact.")
-        else:
-            if not specific_item_check("plank"):
-                print("You lack the materials!")
-            elif not specific_item_check("hammer"):
-                print("You need a hammer to make those planks stick")
-            elif not specific_item_check("box of nails"):
-                print("You need some nails to hammer the planks in")
-            else:
-                if count_item("plank")==1 or (count_item("plank")>0 and amount==1):
-                    print("You nail in a plank")
-                    missingPlanks-=1
-                    if missingPlanks>3:
-                        print("But theres still too big of a gap.")
-                    elif missingPlanks==3:
-                        print("The gap is now small enough that you can safely cross the bridge.")
-                elif count_item("plank")==2:
-                    if missingPlanks==1:
-                        missingPlanks-=1
-                        print("You nail in a plank and make the bridge is now complete.")
-                    elif amountToFix==0:
-                        print("You nail in two planks.")
-                        missingPlanks-=2
-                    elif amountToFix==1:
-                        print("You nail in a plank")
-                        missingPlanks-=1
-                        print("The gap is now small enough that you can safely cross the bridge.")
-                    elif amountToFix==2:
-                        print("You nail in two planks")
-                        missingPlanks-=2
-                        print("The gap is now small enough that you can safely cross the bridge.")    
-                    elif amountToFix>2:
-                        print("You nail in two planks")
-                        missingPlanks-=2
-                        print("But theres still too big of a gap.")
-                elif count_item("plank")==3:
-                    if missingPlanks==1:
-                        missingPlanks-=1
-                        print("You nail in a plank and make the bridge is now complete.")
-                    elif missingPlanks==2:
-                        print("You nail in two planks")
-                        missingPlanks-=2
-                        print("The bridge is now complete.")    
-                    elif amountToFix==0:
-                        print("You nail in three planks.")
-                        missingPlanks-=3
-                        print("The bridge is now complete.")
-                    elif amountToFix==1:
-                        print("You nail in a plank")
-                        missingPlanks-=1
-                        print("The gap is now small enough that you can safely cross the bridge.")
-                    elif amountToFix==2:
-                        print("You nail in two planks")
-                        missingPlanks-=2
-                        print("The gap is now small enough that you can safely cross the bridge.")   
-                    elif amountToFix==3:
-                        print("You nail in three planks")
-                        missingPlanks-=3
-                        print("The gap is now small enough that you can safely cross the bridge.")  
-                    elif amountToFix>3:
-                        print("You nail in three planks")
-                        missingPlanks-=3
-                        print("But theres still too big of a gap.")
-                elif count_item("plank")==4:
-                    if missingPlanks==1:
-                        missingPlanks-=1
-                        print("You nail in a plank and make the bridge is now complete.")
-                    elif missingPlanks==2:
-                        print("You nail in two planks")
-                        missingPlanks-=2
-                        print("The bridge is now complete.")    
-                    elif amountToFix==0:
-                        print("You nail in three planks.")
-                        missingPlanks-=3
-                        print("The bridge is now complete.")
-                    elif amountToFix==1:
-                        print("You nail in a plank")
-                        missingPlanks-=1
-                        print("The gap is now small enough that you can safely cross the bridge.")
-                    elif amountToFix==2:
-                        print("You nail in two planks")
-                        missingPlanks-=2
-                        print("The gap is now small enough that you can safely cross the bridge.")   
-                    elif amountToFix==3:
-                        print("You nail in three planks")
-                        missingPlanks-=3
-                        print("The gap is now small enough that you can safely cross the bridge.")  
-                    elif amountToFix>3:
-                        print("You nail in four planks")
-                        missingPlanks-=4
-                        print("But theres still too big of a gap.")
-                        print("The gap is now small enough that you can safely cross the bridge.")
-        
     else:
-        print("Can't do that right now!")
-                            
+        print("You can't do that here")
+    
+def group_of_cannibals():
+    print("You approach the group of wild men feasting on the cow, but they take notice of you and attack you, you struggle but they are too many, you're dead!")
+    game_over()
+                                                
 def move_north():
     global visitCounter
     sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -890,6 +933,8 @@ def move_north():
                         open_door2()
                     elif "N4" in res[0][1]:
                         window_enter(res,"N")
+                    elif "N6" in res[0][1]:
+                        open_lockpickable(res,"N")
                 else:
                     print("You can't go through a wall, dummy")
             else:
@@ -945,6 +990,8 @@ def move_south():
                         open_door2()
                     elif "S4" in res[0][1]:
                         window_enter(res,"S")
+                    elif "S6" in res[0][1]:
+                        open_lockpickable(res,"S")
                 else:
                     print("You can't go through a wall, dummy")
             else:
@@ -1000,6 +1047,8 @@ def move_east():
                         open_door2()
                     elif "E4" in res[0][1]:
                         window_enter(res,"E")
+                    elif "E6" in res[0][1]:
+                        open_lockpickable(res,"E")
                 else:
                     print("You can't go through a wall, dummy")
             else:
@@ -1055,6 +1104,8 @@ def move_west():
                         open_door2()
                     elif "W4" in res[0][1]:
                         window_enter(res,"W")
+                    elif "W6" in res[0][1]:
+                        open_lockpickable(res,"W")
                     elif "5" in res[0][1]:
                         print("The bridge is missing too many planks, you need to add some planks to cross the bridge!")
                 else:
@@ -1091,7 +1142,6 @@ def count_item(name):
     res=cur.fetchall()
     return res[0][0]
 def item_delete(name,amount=1):
-    print("your a cunt")
     sql="SELECT item.id FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='branches'"
     cur.execute(sql)
     res=cur.fetchall()
@@ -1099,26 +1149,25 @@ def item_delete(name,amount=1):
     if amount==1 and len(res)>0:
         sql=("Update item set item.player_id=NULL where item.id=%i"%res[0][0])
         cur.execute(sql)
-        db.commit()
         sql="SELECT item.id FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='branches'"
         cur.execute(sql)
         res=cur.fetchall()
-        print(res)
+        print (res)
     elif amount==2 and len(res)>1:
-        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i"%res[0][0],res[1][0])
+        sql=(("Update item set item.player_id=NULL where item.id=%i or item.id=%i")%(res[0][0],res[1][0]))
         cur.execute(sql)
     elif amount==3 and len(res)>2:
-        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i and item.id=%i"%res[0][0],res[1][0],res[2][0])
+        sql=(("Update item set item.player_id=NULL where item.id=%i or item.id=%i or item.id=%i")%(res[0][0],res[1][0],res[2][0]))
         cur.execute(sql)
     elif amount==4 and len(res)>3:
-        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i and item.id=%i and item.id=%i"%res[0][0],res[1][0],res[2][0],res[3][0])
+        sql=(("Update item set item.player_id=NULL where item.id=%i or item.id=%i or item.id=%i and item.id=%i")% (res[0][0],res[1][0],res[2][0],res[3][0]))
         cur.execute(sql)
     elif amount==5 and len(res)>4:
-        sql=("Update item set item.player_id=NULL where item.id=%i and item.id=%i and item.id=%i and item.id=%i and item.id=%i"%res[0][0],res[1][0],res[2][0],res[3][0],res[4][0])
+        sql=(("Update item set item.player_id=NULL where item.id=%i or item.id=%i or item.id=%i or item.id=%i or item.id=%i")%(res[0][0],res[1][0],res[2][0],res[3][0],res[4][0]))
         cur.execute(sql)
     elif amount=="all" and len(res)>0:
-        sql="Update item set item.player_id=NULL where item.id in(select ID from (select item.id as ID from item,item_type where item.type_id=item_type.id and item_type.name='%s')as c)"%name
-    db.commit()
+        sql=(("Update item set item.player_id=NULL where item.id in(select ID from (select item.id as ID from item,item_type where item.type_id=item_type.id and item_type.name='%s')as c)")% (name))
+        cur.execute(sql)
         
 def specific_item_check(name):
     sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='%s'"%name
@@ -1611,25 +1660,30 @@ def parse(playerInput):
                 extended_look(playerText[1])
         else:
             look()
+    elif playerText[0]=="TALK":
+        if npc_check()==0:
+            print("Theres no-one to talk to.")
+        else:
+            talk(npc_check())
     elif playerText[0]=="USE":
         if playerText[1]=="PLANK":
-            fixBridge(1)
+            fix_bridge(1)
         elif playerText[1]=="PLANKS":
-            fixBridge()
+            fix_bridge()
      #   elif playerText[1]=="":
             
         else:
             print("Can't use that!")
     elif playerText[0]=="ADD":
         if playerText[1]=="PLANK":
-            fixBridge(1)
+            fix_bridge(1)
         elif playerText[1]=="PLANKS":
-            fixBridge()
+            fix_bridge()
         else:
             print("Can't add that to anything right now!")
     elif playerText[0]=="FIX":
         if playerText[1]=="BRIDGE":
-            fixBridge()
+            fix_bridge()
         else:
             print("Can't fix that!")
     elif (playerText[0])=="I":
@@ -1814,13 +1868,15 @@ def parse(playerInput):
             read(item)
             
     else:
-        print("Not understood")      
+        print("Not understood")
 def main():
-    fix_bridge(1)
     while True:
-        #out_of_breath()
-        #print(player_carry())
-        playerInput = input()
-        parse(playerInput)
-   
+        if gameOver==0:
+            #out_of_breath()
+            #print(player_carry())
+            playerInput = input()
+            parse(playerInput)
+            game_over()
+        else:
+            return  
 main()
