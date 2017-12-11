@@ -2490,12 +2490,8 @@ def parse(playerInput):
     elif (playerText[0])=="COMBINE":
         if len(playerText)>1:
             item=""
-            for i in range(len(playerText)):
-                if i>=1:
-                    if i<(len(playerText)-1):
-                        item+=(playerText[i]+" ")
-                    else:
-                        item+=(playerText[i])
+            item=itemString(playerText)
+                
             pos=item.find("+")
             if item[(pos-1)]==" " and item[(pos+1)]==" ":
                 newitem=item[:(pos-1)]+item[pos:]
@@ -2521,7 +2517,7 @@ def parse(playerInput):
             list=[item1,item2]
             combine(list)
         else:
-            print("You meant? combine item+item")
+            print("You meant? combine <item>+<item>")
             
     elif (playerText[0])=="TIME":
         show_time()
