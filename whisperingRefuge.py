@@ -13,7 +13,7 @@ msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 db = mysql.connector.connect(host="localhost",
                              user="dbuser",
                              passwd="dbpass",
-                             db="whispertest",
+                             db="almostfinalrefuge",
                              buffered=True)
 
 cur=db.cursor()
@@ -370,8 +370,7 @@ def drop_item(item):
             
             print("You dropped the ", result[i][0])
             break
-    if result[i][0].upper()!=item:
-        print("You don't have that kind of item in your inventory")  
+    
 def pick_up(item):
     
     sql="SELECT item_type.name, item.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
@@ -438,7 +437,7 @@ def look():
     else:
         print("To the north is the Atlantic")
         
-    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
+    sql ="Select terrain_type.name,terrain_type.id, terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
@@ -469,7 +468,7 @@ def look():
     else:
         print("To the south is the Atlantic")
         
-    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
+    sql ="Select terrain_type.name,terrain_type.id, terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
@@ -500,7 +499,7 @@ def look():
     else:
         print("To the east is the Atlantic")
         
-    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
+    sql ="Select terrain_type.name,terrain_type.id, terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
@@ -1047,7 +1046,39 @@ def fix_bridge(amount=4):
 def group_of_cannibals():
     print("You approach the group of wild men feasting on the cow, but they take notice of you and attack you, you struggle but they are too many, you're dead!")
     game_over()
-                                                
+    
+def pack_of_dogs():
+    dogsLeft=5
+    print("You approach the pack of feral dogs and they turn to you growling viciously.")
+    print("The dog in the forefront is inching closer and closer, if it attacks you, the others will as well")
+    while True:
+        ans= input("This would be the time to be giving! What will you do?") 
+        if quickParse(ans)[0]=="GIVE" or quickParse(ans)[0]=="DROP" or quickParse(ans)[0]=="THROW" or quickParse(ans)[0]=="OFFER":
+            if "MEAT" in quickParse(ans):
+                if approximate_item_check("meat"):
+                    print("You throw the dog some of your meat and he leaves to eat it.")
+                    dogsLeft-=1
+                    meat=return_approximate_item("meat")
+                    item_delete(meat)
+                else:
+                    print("Sadly you forgot to bring the meat ¯\(°_o)/¯, although the dogs thought you delivered ಠ‿ಠ. You're dead.")
+                    game_over()
+            else:
+                print("That didn't satisfy the dog, so it feasted on your meat¯\_(ツ)_/¯")
+                game_over()
+        else:
+            print("Didn't quite get what you meant, but the dogs sure understood it as \"TIME TO FEED!\"ಠ‿ಠ. You're dead")
+            game_over()
+        if dogsLeft>0:
+            print("There are %i hungry dogs left",dogsLeft) if dogsLeft>1 else print("There's only one dog left, and it is most certainly the cutest.")
+            print("The next dog steps closer asking for a meal, if it attacks you, the others will as well")if dogsLeft>1 else print("It steps forward humbly as the last one, but nevertheless with great expectations.")
+        else:
+            print("Whew, that was nerve-racking, anyway, the dogs won't bother you for a while.")  
+            sql="Update terrain_square set restriction='U' where x=2 and y=-1"
+            cur.execute(sql)  
+            sql="Update terrain_square set description=NULL where y=-1 and (x=3 or x=1)"
+            cur.execute(sql)  
+            
 def move_north():
     global visitCounter
     sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
@@ -1193,6 +1224,8 @@ def move_east():
                         window_enter(res,"E")
                     elif "E6" in res[0][1]:
                         open_lockpickable(res,"E")
+                    elif "E8" in res[0][1]:
+                        pack_of_dogs()
                 else:
                     print("You can't go through the wall")
             else:
@@ -1252,6 +1285,8 @@ def move_west():
                         open_lockpickable(res,"W")
                     elif "5" in res[0][1]:
                         print("The bridge is missing too many planks, you need to add some planks to cross the bridge!")
+                    elif "W8" in res[0][1]:
+                        pack_of_dogs()
                 else:
                     print("You can't go through the wall")
             else:
@@ -1321,7 +1356,22 @@ def specific_item_check(name):
         return True
     else:
         return False
-    
+def approximate_item_check(name):  
+    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name like'%%s%'"%name
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        return True
+    else:
+        return False 
+def return_approximate_item(name):
+    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name like'%%s%'"%name
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        return res[0][0]
+    else:
+        return False 
 def check_object(useable,item="default"):
     if item=="default":
         sql=(("SELECT item_type.name, item_type.description, object.open FROM object,item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and player.y=object.y and item.object_ID=object.ID and object.name='%s' group by item_type.name")%(useable.lower()))
@@ -2344,23 +2394,7 @@ def enemySpawn():
                     print(str(enemies[0][7])+" is too far away from you to see")
     else:
         print("No enemy")
-def itemString(playerText):
-    item=""
-    for i in range(len(playerText)):
-        if i>=1:
-            if i<(len(playerText)-1):
-                item+=(playerText[i]+" ")
-            else:
-                item+=(playerText[i])
-    return item 
-def examine_item(item):
-    sql=(("SELECT item_type.description FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name LIKE '"+item+"%' GROUP BY item_type.name"))
-    cur.execute(sql)
-    result=cur.fetchall()
-    if len(result)>0:
-        print(result[0][0])
-    else:
-        print("You don't have that kind of item in your inventory")
+        
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
@@ -2426,13 +2460,13 @@ def parse(playerInput):
         inventory()
     elif (playerText[0])=="DROP":
         item=""
-        if len(playerText)>1:
-            print(playerText)
-            item=itemString(playerText)
-            print(item)
-            drop_item(item)
-        else:
-            print("You meant drop <item>")
+        for i in range(len(playerText)):
+            if i>=1:
+                if i<(len(playerText)-1):
+                    item+=(playerText[i]+" ")
+                else:
+                    item+=(playerText[i])
+        drop_item(item)
     elif (playerText[0])=="KILL"or playerText[0]=="ATTACK" or playerText[0] =="FIGHT":
         attack()  
     elif (playerText[0])=="COMBINE":
@@ -2501,8 +2535,6 @@ def parse(playerInput):
         if len(playerText)>1:
             if(playerText[1])== "AREA":
                     examine_area()
-        else:
-            print("You meant examine area?")
     elif (playerText[0])=="STATS":
         player_stats()
     elif (playerText[0])=="HELP":
