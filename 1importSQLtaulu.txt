@@ -41,6 +41,8 @@ CREATE TABLE IF NOT EXISTS `enemy_type` (
   `att` int(11) NOT NULL,
   `speed` decimal(10,0) NOT NULL,
   `description` varchar(200) DEFAULT NULL,
+  `description2` VARCHAR(200) NULL DEFAULT NULL,
+  `seen` INT(11) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -83,6 +85,7 @@ CREATE TABLE enemy
 	type_id INT NOT NULL,
 	x INT,
 	y INT,
+	spawned INT,
 	PRIMARY KEY (id),
 	FOREIGN KEY (type_id) REFERENCES enemy_type(id),
 	FOREIGN KEY (x, y) REFERENCES terrain_square(x, y)
