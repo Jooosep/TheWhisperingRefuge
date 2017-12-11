@@ -112,4 +112,9 @@ INSERT INTO `item_type` (`id`, `name`, `att`, `defense`, `healing`, `weight`, `d
 (113, 'insect', 0, 0, 4, 1, 'A small bug that is high in protein.', NULL),
 (114, 'cookie', 0, 0, 5, 1, 'Chocolatechip cookie. Very tasty and full of sugar.', NULL),
 (115, 'dirty water', 0 ,0, 5, 1, 'Very delisious looking water.', NULL),
-(116, 'yellowish water', 0, 0, -10, 'This is water right?', NULL);
+(116, 'yellowish water', 0, 0, -10, 1, 'This is water right?', NULL)
+(117, 'wrapping paper', 0, 0, 0, 1, 'Wrapping paper from a popular candy.', NULL),
+(118, 'leaves', 0, 0, 0, 1, 'Tree leaves.', NULL),
+(119, 'la doll', 0, 0, 0, 1, 'Made by famous artist Lauri Alppi.', NULL),
+(120,'vk doll', 0, 0, 0, 1, 'Made by famous gamedesigner Ville Kajander.', NULL),
+(121, 'jt doll', 0, 0, 0, 1, 'Made by famous coder Joosep Teemaa.', NULL);;
