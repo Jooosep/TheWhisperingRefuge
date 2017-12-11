@@ -420,17 +420,17 @@ def look():
                 print("To the north there is a " + res[0][0])
             else:
                 if "N" not in res[0][2] or "N6" in res[0][2]:
-                    print("To the north there seems to be an entrance to %s"%res[0][0])
+                    print("To the north there seems to be an entrance to a %s"%res[0][0])
                 elif "N4" in res[0][2]:
-                    print("To the north there is %s, you notice a window on the wall facing you."%res[0][0])
+                    print("To the north there is a %s, you notice a window on the wall facing you."%res[0][0])
                 else:
-                    print("To the north there is %s, you don't see an entrance."%res[0][0])
+                    print("To the north there is a %s, you don't see an entrance."%res[0][0])
         else:
             if res[0][1] not in buildings:
                 if "S" not in result[0][2] or "S6" in result[0][2]:
                     print("To the north there's a door exiting the building")
                 elif "S4" in result[0][2]:
-                    print("To the north you see %s through the window."%res[0][0])
+                    print("To the north you see a %s through the window."%res[0][0])
                 else:
                     print("To the north there's the inside wall of the building.")
             else:
@@ -451,17 +451,17 @@ def look():
                 print("To the south there is a " + res[0][0])
             else:
                 if "S" not in res[0][2] or "S6" in res[0][2]:
-                    print("To the north there seems to be an entrance to %s"%res[0][0])
+                    print("To the north there seems to be an entrance to a %s"%res[0][0])
                 elif "S4" in res[0][2]:
-                    print("To the north there is %s, you notice a window on the wall facing you."%res[0][0])
+                    print("To the north there is a %s, you notice a window on the wall facing you."%res[0][0])
                 else:
-                    print("To the north there is %s, you don't see an entrance."%res[0][0])
+                    print("To the north there is a %s, you don't see an entrance."%res[0][0])
         else:
             if res[0][1] not in buildings:
                 if "N" not in result[0][2] or "N6" in result[0][2]:
                     print("To the south there's a door exiting the building")
                 elif "N4" in result[0][2]:
-                    print("To the south you see %s through the window."%res[0][0])
+                    print("To the south you see a %s through the window."%res[0][0])
                 else:
                     print("To the south there's the inside wall of the building.")
             else:
@@ -482,17 +482,17 @@ def look():
                 print("To the east there is a " + res[0][0])
             else:
                 if "E" not in res[0][2] or "E6" in res[0][2]:
-                    print("To the east there seems to be an entrance to %s"%res[0][0])
+                    print("To the east there seems to be an entrance to a %s"%res[0][0])
                 elif "E4" in res[0][2]:
-                    print("To the east there is %s, you notice a window on the wall facing you."%res[0][0])
+                    print("To the east there is a %s, you notice a window on the wall facing you."%res[0][0])
                 else:
-                    print("To the east there is %s, you don't see an entrance."%res[0][0])
+                    print("To the east there is a %s, you don't see an entrance."%res[0][0])
         else:
             if res[0][1] not in buildings:
                 if "W" not in result[0][2] or "W6" in result[0][2]:
                     print("To the east there's a door exiting the building")
                 elif "W4" in result[0][2]:
-                    print("To the east you see %s through the window."%res[0][0])
+                    print("To the east you see a %s through the window."%res[0][0])
                 else:
                     print("To the east there's the inside wall of the building.")
             else:
@@ -513,17 +513,17 @@ def look():
                 print("To the west there is a " + res[0][0])
             else:
                 if "W" not in res[0][2] or "W6" in res[0][2]:
-                    print("To the west there seems to be an entrance to %s"%res[0][0])
+                    print("To the west there seems to be an entrance to a %s"%res[0][0])
                 elif "W4" in res[0][2]:
-                    print("To the west there is %s, you notice a window on the wall facing you."%res[0][0])
+                    print("To the west there is a %s, you notice a window on the wall facing you."%res[0][0])
                 else:
-                    print("To the west there is %s, you don't see an entrance."%res[0][0])
+                    print("To the west there is a %s, you don't see an entrance."%res[0][0])
         else:
             if res[0][1] not in buildings:
                 if "E" not in result[0][2] or "E6" in result[0][2]:
                     print("To the west there's a door exiting the building")
                 elif "E4" in result[0][2]:
-                    print("To the west you see %s through the window."%res[0][0])
+                    print("To the west you see a %s through the window."%res[0][0])
                 else:
                     print("To the west there's the inside wall of the building.")
             else:
@@ -928,6 +928,7 @@ def open_door1():
                 if quickParse(answer2)[0]=="USE":
                     if quickParse(answer2)[1]=="LOCKPICK":
                         if specific_item_check("lockpick"):
+                            timedelay(4,0.5)
                             print("This lock is surprisingly tough to pick, you can't manage!")
                         else:
                             print("You don't have any lockpicks!")                                        
@@ -947,6 +948,7 @@ def open_door1():
                     elif quickParse(answer2)[1]=="KEY":
                         print("You have to be more specific.")
                     else:
+                        timedelay(4,0.5)
                         print("That didn't work")
                     while True:
                         answer3 = input("The door remains closed, want to try something else?(y/n)")
@@ -971,11 +973,13 @@ def open_door2():
                 if quickParse(answer2)[0]=="USE":
                     if quickParse(answer2)[1]=="LOCKPICK":
                         if specific_item_check("lockpick"):
+                            timedelay(4,0.5)
                             print("This lock is surprisingly tough to pick, you can't manage!")
                         else:
                             print("You don't have any lockpicks!")                                        
                     elif quickParse(answer2)[1]=="OLD" and quickParse(answer2)[2]=="KEY":
                         if specific_item_check("old key"):
+                            timedelay(4,0.5)
                             print("That was the right key, you proceed to open the door!")
                             sql="Update terrain_square set restriction='NES' where terrain_square.x=-9 and terrain_square.y=4"
                             cur.execute(sql)
@@ -984,12 +988,14 @@ def open_door2():
                             print("you don't have such a key!")
                     elif quickParse(answer2)[1]=="TITANIUM" and quickParse(answer2)[2]=="KEY":
                         if specific_item_check("titanium key"):
+                            timedelay(4,0.5)
                             print("That key didn't fit in the padlock!")
                         else:
                             print("you don't have such a key!")
                     elif quickParse(answer2)[1]=="KEY":
                         print("You have to be more specific.")
                     else:
+                        timedelay(4,0.5)
                         print("That didn't work")
                     while True:
                         answer3 = input("The door remains closed, want to try something else?(y/n)")
@@ -1036,6 +1042,7 @@ def fix_bridge(amount=4):
                 missingPlanks-=planksNailed
                 item_delete("plank",planksNailed)
                 amountToFix=missingPlanks-3
+                timedelay(4,0.5)
                 print("You nail in a plank.") if planksNailed==1 else print("You nail in %i planks"%planksNailed)
                 if amountToFix==0:
                     sql="Update terrain_square set restriction='U' where x=-7 and y=7"
@@ -1049,40 +1056,65 @@ def fix_bridge(amount=4):
         print("You can't do that here")
     
 def group_of_cannibals():
+    timedelay(4,0.5)
     print("You approach the group of wild men feasting on the cow, but they take notice of you and attack you, you struggle but they are too many, you're dead!")
     game_over()
+    return
     
 def pack_of_dogs():
     dogsLeft=5
+    timedelay(3,0.7)
     print("You approach the pack of feral dogs and they turn to you growling viciously.")
-    print("The dog in the forefront is inching closer and closer, if it attacks you, the others will as well")
+    time.sleep(1)
+    timedelay(3,0.7)
+    print("The dog in the forefront is inching closer and closer, if it attacks you, the others will as well.")
+    time.sleep(1)
+    timedelay(3,0.7)
     while True:
         ans= input("This would be the time to be giving! What will you do?") 
         if quickParse(ans)[0]=="GIVE" or quickParse(ans)[0]=="DROP" or quickParse(ans)[0]=="THROW" or quickParse(ans)[0]=="OFFER":
             if "MEAT" in quickParse(ans):
                 if approximate_item_check("meat"):
+                    timedelay(3,0.7)
                     print("You throw the dog some of your meat and he leaves to eat it.")
+                    time.sleep(1)
                     dogsLeft-=1
                     meat=return_approximate_item("meat")
                     item_delete(meat)
                 else:
-                    print("Sadly you forgot to bring the meat ¯\(°_o)/¯, although the dogs thought you delivered ಠ‿ಠ. You're dead.")
+                    timedelay(3,0.7)
+                    print("Sadly you forgot to bring the meat, although the dogs thought you certainly delivered :). You're dead.")
                     game_over()
+                    return
             else:
-                print("That didn't satisfy the dog, so it feasted on your meat¯\_(ツ)_/¯")
+                timedelay(3,0.7)
+                print("That didn't satisfy the dog, so it feasted on your meat :)")
                 game_over()
-        else:
-            print("Didn't quite get what you meant, but the dogs sure understood it as \"TIME TO FEED!\"ಠ‿ಠ. You're dead")
+                return
+        elif quickParse(ans)[0]=="RUN" or quickParse(ans)[0]=="LEAVE":
+            timedelay(3,0.7)
+            print("One does not simply run away from a pack of hungry dogs. You're dead!")
             game_over()
-        if dogsLeft>0:
-            print("There are %i hungry dogs left",dogsLeft) if dogsLeft>1 else print("There's only one dog left, and it is most certainly the cutest.")
-            print("The next dog steps closer asking for a meal, if it attacks you, the others will as well")if dogsLeft>1 else print("It steps forward humbly as the last one, but nevertheless with great expectations.")
+            return
         else:
+            timedelay(3,0.7)
+            print("Didn't quite get what you meant, but the dogs sure understood it as \"TIME TO FEED!\":). You're dead")
+            game_over()
+            return
+        if dogsLeft>0:
+            print("There are %i hungry dogs left" %dogsLeft) if dogsLeft>1 else print("There's only one dog left, and it is most certainly the cutest.")
+            time.sleep(1)
+            timedelay(3,0.7)
+            print("The next dog steps closer asking for a meal, if it attacks you, the others will as well")if dogsLeft>1 else print("It steps forward humbly as the last one, but nevertheless with great expectations.")
+            time.sleep(1)
+        else:
+            timedelay(3,0.7)
             print("Whew, that was nerve-racking, anyway, the dogs won't bother you for a while.")  
             sql="Update terrain_square set restriction='U' where x=2 and y=-1"
             cur.execute(sql)  
             sql="Update terrain_square set description=NULL where y=-1 and (x=3 or x=1)"
             cur.execute(sql)  
+            return
             
 def move_north():
     global visitCounter
@@ -1164,9 +1196,9 @@ def move_south():
                 if any(str.isdigit(restriction) for restriction in restriction):
                     if "1" in res[0][1]:
                         print("here we have the gate code function")
-                    elif "2" in res[0][1]:
+                    elif "N2" in res[0][1]:
                         open_door1()
-                    elif "3" in res[0][1]:
+                    elif "W3" in res[0][1]:
                         open_door2()
                     elif "S4" in res[0][1]:
                         window_enter(res,"S")
@@ -1221,9 +1253,9 @@ def move_east():
                 if any(str.isdigit(restriction) for restriction in restriction):
                     if "1" in res[0][1]:
                         print("here we have the gate code function")
-                    elif "2" in res[0][1]:
+                    elif "N2" in res[0][1]:
                         open_door1()
-                    elif "3" in res[0][1]:
+                    elif "W3" in res[0][1]:
                         open_door2()
                     elif "E4" in res[0][1]:
                         window_enter(res,"E")
@@ -1280,9 +1312,9 @@ def move_west():
                 if any(str.isdigit(restriction) for restriction in restriction):
                     if "1" in res[0][1]:
                         print("here we have the gate code function")
-                    elif "2" in res[0][1]:
+                    elif "N2" in res[0][1]:
                         open_door1()
-                    elif "3" in res[0][1]:
+                    elif "W3" in res[0][1]:
                         open_door2()
                     elif "W4" in res[0][1]:
                         window_enter(res,"W")
@@ -1329,14 +1361,12 @@ def item_delete(name,amount=1):
     sql="SELECT item.id FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='branches'"
     cur.execute(sql)
     res=cur.fetchall()
-    print(res)
     if amount==1 and len(res)>0:
         sql=("Update item set item.player_id=NULL where item.id=%i"%res[0][0])
         cur.execute(sql)
         sql="SELECT item.id FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name='branches'"
         cur.execute(sql)
         res=cur.fetchall()
-        print (res)
     elif amount==2 and len(res)>1:
         sql=(("Update item set item.player_id=NULL where item.id=%i or item.id=%i")%(res[0][0],res[1][0]))
         cur.execute(sql)
@@ -1362,7 +1392,7 @@ def specific_item_check(name):
     else:
         return False
 def approximate_item_check(name):  
-    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name like'%%s%'"%name
+    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name like'%"+name+"%'"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
@@ -1370,7 +1400,7 @@ def approximate_item_check(name):
     else:
         return False 
 def return_approximate_item(name):
-    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name like'%%s%'"%name
+    sql="SELECT item_type.name FROM item,item_type,player WHERE item_type.id=item.type_id and item.player_id=player.id and item_type.name like'%"+name+"%'"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
