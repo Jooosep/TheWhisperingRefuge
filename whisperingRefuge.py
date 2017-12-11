@@ -370,7 +370,8 @@ def drop_item(item):
             
             print("You dropped the ", result[i][0])
             break
-    
+    if result[i][0].upper()!=item:
+        print("You don't have that kind of item in your inventory")  
 def pick_up(item):
     
     sql="SELECT item_type.name, item.id FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=terrain_square.x and player.y=terrain_square.y and item.x=terrain_square.x and item.y=terrain_square.y"
@@ -2343,7 +2344,23 @@ def enemySpawn():
                     print(str(enemies[0][7])+" is too far away from you to see")
     else:
         print("No enemy")
-        
+def itemString(playerText):
+    item=""
+    for i in range(len(playerText)):
+        if i>=1:
+            if i<(len(playerText)-1):
+                item+=(playerText[i]+" ")
+            else:
+                item+=(playerText[i])
+    return item 
+def examine_item(item):
+    sql=(("SELECT item_type.description FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name LIKE '"+item+"%' GROUP BY item_type.name"))
+    cur.execute(sql)
+    result=cur.fetchall()
+    if len(result)>0:
+        print(result[0][0])
+    else:
+        print("You don't have that kind of item in your inventory")
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
@@ -2409,13 +2426,13 @@ def parse(playerInput):
         inventory()
     elif (playerText[0])=="DROP":
         item=""
-        for i in range(len(playerText)):
-            if i>=1:
-                if i<(len(playerText)-1):
-                    item+=(playerText[i]+" ")
-                else:
-                    item+=(playerText[i])
-        drop_item(item)
+        if len(playerText)>1:
+            print(playerText)
+            item=itemString(playerText)
+            print(item)
+            drop_item(item)
+        else:
+            print("You meant drop <item>")
     elif (playerText[0])=="KILL"or playerText[0]=="ATTACK" or playerText[0] =="FIGHT":
         attack()  
     elif (playerText[0])=="COMBINE":
@@ -2484,6 +2501,8 @@ def parse(playerInput):
         if len(playerText)>1:
             if(playerText[1])== "AREA":
                     examine_area()
+        else:
+            print("You meant examine area?")
     elif (playerText[0])=="STATS":
         player_stats()
     elif (playerText[0])=="HELP":
