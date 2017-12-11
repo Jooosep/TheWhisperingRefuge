@@ -1739,7 +1739,7 @@ def combine(twoItems):
                 result=cur.fetchall()
                 newItemsName=result[0][0]
                 #new Item made for player inv(below)
-                sql=(("INSERT INTO item VALUES (%i,%i,0,0,1)") % (newItemsID,productId))
+                sql=(("INSERT INTO item VALUES (%i,%i,0,0,1,NULL,NULL)") % (newItemsID,productId))
                 cur.execute(sql)
                 
                 sql=(("SELECT item.id,item_type.name,item_type.weight FROM item,item_type WHERE item.type_id=item_type.id and item_type.name like '"+itemnames[0]+"%' and item.player_ID>0"))
