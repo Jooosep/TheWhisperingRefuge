@@ -1667,7 +1667,7 @@ def eat(foodName):
             
             sql=(("DELETE FROM item WHERE item.id=%i") % itemID)
             cur.execute(sql)
-            
+            print("You ate",result[0][0])
             if result[0][5]==2:
                 if rand<25:
                     if infected:
