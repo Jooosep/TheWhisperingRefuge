@@ -43,7 +43,10 @@ infected = True
 infection_message=0
 missingPlanks=7
 gameOver=0
-
+itemDropChange=0.5
+enemySpawnRate=100 #%
+despawnCount=2
+despawnCountX=0
 objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 locked=["BRIEFCASE","DRAWER"]
@@ -54,6 +57,9 @@ player_max_healt=100
 player_max_fatique=100
 player_max_speed=15
 player_max_attack=100
+
+player_position_x=None
+player_position_y=None
 def help():
     print('''    
 HELP                                                     -Displays all available commands
@@ -946,6 +952,7 @@ def move_north():
                 res=cur.fetchall()
                 currentSquare = res[0][0]
                 print("You entered a " + currentSquare)
+                enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
                         print(NewAreaDescription[newAreaCode])
@@ -1003,6 +1010,7 @@ def move_south():
                 res=cur.fetchall()
                 currentSquare = res[0][0]
                 print("You entered a " + currentSquare)
+                enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
                         print(NewAreaDescription[newAreaCode])
@@ -1060,6 +1068,7 @@ def move_east():
                 res=cur.fetchall()
                 currentSquare = res[0][0]
                 print("You entered a " + currentSquare)
+                enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
                         print(NewAreaDescription[newAreaCode])
@@ -1119,6 +1128,7 @@ def move_west():
                 res=cur.fetchall()
                 currentSquare = res[0][0]
                 print("You entered a " + currentSquare)
+                enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
                         print(NewAreaDescription[newAreaCode])
@@ -1488,8 +1498,22 @@ def combineITEMS(itemId1,itemId2):
     itemids.sort()
     #item1=0
     #item2=0
-    #combineItems=[58,10,37,38,57,31,50,6]
-    searchProduct={(37,38):39,(57,58):36,(9,58):80,(38,80):81,(31,58):76,(38,50):82,(19,38):83,(20,38):84,(22,38):85,(6,10):86}
+    #combineItems=[58,10,37,38,57]
+    searchProduct={(37,38):39,(57,58):36,(9,58):80,(38,80):81,(31,58):76,(38,50):82,(19,38):83,(20,38):84,(22,38):85,(6,10):86,(10,58):87,(13,93):94,(13,95):96}
+    #39 poison arrow
+    #36 bow
+    #80 spear
+    #81 toxic spear
+    #76 slingshot
+    #82 toxic axe
+    #83 poisoned blade
+    #84 poisoned shovel
+    #85 poisoned rake
+    #86 paperweight
+    
+    #85 stone spear
+    #94 spiked baton
+    #96 spiked baseball bat
     
     try:
         productId=searchProduct[itemids[0],itemids[1]]
@@ -1631,6 +1655,539 @@ def quickParse(input):
     splitText = split_line(playerCaps)
     playerText = [c for c in splitText if c not in filter]
     return playerText
+def removeEnemy(id):
+    sql=("DELETE FROM enemy WHERE id=%i" % id)
+    cur.execute(sql)
+def combat(enemyName):
+    enemyName=enemyName.lower()
+    sql=(("SELECT enemy.id,enemy_type.id, enemy_type.name,enemy_type.hp,enemy_type.att,enemy_type.speed,enemy_type.description, enemy_type.description2,enemy_type.seen FROM enemy,enemy_type,player,terrain_square WHERE enemy.type_id=enemy_type.id and player.x=terrain_square.x and player.y=terrain_square.y and enemy.x=terrain_square.x and enemy.y=terrain_square.y and enemy_type.name='%s'")% (enemyName))    
+    cur.execute(sql)
+    enemyINFO=cur.fetchall()
+    
+    sql=("SELECT item.type_id FROM item WHERE item.equipped>0")
+    if len(enemyINFO)>0:
+        print("Attack is starting...")
+        hpBuff=((random.randint(1,15))/100+1)
+        attBuff=((random.randint(1,20))/100+1)
+        speedBuff=((random.randint(1,20))/100+1)
+        enemyTypeID=enemyINFO[0][1]
+        enemyID=enemyINFO[0][0]
+        enemyName=enemyINFO[0][2]
+        enemyHP=(float((enemyINFO[0][3]))*hpBuff)
+        enemyAtt=(float((enemyINFO[0][4]))*attBuff)
+        enemySpeed=(float((enemyINFO[0][5]))*speedBuff)
+        
+        playerHP=player_carry_att_speed_hp_fatique()[0][3]
+        playerAtt=player_carry_att_speed_hp_fatique()[0][1]
+        playerSpeed=player_carry_att_speed_hp_fatique()[0][2]
+        
+        sql=("SELECT item_type.name, item_type.id, item_type.att FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part='hand'")
+        cur.execute(sql)
+        inHand=cur.fetchall()
+        if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
+            if inHand[0][0]=="slingshot":
+                ammonation="sammo"
+            else:
+                ammonation="arrow"
+            
+            sql=("SELECT item_type.att ,item_type.name, item.id,item.type_id  FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.part='"+ammonation+"'  GROUP BY item_type.att DESC")
+            cur.execute(sql)
+            ammo=cur.fetchall()
+            if len(ammo)>0:
+                ammoID=ammo[0][2]
+                ammoName=ammo[0][1]
+                ammoAtt=ammo[0][0]
+                
+            else:
+                ammoName="noammo"
+                ammoAtt=0
+        
+        x="."
+        for i in range(1,4):
+            time.sleep(0.6)
+            print(x*i)
+        print("You are in combat with",enemyName)
+        if playerSpeed>enemySpeed:
+            print("and you were faster than opponent, you hit",enemyName)
+            enemyHP-=(playerAtt+ammoAtt)
+        else:
+            print("and got hit by it")
+            playerHP-=enemyAtt
+        time.sleep(1.5)
+        for i in range(1,4):
+            time.sleep(1)
+            print(x*i)
+        human='''             x====x
+             |head|            
+        x====x====x====x
+        |hand|body|hand|            
+        x====x====x====x     
+             |legs|       
+             x====x
+             |feet|
+             x====x    '''
+        handlesshuman='''             x====x
+             |head|            
+             x====x
+             |body|            
+             x====x     
+             |legs|       
+             x====x
+             |feet|
+             x====x    '''
+        leglesshuman='''             x====x
+             |head|            
+        x====x====x====x
+        |hand|body|hand|            
+        x====x====x====x     
+             ||||||    '''
+        fourlegs='''       xx====x====x====x====x
+      x |====|body|====|head|
+     x  x====x====x====x====x
+        |legs||   |legs||
+        x====xx   x====xx
+        '''
+        bird='''             x====x
+             |head|            
+             x====x
+            x|body|x            
+           x x====x x    
+             |legs|       
+             x====x
+                    '''
+        
+        xx=0
+        if enemyHP<0:
+            
+            if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
+                if ammoAtt>0:
+                    print("You killed "+enemyName+" with single shot and got your ammunation back")
+                else:
+                    print("You hit with your poor range weapon to "+enemyName+" and killed it")
+            else:
+                print("You killed "+enemyName+" with single blow")
+            
+            removeEnemy(enemyID)
+            update_player_healt(playerHP)
+            
+        else:
+            xxx=0
+            if ammoName!="noammo":
+                itemdrop=random.randint(1,2)
+                
+                if itemdrop==1:
+                    sql=("DELETE FROM item WHERE item.id=%i" % ammoID)
+                    cur.execute(sql)
+                else:
+                    sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
+                    cur.execute(sql)
+            while playerHP>0 or enemyHP>0:
+                #sql=("SELECT item_type.name, item_type.id, item_type.att FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part='hand'")
+                #cur.execute(sql)
+                #inHand=cur.fetchall()
+                
+                if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
+                    if inHand[0][0]=="slingshot":
+                        ammonation="sammo"
+                    else:
+                        ammonation="arrow"
+                    
+                    sql=("SELECT item_type.att ,item_type.name, item.id,item.type_id  FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.part='"+ammonation+"'  GROUP BY item_type.att DESC")
+                    #print(sql)
+                    cur.execute(sql)
+                    ammo=cur.fetchall()
+                    if len(ammo)>0:
+                        ammoID=ammo[0][2]
+                        ammoName=ammo[0][1]
+                        ammoAtt=ammo[0][0]
+                        
+                    else:
+                        ammoName="noammo"
+                        ammoAtt=0
+                        
+               
+                
+                playerAtt+=ammoAtt
+                enemyHitchange=random.randint(1,100)
+                playerHitchange=random.randint(1,100)
+                playerHitchangeTarget=(1.01**float(playerSpeed))
+                enemyCritChange=10 #%
+                enemyCritChangeValue=random.randint(1,100)
+                playerCritChange=18 #%
+                playerCritChangeValue=random.randint(1,100)
+                critMultiplier=1.5 
+                if xx==0:
+                    print("\n"*100)
+                    xx=1
+                else:
+                    x="."
+                    for i in range(1,4):
+                        time.sleep(0.5)
+                        print(x*i)
+                    print("\n"*100)
+                print("You are combat with",enemyName)
+                print()
+                print("\t    Healt:%i"%enemyHP)
+                pheadHit=80*playerHitchangeTarget
+                phandHit=70*playerHitchangeTarget
+                pbodyHit=95*playerHitchangeTarget
+                plegsHit=70*playerHitchangeTarget
+                pfeetHit=20*playerHitchangeTarget
+                if enemyTypeID in [1,2]:
+                    print(human)
+                    hitlist=["head","hand","body","legs","feet","hands","leg"]
+                    damageMultiplier=1
+                    if enemySpeed<3:
+                        damageMultiplier=1.9
+                    headHit=80*playerHitchangeTarget
+                    handHit=70*playerHitchangeTarget
+                    bodyHit=95*playerHitchangeTarget
+                    legsHit=70*playerHitchangeTarget
+                    feetHit=20*playerHitchangeTarget
+                elif enemyTypeID==4:
+                    print(handlesshuman)
+                    hitlist=["head","body","legs","feet","leg"]
+                    damageMultiplier=0.9
+                    headHit=86*playerHitchangeTarget
+                    bodyHit=96*playerHitchangeTarget
+                    legsHit=90*playerHitchangeTarget
+                    feetHit=70*playerHitchangeTarget
+                elif enemyTypeID==3:
+                    print(leglesshuman)
+                    hitlist=["head","hand","body","hands"]
+                    damageMultiplier=2
+                    headHit=90*playerHitchangeTarget
+                    handHit=80*playerHitchangeTarget
+                    bodyHit=100*playerHitchangeTarget
+                    
+                elif enemyTypeID in [5,6,7,8,9]:
+                    print(fourlegs)
+                    hitlist=["head","body","legs","feet","leg"]
+                    damageMultiplier=1
+                    headHit=85*playerHitchangeTarget
+                    bodyHit=95*playerHitchangeTarget
+                    legsHit=70*playerHitchangeTarget
+                    feetHit=40*playerHitchangeTarget
+                elif enemyTypeID==10:
+                    print(bird)
+                    hitlist=["head","body","legs","leg"]
+                    damageMultiplier=2
+                    headHit=50*playerHitchangeTarget
+                    bodyHit=70*playerHitchangeTarget
+                    legsHit=5*playerHitchangeTarget
+                
+                if ammoName!="noammo":
+                    playerCritChange+=25   
+                print()
+                
+                if inHand[0][0]=="slingshot" or inHand[0][0]=="bow" and ammoName=="noammo" :
+                    
+                    if xxx==0:
+                        playerAtt-=(playerAtt*0.70)
+                        xxx+=1
+                        
+                    print("You dont have any ammunation for your",inHand[0][0])
+                    
+                print("Your attack:",int(playerAtt))
+                print("You CritChange:",playerCritChange)
+                print("Your Healt:",int(playerHP))
+                
+                
+                playerINPUT=input("Where you wanna hit or do you wanna run? : ")
+                
+                playerINPUT.lower()
+                
+               
+                if playerINPUT in hitlist or playerINPUT=="run":
+                    if playerINPUT=="run":
+                        print("You start running..")
+                    else:
+                        print("hitting...")
+                    if playerINPUT=="head" and playerINPUT in hitlist:
+                        damageValue=((100-headHit)/100+1)
+                        if playerCritChange<=playerCritChangeValue:
+                            damage=playerAtt*critMultiplier*damageValue
+                        else:
+                            damage=playerAtt*damageValue
+                        if playerHitchange<=headHit:
+                            enemyHP-=damage
+                            if ammoName!="noammo":
+                                
+                                itemdrop=random.randint(1,2)
+                                
+                                if itemdrop==1:
+                                    sql=("DELETE FROM item WHERE item.id=%i" % ammoID)
+                                    cur.execute(sql)
+                                else:
+                                    sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
+                                    cur.execute(sql)
+                                
+                            print("you hit head",(int(damage)))
+                        else:
+                            print("You missed")
+                    elif playerINPUT=="feet" and playerINPUT in hitlist:
+                        damageValue=((100-feetHit)/100+1)
+                        if playerCritChange<=playerCritChangeValue:
+                            damage=playerAtt*critMultiplier*damageValue
+                        else:
+                            damage=playerAtt*damageValue
+                        if playerHitchange<=feetHit:
+                            enemyHP-=damage
+                            if ammoName!="noammo":
+                                
+                                itemdrop=random.randint(1,2)
+                                
+                                if itemdrop==1:
+                                    sql=("DELETE FROM item WHERE item.id=%i" % ammoID)
+                                    cur.execute(sql)
+                                else:
+                                    sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
+                                    cur.execute(sql)
+                            print("you hit feet",(int(damage)))
+                        else:
+                            print("You missed")
+                        
+                    elif playerINPUT=="legs" and playerINPUT in hitlist:
+                        damageValue=((100-legsHit)/100+1)
+                        if playerCritChange<=playerCritChangeValue:
+                            damage=playerAtt*critMultiplier*damageValue
+                        else:
+                            damage=playerAtt*damageValue
+                        if playerHitchange<=legsHit:
+                            enemyHP-=damage
+                            if ammoName!="noammo":
+                                
+                                itemdrop=random.randint(1,2)
+                                
+                                if itemdrop==1:
+                                    sql=("DELETE FROM item WHERE item.id=%i" % ammoID)
+                                    cur.execute(sql)
+                                else:
+                                    sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
+                                    cur.execute(sql)
+                            print("you hit legs",(int(damage)))
+                        else:
+                            print("You missed")
+                        
+                    elif playerINPUT=="body" and playerINPUT in hitlist:
+                        damageValue=((100-bodyHit)/100+1)
+                        if playerCritChange<=playerCritChangeValue:
+                            damage=playerAtt*critMultiplier*damageValue
+                        else:
+                            damage=playerAtt*damageValue
+                        if playerHitchange<=bodyHit:
+                            enemyHP-=damage
+                            if ammoName!="noammo":
+                                
+                                itemdrop=random.randint(1,2)
+                                
+                                if itemdrop==1:
+                                    sql=("DELETE FROM item WHERE item.id=%i" % ammoID)
+                                    cur.execute(sql)
+                                else:
+                                    sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
+                                    cur.execute(sql)
+                            print("you hit body",(int(damage)))
+                        else:
+                            print("You missed")
+                    elif playerINPUT=="run":
+                        if enemyHitchange>=30:
+                            playerHP-=(playerHP*0.1+enemyAtt)
+                            for i in range(1,4):
+                                time.sleep(0.5)
+                                print(x*i)
+                            print("You escaped from %s but you got hit by %i" % (enemyName,(playerHP*0.1+enemyAtt)))
+                        else:
+                            for i in range(1,4):
+                                time.sleep(0.5)
+                                print(x*i)
+                            print("You escaped from",enemyName)
+                        removeEnemy(enemyID)
+                        update_player_healt(playerHP)
+                        break
+                    for i in range(1,4):
+                        time.sleep(0.5)
+                        print(x*i)
+                    if enemyHP>0:
+                        print("Opponent's turn")
+                        for i in range(1,4):
+                            time.sleep(0.5)
+                            print(x*i)
+                        
+                        enemyHit=random.choice(["head","hands","hands","body","body","body","legs","legs","feet","miss"])
+                        if enemyHit=="head":
+                            damageValue=((100-pheadHit)/100+1)
+                            if enemyCritChange<=enemyCritChangeValue:
+                                damage=enemyAtt*critMultiplier*damageValue
+                            else:
+                                damage=enemyAtt*damageValue
+                            if enemyCritChange<=pheadHit:
+                                playerHP-=damage
+                                print("Enemy hit you to head")
+                            else:
+                                print("Enemy missed his attack")
+                                
+                        elif enemyHit=="hands":
+                            damageValue=((100-phandHit)/100+1)
+                            if enemyCritChange<=enemyCritChangeValue:
+                                damage=enemyAtt*critMultiplier*damageValue
+                            else:
+                                damage=enemyAtt*damageValue
+                            if enemyCritChange<=phandHit:
+                                playerHP-=damage
+                                print("Enemy hit you to hand")
+                            else:
+                                print("Enemy missed his attack")
+                        elif enemyHit=="body":
+                            damageValue=((100-pbodyHit)/100+1)
+                            if enemyCritChange<=enemyCritChangeValue:
+                                damage=enemyAtt*critMultiplier*damageValue
+                            else:
+                                damage=enemyAtt*damageValue
+                            if enemyCritChange<=pbodyHit:
+                                playerHP-=damage
+                                print("Enemy hit you to body")
+                            else:
+                                print("Enemy missed his attack")
+                        elif enemyHit=="legs":
+                            damageValue=((100-plegsHit)/100+1)
+                            if enemyCritChange<=enemyCritChangeValue:
+                                damage=enemyAtt*critMultiplier*damageValue
+                            else:
+                                damage=enemyAtt*damageValue
+                            if enemyCritChange<=plegsHit:
+                                playerHP-=damage
+                                print("Enemy hit you to legs")
+                            else:
+                                print("Enemy missed his attack")
+                        elif enemyHit=="feet":
+                            damageValue=((100-pfeetHit)/100+1)
+                            if enemyCritChange<=enemyCritChangeValue:
+                                damage=enemyAtt*critMultiplier*damageValue
+                            else:
+                                damage=enemyAtt*damageValue
+                            if enemyCritChange<=pfeetHit:
+                                playerHP-=damage
+                                print("Enemy hit you to feet")
+                            else:
+                                print("Enemy missed his attack")
+                        elif enemyHit=="miss":
+                            print("You dodged opponents attack")
+                        
+                        for i in range(1,4):
+                            time.sleep(0.5)
+                            print(x*i)
+                        print("Your turn is coming...")
+                    
+                    if playerHP<0 or enemyHP<0:
+                        if playerHP>0:
+                            print("You killed",enemyName)
+                        else:
+                            print("You died")
+                        removeEnemy(enemyID)
+                        update_player_healt(playerHP)
+                        break
+                else:
+                    print("you didnt hit")
+            
+        
+    else:   
+        print("There isn't that kind of character in area") 
+def enemySpawn():
+    global despawnCountX
+    
+    if despawnCountX>=despawnCount:
+        sql="DELETE FROM enemy WHERE enemy.spawned>0"
+        cur.execute(sql)
+    
+    neutralEnemiesIds=[5,8,10,9]
+    sql=(("SELECT enemy.id,enemy_type.id, enemy_type.name,enemy_type.hp,enemy_type.att,enemy_type.speed, terrain_square.type_id, enemy_type.description, enemy_type.description2,enemy_type.seen FROM enemy,enemy_type,player,terrain_square WHERE enemy.type_id=enemy_type.id and player.x=terrain_square.x and player.y=terrain_square.y and enemy.x=terrain_square.x and enemy.y=terrain_square.y"))    
+    cur.execute(sql)
+    enemies=cur.fetchall()
+    
+    sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x")
+    cur.execute(sql)
+    result=cur.fetchall()
+    
+    if len(enemies)>1: #delete all other enemies expect one
+        for i in range(len(enemies)-1):
+            id=enemies[(i+1)][0]
+            sql=("DELETE FROM enemy WHERE id=%i" % id)
+            cur.execute(sql)
+    
+    elif len(enemies)<1 and (result[0][0]) in [1,2,3,4]:
+        sql=("SELECT MAX(enemy.id) FROM enemy")
+        cur.execute(sql)
+        newId=(cur.fetchall()[0][0]+(random.randint(1,9999)))
+        spawn=random.randint(1,100)
+        enemyTypeId=random.randint(1,10)
+        
+        if spawn<=enemySpawnRate:
+            playerPOS=player_position()
+            sql=("INSERT INTO enemy VALUES (%i,%i,%i,%i,1)" % (newId,enemyTypeId,playerPOS[0][0],playerPOS[0][1]) )
+            cur.execute(sql)
+            despawnCountX+=1
+    distanceBetweenYou=random.randint(7,square_side+7)
+    sql=(("SELECT enemy.id,enemy_type.id, enemy_type.name,enemy_type.hp,enemy_type.att,enemy_type.speed, terrain_square.type_id, enemy_type.description, enemy_type.description2,enemy_type.seen FROM enemy,enemy_type,player,terrain_square WHERE enemy.type_id=enemy_type.id and player.x=terrain_square.x and player.y=terrain_square.y and enemy.x=terrain_square.x and enemy.y=terrain_square.y"))    
+    cur.execute(sql)
+    enemies=cur.fetchall()
+   
+    
+    if len(enemies)>0:
+        seen=enemies[0][9]
+        sql=("UPDATE enemy_type SET seen=1 WHERE id=%i" % enemies[0][1])
+        cur.execute(sql)
+        #print(enemies)     
+        
+        timeToReachPlayer=distanceBetweenYou/(enemies[0][5]) #seconds
+        
+        if (enemies[0][1]) in neutralEnemiesIds:
+            action=random.randint(1,3)
+            if action==1:
+                print("There is "+enemies[0][2]+" passing you")
+            elif action==2:
+                if (enemies[0][1])!=10:
+                    print(enemies[0][2]+" is running away from you")
+                else:
+                    print(enemies[0][2]+" is flying past you")
+            else:
+                print(enemies[0][2]+" is standing still and looking at you")
+            
+        else:
+            print(str(timeToReachPlayer)+"s")
+            print(str(distanceBetweenYou)+"m")
+            
+            if distanceBetweenYou<=15:
+                if seen>0:
+                    print(enemies[0][2]+" sees you")
+                else:
+                    print(str(enemies[0][7])+" sees you")
+                if timeToReachPlayer<=10:
+                    if (enemies[0][1])!=3:
+                        xxx=1
+                        print("it is running towards you aggressively, you don't have time to react")
+                    else:
+                        xxx=random.randint(1,2)
+                        print("it is crawling towards you aggressively, you don't have time to react")
+                    if enemies[0][1]==3 and xxx==2:
+                        x="."
+                        for i in range(1,4):
+                            time.sleep(1)
+                            print(x*i)
+                        print("but thank god this creature fell to hole next to it")
+                    else:   
+                        combat(enemies[0][2])
+                else:
+                    #print("but it is moving slowly towards you, and you estimate its gonna reach you in about %is" % (int(timeToReachPlayer)+3))
+                    print("but it is moving too slow")
+                          
+            else:
+                if seen>0:
+                    print(enemies[0][2]+" is too far away from you to see")
+                else:
+                    print(str(enemies[0][7])+" is too far away from you to see")
+    else:
+        print("No enemy")
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
@@ -1697,7 +2254,19 @@ def parse(playerInput):
                 else:
                     item+=(playerText[i])
         drop_item(item)
-        
+    elif (playerText[0])=="KILL":
+        item=""
+        if len(playerText)>1:
+            for i in range(len(playerText)):
+                if i>=1:
+                    if i<(len(playerText)-1):
+                        item+=(playerText[i]+" ")
+                    else:
+                        item+=(playerText[i])
+            
+            combat(item)
+        else:
+            print("You meant attack enemy?")    
     elif (playerText[0])=="COMBINE":
         if len(playerText)>1:
             item=""
