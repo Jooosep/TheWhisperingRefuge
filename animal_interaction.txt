@@ -1,0 +1,75 @@
+cow
+	MMoooooo!
+cow
+	Cow walked past you.
+cow
+	Cow is looking at you in the distance.
+cow
+	You can hear a mmoooooo nearby.
+
+	
+dog
+	There is a dog looking at you nearby
+dog
+	You can hear a dog panting
+dog
+	Woof!
+dog
+	Hau Hau!
+
+	
+	
+squirrel
+	Squirrel walk past you.
+squirrel
+	A squirrel is looking at you.
+squirrel
+	Squirrel is climbing on a tree.
+
+rat	
+	Rat walked past you.
+
+	
+legless cannibal
+	Legless cannibal is hitting themeself.
+	Legless cannibal is hitting their head.
+	Legless cannibal is eatig meat.
+	Legless cannibal is stuck in a pit.
+
+Armless cannibal
+	Armless cannibal fell over.
+	Armless cannibal is jumping in circles.
+	Armless cannibal is hitting their head on a tree.
+	
+Bulky cannibal 
+	Bulky cannibal is flexing.
+	Bulky cannibal is doing pushups nearby.
+	Bulky cannibal rolled away from you.
+	Bulky cannibal is eating meat.
+	
+	
+	
+		
+	
+All
+	<item> walked past you.
+	<item> is looking at you nearby.
+	<item> ran away from you.
+	You hear tree leaves falling.
+	
+	
+	
+Combat
+	Enemy hit a jab to your body.
+	Cannibal tried to hit you but failed.
+	Cannibal lost a tooth from your hit.
+	<Enemy> missed your <bodypart>.
+	You got a critical hit.
+	<enemy> bit your <bodypart>.
+	Handless cannibal missed you and fell over.
+	Handless cannibal rammed your <bodypart>.
+	Legless cannibal scrached your <bodypart>.
+	Legless cannibal tried to scratch you.
+	<enemy> tried to grab you but missed.
+	GOD gifted you a critical hit.
+	Handless cannibal ran at you but hit a tree.
