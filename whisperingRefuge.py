@@ -6,6 +6,7 @@ import time
 import sys
 import msvcrt
 import os
+from Tekstipeli.Main import player_position
 
 msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
 
@@ -44,12 +45,15 @@ infection_message=0
 missingPlanks=7
 gameOver=0
 itemDropChange=0.5
-enemySpawnRate=100 #%
+enemySpawnRate=0 #%
+spawnReduction=5
 despawnCount=2
 despawnCountX=0
 objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 locked=["BRIEFCASE","DRAWER"]
+buildings=[6,7,8,9,10,11]
+
 
 #player max stats
 player_carry_capasity=150
@@ -63,10 +67,10 @@ player_position_y=None
 def help():
     print('''    
 HELP                                                     -Displays all available commands
-N, NORTH                                               -Player moves North
-S, SOUTH                                                -Player moves South
-E, EAST                                                   -Player moves East
-W, WEST                                                   -player moves West
+N, NORTH                                               -Player moves north
+S, SOUTH                                                -Player moves south
+E, EAST                                                   -Player moves east
+W, WEST                                                   -player moves west
 LOOK, L, WATCH, SEE                              -Tells player's current location
 LOOK <compass point>                             -Tells player about the area of compass point 
 I, INVENTORY, BAG, ITEMS                       -Prints a list of items player is currently carrying
@@ -91,7 +95,13 @@ def infect():
     cur.execute(sql)
     infection_time = dt
     infected=True
-
+    
+def player_position():
+    sql="SELECT player.x,player.y FROM player"
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    
 def game_over():
     global gameOver
     print("G",end = "")
@@ -214,7 +224,7 @@ def inventory():
     result2=cur.fetchall()
     sql="SELECT object.name FROM player,object WHERE object.player_id=player.id"
     cur.execute(sql)
-    res=cur.fetchall
+    res=cur.fetchall()
     if len(result)>0 or len(res)>0 or len(result2)>0:
         print("You are carrying")
         if len(result)>0:
@@ -272,8 +282,23 @@ def inventory():
     else:
         
         print("You don't carry any items with you")   
-def add_time(distance,terrain_type_id):
     
+def refresh_spawnrate(reduce=0):
+    global spawnReduction
+    global enemySpawnRate
+    if reduce == 0:
+        if spawnReduction==0:
+            return
+        else:
+            spawnReduction-=1
+    else:
+        enemySpawnRate = 0
+        spawnReduction = reduce
+        return
+    if spawnReduction==0:
+        enemySpawnRate=10
+                
+def add_time(distance,terrain_type_id):
     sql=("SELECT terrain_type.movement_difficulty FROM terrain_type WHERE terrain_type.id=%i" % terrain_type_id)
     cur.execute(sql)
     movement_dificulty=int(cur.fetchall()[0][0])
@@ -289,6 +314,7 @@ def add_time(distance,terrain_type_id):
     tdelta=datetime.timedelta(seconds=time)
     global dt
     dt=(dt+tdelta)
+    refresh_spawnrate()
     
 def show_time():
     print(dt)
@@ -342,7 +368,7 @@ def drop_item(item):
             sql=("UPDATE item SET item.x=%i, item.y=%i, item.player_ID=NULL WHERE item.id=%i" % (pos[0][0],pos[0][1],item_id))
             cur.execute(sql)
             
-            print("You dropped", result[i][0])
+            print("You dropped the ", result[i][0])
             break
     
 def pick_up(item):
@@ -367,44 +393,142 @@ def pick_up(item):
                 cur.execute(sql)
                 print("You took", result[i][0])
             else:
-                print("You cant get more weight to your poor back!")
+                print("That would put too much weight on your back!")
             break
-
-def player_position():
-    sql="SELECT player.x,player.y FROM player"
-    cur.execute(sql)
-    result=cur.fetchall()
-    return result
     
 def split_line(text):
     words = text.split()
     return words
 
 def look():
-    sql = "Select terrain_type.description FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
+    sql = "Select terrain_type.description,terrain_type.id,terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y"
     cur.execute(sql)
-    res = cur.fetchall()
-    print("Your current location is "+ res[0][0])
-    sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
+    result = cur.fetchall()
+    current=result[0][1]
+    print("Your current location is "+ result[0][0])
+    sql ="Select terrain_type.name,terrain_type.id, terrain_square.restriction FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
-        print("To the North there is a " + res[0][0])
+        if current not in buildings:
+            if res[0][1] not in buildings:
+                print("To the north there is a " + res[0][0])
+            else:
+                if "N" not in res[0][2] or "N6" in res[0][2]:
+                    print("To the north there seems to be an entrance to %s"%res[0][0])
+                elif "N4" in res[0][2]:
+                    print("To the north there is %s, you notice a window on the wall facing you."%res[0][0])
+                else:
+                    print("To the north there is %s, you don't see an entrance."%res[0][0])
+        else:
+            if res[0][1] not in buildings:
+                if "S" not in result[0][2] or "S6" in result[0][2]:
+                    print("To the north there's a door exiting the building")
+                elif "S4" in result[0][2]:
+                    print("To the north you see %s through the window."%res[0][0])
+                else:
+                    print("To the north there's the inside wall of the building.")
+            else:
+                if "N" in res[0][2]:
+                    print("To the north you see a door, it must lead to another room.")
+                else:
+                    print("To the north there is another room")
+            
+    else:
+        print("To the north is the Atlantic")
+        
     sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
-        print("To the South there is a " + res[0][0])
+        if current not in buildings:
+            if res[0][1] not in buildings:
+                print("To the south there is a " + res[0][0])
+            else:
+                if "S" not in res[0][2] or "S6" in res[0][2]:
+                    print("To the north there seems to be an entrance to %s"%res[0][0])
+                elif "S4" in res[0][2]:
+                    print("To the north there is %s, you notice a window on the wall facing you."%res[0][0])
+                else:
+                    print("To the north there is %s, you don't see an entrance."%res[0][0])
+        else:
+            if res[0][1] not in buildings:
+                if "N" not in result[0][2] or "N6" in result[0][2]:
+                    print("To the south there's a door exiting the building")
+                elif "N4" in result[0][2]:
+                    print("To the south you see %s through the window."%res[0][0])
+                else:
+                    print("To the south there's the inside wall of the building.")
+            else:
+                if "S" in res[0][2]:
+                    print("To the south you see a door, it must lead to another room.")
+                else:
+                    print("To the south there is another room")
+            
+    else:
+        print("To the south is the Atlantic")
+        
     sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
-        print("To the East there is a " + res[0][0])
+        if current not in buildings:
+            if res[0][1] not in buildings:
+                print("To the east there is a " + res[0][0])
+            else:
+                if "E" not in res[0][2] or "E6" in res[0][2]:
+                    print("To the east there seems to be an entrance to %s"%res[0][0])
+                elif "E4" in res[0][2]:
+                    print("To the east there is %s, you notice a window on the wall facing you."%res[0][0])
+                else:
+                    print("To the east there is %s, you don't see an entrance."%res[0][0])
+        else:
+            if res[0][1] not in buildings:
+                if "W" not in result[0][2] or "W6" in result[0][2]:
+                    print("To the east there's a door exiting the building")
+                elif "W4" in result[0][2]:
+                    print("To the east you see %s through the window."%res[0][0])
+                else:
+                    print("To the east there's the inside wall of the building.")
+            else:
+                if "W" in res[0][2]:
+                    print("To the east you see a door, it must lead to another room.")
+                else:
+                    print("To the east there is another room")
+            
+    else:
+        print("To the east is the Atlantic")
+        
     sql ="Select terrain_type.name FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
     cur.execute(sql)
     res=cur.fetchall()
     if len(res)>0:
-        print("To the West there is a " + res[0][0])
+        if current not in buildings:
+            if res[0][1] not in buildings:
+                print("To the west there is a " + res[0][0])
+            else:
+                if "W" not in res[0][2] or "W6" in res[0][2]:
+                    print("To the west there seems to be an entrance to %s"%res[0][0])
+                elif "W4" in res[0][2]:
+                    print("To the west there is %s, you notice a window on the wall facing you."%res[0][0])
+                else:
+                    print("To the west there is %s, you don't see an entrance."%res[0][0])
+        else:
+            if res[0][1] not in buildings:
+                if "E" not in result[0][2] or "E6" in result[0][2]:
+                    print("To the west there's a door exiting the building")
+                elif "E4" in result[0][2]:
+                    print("To the west you see %s through the window."%res[0][0])
+                else:
+                    print("To the west there's the inside wall of the building.")
+            else:
+                if "E" in res[0][2]:
+                    print("To the north you see a door, it must lead to another room.")
+                else:
+                    print("To the north there is another room")
+            
+    else:
+        print("To the north is the Atlantic")
  
 def retrieve(useable,item):
     sql=(("SELECT item_type.name, item.id FROM item,item_type,player,object WHERE item.type_id=item_type.id and player.x=object.x and player.y=object.y and item.object_ID=object.id and object.name='%s'")%(useable))
@@ -414,9 +538,9 @@ def retrieve(useable,item):
         print(("There's no %s here!")%(useable.lower()))
     elif object_is_open(useable)==False:
         print(("The %s is closed!")%(useable.lower()))
-    elif check_object(item,useable):
+    elif check_object(useable,item):
         for i in range(len(result)):
-            if result[i][0].upper()==item:
+            if result[i][0]==item:
                 item_id=result[i][1]
                 
                 sql=("SELECT item_type.weight FROM item,item_type WHERE item.type_id=item_type.id and item.id=%i" % item_id)
@@ -428,7 +552,7 @@ def retrieve(useable,item):
                     sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
                     cur.execute(sql)
                 
-                    sql=("UPDATE item SET item.objectid=NULL, item.player_ID=1 WHERE item.id=%i" % item_id)
+                    sql=("UPDATE item SET item.object_id=NULL, item.player_ID=1 WHERE item.id=%i" % item_id)
                     cur.execute(sql)
                     print("You took", result[i][0])
                 else:
@@ -446,7 +570,7 @@ def store(useable,item):
     elif object_is_open(useable)==False:
         print(("The %s is closed!")%(useable.lower()))
     else:
-        sql=(("SELECT item_type.name,item.id,object.id FROM object,item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and object.name=%s")%(useable.lower()))
+        sql=(("SELECT item_type.name,item.id,object.id FROM object,item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and object.name='%s'")%(useable.lower()))
         cur.execute(sql)
         result=cur.fetchall()
         obj_id = result[0][2]
@@ -467,6 +591,7 @@ def store(useable,item):
                 print(("you stored the %s")%(result[i][0]))
                 break
         print("You don't even have that")
+        
 def npc_check():
     sql="select npc.id from npc, player where npc.x=player.x and npc.y=player.y" 
     cur.execute(sql)
@@ -474,7 +599,8 @@ def npc_check():
     if len(res)>0:
         return res[0][0]   
     else:
-        return 0   
+        return 0
+       
 def talk(ID):
     print("What will you ask?")
     if ID==1:
@@ -507,15 +633,16 @@ def talk(ID):
                 
 def object_is_open(useable):
     sql=(("select object.open from object where object.name='%s'")%(useable.lower()))
+    print (sql)
     cur.execute(sql)
     res = cur.fetchall()
-    if len(res)>0:
+    if res[0][0]==1:
         return True
     else:
         return False
     
 def object_is_here(useable):
-    sql=(("select object.name from object,player where object.name=%s and (player.ID=object.player_id or (object.x=player.x and object.y=player.y))" )%(useable.lower()))
+    sql=(("select object.name from object,player where object.name='%s' and (player.ID=object.player_id or (object.x=player.x and object.y=player.y))" )%(useable.lower()))
     cur.execute(sql)
     res = cur.fetchall()
     if len(res)>0:
@@ -525,7 +652,6 @@ def object_is_here(useable):
     
 def mangleWithObjects(command,useable):
     global locked
-    print(command)
     sql=(("select id, name, x, y,key_item_id,open from object where name='%s'")% useable)
     cur.execute(sql)
     res=cur.fetchall()
@@ -552,7 +678,7 @@ def mangleWithObjects(command,useable):
         elif res[0][0]==2:
             if command[0] == "OPEN":
                 if res[0][5]==0:
-                    sql="Update object set open=1 where id=1"
+                    sql="Update object set open=1 where id=2"
                     cur.execute(sql)
                     print("You opened the %s."%useable)
                     check_object("chest")
@@ -560,7 +686,7 @@ def mangleWithObjects(command,useable):
                     print("Looks like its already open!")
             elif command[0] == "CLOSE":
                 if res[0][5]==1:
-                    sql="Update object set open=0 where id=1"
+                    sql="Update object set open=0 where id=2"
                     cur.execute(sql)
                     print("You closed the %s."%useable)
                 else:
@@ -605,7 +731,16 @@ def mangleWithObjects(command,useable):
                     print("You took the briefcase with you!")
                 else:
                     print("That's too much weight on your back!!")
+                    
+            elif command[0] == "DROP":
+                totalWeight=((player_carry_att_speed_hp_fatique()[0][0])-20)
+                sql=("UPDATE player SET player.carry=%d WHERE player.ID=1" % totalWeight)
+                cur.execute(sql)
                 
+                sql=(("UPDATE item SET object.x=%i, object.y=%i, object.player_ID=NULL WHERE object.id=3")%(player_position[0][0],player_position[0][1]))
+                cur.execute(sql)
+                print("You left the briefcase.")
+
             else:
                 print("Your asking for too much here!")
                 
@@ -919,7 +1054,7 @@ def move_north():
     res=cur.fetchall()
     oldAreaCode=res[0][2]
     if "S" in res[0][1]:
-        print("You can't go through a wall, dummy")
+        print("You can't go through the wall")
     else:
         sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y+1"
         cur.execute(sql)
@@ -942,7 +1077,7 @@ def move_north():
                     elif "N6" in res[0][1]:
                         open_lockpickable(res,"N")
                 else:
-                    print("You can't go through a wall, dummy")
+                    print("You can't go through the wall")
             else:
                 add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
@@ -951,7 +1086,6 @@ def move_north():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
-                print("You entered a " + currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -977,7 +1111,9 @@ def move_south():
     res=cur.fetchall()
     oldAreaCode = res[0][2]
     if "N" in res[0][1]:
-        print("You can't go through a wall, dummy")
+        if "N7" in res[0][1]:
+            group_of_cannibals()
+        print("You can't go through the wall")
     else:
         sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.x=player.x and terrain_square.y=player.y-1"
         cur.execute(sql)
@@ -1000,7 +1136,7 @@ def move_south():
                     elif "S6" in res[0][1]:
                         open_lockpickable(res,"S")
                 else:
-                    print("You can't go through a wall, dummy")
+                    print("You can't go through the wall")
             else:
                 add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y -1"
@@ -1009,7 +1145,6 @@ def move_south():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
-                print("You entered a " + currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -1035,7 +1170,7 @@ def move_east():
     res=cur.fetchall()
     oldAreaCode=res[0][2]
     if "W" in res[0][1]:
-        print("You can't go through a wall, dummy")
+        print("You can't go through the wall")
     else:
         sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x+1"
         cur.execute(sql)
@@ -1058,7 +1193,7 @@ def move_east():
                     elif "E6" in res[0][1]:
                         open_lockpickable(res,"E")
                 else:
-                    print("You can't go through a wall, dummy")
+                    print("You can't go through the wall")
             else:
                 add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x +1"
@@ -1067,7 +1202,6 @@ def move_east():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
-                print("You entered a " + currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -1093,7 +1227,7 @@ def move_west():
     res=cur.fetchall()
     oldAreaCode=res[0][2]
     if "E" in res[0][1]:
-        print("You can't go through a wall, dummy")
+        print("You can't go through the wall")
     else:
         sql ="Select terrain_type.Id,terrain_square.restriction,terrain_square.area FROM terrain_type,terrain_square,player Where terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1"
         cur.execute(sql)
@@ -1118,7 +1252,7 @@ def move_west():
                     elif "5" in res[0][1]:
                         print("The bridge is missing too many planks, you need to add some planks to cross the bridge!")
                 else:
-                    print("You can't go through a wall, dummy")
+                    print("You can't go through the wall")
             else:
                 add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.x = player.x -1"
@@ -1127,7 +1261,6 @@ def move_west():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
-                print("You entered a " + currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -1190,20 +1323,20 @@ def specific_item_check(name):
     
 def check_object(useable,item="default"):
     if item=="default":
-        sql=(("SELECT item_type.name, item_type.description, object.open FROM object,item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and item.objectID=object.ID and object.name='%s'")%(useable.lower()))
+        sql=(("SELECT item_type.name, item_type.description, object.open FROM object,item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and player.y=object.y and item.object_ID=object.ID and object.name='%s' group by item_type.name")%(useable.lower()))
         cur.execute(sql)
         result=cur.fetchall()
         if result[0][2]==1:
             if len(result)>1:
-                print("You found the following items in the '%s'"% useable)
+                print("You found the following items in the %s:"% useable)
                 for i in range(len(result)):
-                    print(result[i][0]+" (" + result[i][0] + ")")
+                    print(result[i][0]+" (" + result[i][1] + ")")
             else:        
                 print("Its empty!")
         else:
             print("The %s is closed"%useable)
     else:
-        sql=(("SELECT item_type.name FROM item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and player.y=object.y and item.x=object.x and item.y=object.y and object.name=%s and item_type.name = %s")%(useable,item))
+        sql=(("SELECT item_type.name FROM object,item,item_type,player,terrain_square WHERE item.type_id=item_type.id and player.x=object.x and player.y=object.y and object.name='%s' and item_type.name = '%s'")%(useable,item))
         cur.execute(sql)
         result=cur.fetchall()
         if len(result)>0:
@@ -1323,7 +1456,7 @@ def extended_look(direction):
                 else:
                     extended_look_desription(0, distance,lastResult[0][0])
             else:
-                print("There is %s blocking your vission" % result[0][0])
+                print("There is %s blocking your vision" % result[0][0])
     if direction.upper()=="WEST":
         
         sql=("SELECT terrain_type.Id FROM terrain_type,terrain_square,player WHERE terrain_type.ID=terrain_square.type_id and terrain_square.y=player.y and terrain_square.x=player.x-1")
@@ -1658,6 +1791,14 @@ def quickParse(input):
 def removeEnemy(id):
     sql=("DELETE FROM enemy WHERE id=%i" % id)
     cur.execute(sql)
+def attack():
+    sql="select enemy_type.name from enemy_type,enemy, player where enemy.type_id=enemy_type.id and enemy.x=player.x and enemy.y=player.y"
+    cur.execute(sql)
+    res=cur.fetchall()
+    if len(res)>0:
+        combat(res[0][0])
+    else:
+        print("Theres no-one to attack.")
 def combat(enemyName):
     enemyName=enemyName.lower()
     sql=(("SELECT enemy.id,enemy_type.id, enemy_type.name,enemy_type.hp,enemy_type.att,enemy_type.speed,enemy_type.description, enemy_type.description2,enemy_type.seen FROM enemy,enemy_type,player,terrain_square WHERE enemy.type_id=enemy_type.id and player.x=terrain_square.x and player.y=terrain_square.y and enemy.x=terrain_square.x and enemy.y=terrain_square.y and enemy_type.name='%s'")% (enemyName))    
@@ -1684,24 +1825,26 @@ def combat(enemyName):
         sql=("SELECT item_type.name, item_type.id, item_type.att FROM item,item_type WHERE item.type_id=item_type.id and item.equipped>0 and item_type.part='hand'")
         cur.execute(sql)
         inHand=cur.fetchall()
-        if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
-            if inHand[0][0]=="slingshot":
-                ammonation="sammo"
-            else:
-                ammonation="arrow"
-            
-            sql=("SELECT item_type.att ,item_type.name, item.id,item.type_id  FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.part='"+ammonation+"'  GROUP BY item_type.att DESC")
-            cur.execute(sql)
-            ammo=cur.fetchall()
-            if len(ammo)>0:
-                ammoID=ammo[0][2]
-                ammoName=ammo[0][1]
-                ammoAtt=ammo[0][0]
+        ammoName="noammo"
+        ammoAtt=0
+        if len(inHand)>0:
+            if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
+                if inHand[0][0]=="slingshot":
+                    ammonation="sammo"
+                else:
+                    ammonation="arrow"
                 
-            else:
-                ammoName="noammo"
-                ammoAtt=0
-        
+                sql=("SELECT item_type.att ,item_type.name, item.id,item.type_id  FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.part='"+ammonation+"'  GROUP BY item_type.att DESC")
+                cur.execute(sql)
+                ammo=cur.fetchall()
+                if len(ammo)>0:
+                    ammoID=ammo[0][2]
+                    ammoName=ammo[0][1]
+                    ammoAtt=ammo[0][0]
+                    
+                else:
+                    ammoName="noammo"
+                    ammoAtt=0
         x="."
         for i in range(1,4):
             time.sleep(0.6)
@@ -1786,24 +1929,25 @@ def combat(enemyName):
                 #cur.execute(sql)
                 #inHand=cur.fetchall()
                 
-                if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
-                    if inHand[0][0]=="slingshot":
-                        ammonation="sammo"
-                    else:
-                        ammonation="arrow"
-                    
-                    sql=("SELECT item_type.att ,item_type.name, item.id,item.type_id  FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.part='"+ammonation+"'  GROUP BY item_type.att DESC")
-                    #print(sql)
-                    cur.execute(sql)
-                    ammo=cur.fetchall()
-                    if len(ammo)>0:
-                        ammoID=ammo[0][2]
-                        ammoName=ammo[0][1]
-                        ammoAtt=ammo[0][0]
+                if len(inHand)>0:
+                    if inHand[0][0]=="bow" or inHand[0][0]=="slingshot":
+                        if inHand[0][0]=="slingshot":
+                            ammonation="sammo"
+                        else:
+                            ammonation="arrow"
                         
-                    else:
-                        ammoName="noammo"
-                        ammoAtt=0
+                        sql=("SELECT item_type.att ,item_type.name, item.id,item.type_id  FROM item,item_type WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.part='"+ammonation+"'  GROUP BY item_type.att DESC")
+                        #print(sql)
+                        cur.execute(sql)
+                        ammo=cur.fetchall()
+                        if len(ammo)>0:
+                            ammoID=ammo[0][2]
+                            ammoName=ammo[0][1]
+                            ammoAtt=ammo[0][0]
+                            
+                        else:
+                            ammoName="noammo"
+                            ammoAtt=0
                         
                
                 
@@ -1825,9 +1969,9 @@ def combat(enemyName):
                         time.sleep(0.5)
                         print(x*i)
                     print("\n"*100)
-                print("You are combat with",enemyName)
+                print("You are in combat with the",enemyName)
                 print()
-                print("\t    Healt:%i"%enemyHP)
+                print("\t    Health:%i"%enemyHP)
                 pheadHit=80*playerHitchangeTarget
                 phandHit=70*playerHitchangeTarget
                 pbodyHit=95*playerHitchangeTarget
@@ -1880,20 +2024,21 @@ def combat(enemyName):
                     playerCritChange+=25   
                 print()
                 
-                if inHand[0][0]=="slingshot" or inHand[0][0]=="bow" and ammoName=="noammo" :
-                    
-                    if xxx==0:
-                        playerAtt-=(playerAtt*0.70)
-                        xxx+=1
+                if len(inHand)>0:
+                    if inHand[0][0]=="slingshot" or inHand[0][0]=="bow" and ammoName=="noammo" :
                         
-                    print("You dont have any ammunation for your",inHand[0][0])
+                        if xxx==0:
+                            playerAtt-=(playerAtt*0.70)
+                            xxx+=1
+                            
+                        print("You dont have any ammunition for your",inHand[0][0])
                     
                 print("Your attack:",int(playerAtt))
-                print("You CritChange:",playerCritChange)
-                print("Your Healt:",int(playerHP))
+                print("Your crit chance:",playerCritChange)
+                print("Your Health:",int(playerHP))
                 
                 
-                playerINPUT=input("Where you wanna hit or do you wanna run? : ")
+                playerINPUT=input("Choose where to aim the next attack or run : ")
                 
                 playerINPUT.lower()
                 
@@ -1911,7 +2056,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=headHit:
                             enemyHP-=damage
-                            if ammoName!="noammo":
+                            if ammoName!="You have no ammo.":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -1922,7 +2067,7 @@ def combat(enemyName):
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
                                 
-                            print("you hit head",(int(damage)))
+                            print("you hit the enemies head for %i damage",(int(damage)))
                         else:
                             print("You missed")
                     elif playerINPUT=="feet" and playerINPUT in hitlist:
@@ -1933,7 +2078,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=feetHit:
                             enemyHP-=damage
-                            if ammoName!="noammo":
+                            if ammoName!="You have no ammo.":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -1943,7 +2088,7 @@ def combat(enemyName):
                                 else:
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
-                            print("you hit feet",(int(damage)))
+                            print("you hit the enemies feet for %i",(int(damage)))
                         else:
                             print("You missed")
                         
@@ -1955,7 +2100,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=legsHit:
                             enemyHP-=damage
-                            if ammoName!="noammo":
+                            if ammoName!="You have no ammo.":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -1965,7 +2110,7 @@ def combat(enemyName):
                                 else:
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
-                            print("you hit legs",(int(damage)))
+                            print("you hit the enemies legs",(int(damage)))
                         else:
                             print("You missed")
                         
@@ -1977,7 +2122,7 @@ def combat(enemyName):
                             damage=playerAtt*damageValue
                         if playerHitchange<=bodyHit:
                             enemyHP-=damage
-                            if ammoName!="noammo":
+                            if ammoName!="You have no ammo.":
                                 
                                 itemdrop=random.randint(1,2)
                                 
@@ -1987,7 +2132,7 @@ def combat(enemyName):
                                 else:
                                     sql=("UPDATE item SET item.type_id=%i,item.x=%i, item.y=%i, item.player_ID=NULL, item.equipped=NULL WHERE item.id=%i" % (ammo[0][3],player_position()[0][0],player_position()[0][1],ammoID))
                                     cur.execute(sql)
-                            print("you hit body",(int(damage)))
+                            print("you hit the enemies body for %i damage",(int(damage)))
                         else:
                             print("You missed")
                     elif playerINPUT=="run":
@@ -2001,7 +2146,7 @@ def combat(enemyName):
                             for i in range(1,4):
                                 time.sleep(0.5)
                                 print(x*i)
-                            print("You escaped from",enemyName)
+                            print("You escaped from the ",enemyName)
                         removeEnemy(enemyID)
                         update_player_healt(playerHP)
                         break
@@ -2023,9 +2168,9 @@ def combat(enemyName):
                                 damage=enemyAtt*damageValue
                             if enemyCritChange<=pheadHit:
                                 playerHP-=damage
-                                print("Enemy hit you to head")
+                                print("The enemy struck your head")
                             else:
-                                print("Enemy missed his attack")
+                                print("The enemy missed his attack")
                                 
                         elif enemyHit=="hands":
                             damageValue=((100-phandHit)/100+1)
@@ -2035,9 +2180,9 @@ def combat(enemyName):
                                 damage=enemyAtt*damageValue
                             if enemyCritChange<=phandHit:
                                 playerHP-=damage
-                                print("Enemy hit you to hand")
+                                print("The enemy hit your hand")
                             else:
-                                print("Enemy missed his attack")
+                                print("The enemy missed his attack")
                         elif enemyHit=="body":
                             damageValue=((100-pbodyHit)/100+1)
                             if enemyCritChange<=enemyCritChangeValue:
@@ -2046,7 +2191,7 @@ def combat(enemyName):
                                 damage=enemyAtt*damageValue
                             if enemyCritChange<=pbodyHit:
                                 playerHP-=damage
-                                print("Enemy hit you to body")
+                                print("The enemy delivered a blow to your body")
                             else:
                                 print("Enemy missed his attack")
                         elif enemyHit=="legs":
@@ -2057,9 +2202,9 @@ def combat(enemyName):
                                 damage=enemyAtt*damageValue
                             if enemyCritChange<=plegsHit:
                                 playerHP-=damage
-                                print("Enemy hit you to legs")
+                                print("The enemy targeted your legs")
                             else:
-                                print("Enemy missed his attack")
+                                print("The enemy missed his attack")
                         elif enemyHit=="feet":
                             damageValue=((100-pfeetHit)/100+1)
                             if enemyCritChange<=enemyCritChangeValue:
@@ -2068,11 +2213,11 @@ def combat(enemyName):
                                 damage=enemyAtt*damageValue
                             if enemyCritChange<=pfeetHit:
                                 playerHP-=damage
-                                print("Enemy hit you to feet")
+                                print("The enemy attacked your feet")
                             else:
-                                print("Enemy missed his attack")
+                                print("The enemy missed his attack")
                         elif enemyHit=="miss":
-                            print("You dodged opponents attack")
+                            print("You managed to dodge the opponents attack")
                         
                         for i in range(1,4):
                             time.sleep(0.5)
@@ -2081,18 +2226,20 @@ def combat(enemyName):
                     
                     if playerHP<0 or enemyHP<0:
                         if playerHP>0:
-                            print("You killed",enemyName)
+                            print("You killed the ",enemyName)
                         else:
                             print("You died")
+                            game_over()
                         removeEnemy(enemyID)
                         update_player_healt(playerHP)
                         break
                 else:
-                    print("you didnt hit")
+                    print("You didn't hit the enemy")
             
         
     else:   
         print("There isn't that kind of character in area") 
+        
 def enemySpawn():
     global despawnCountX
     
@@ -2118,7 +2265,15 @@ def enemySpawn():
     elif len(enemies)<1 and (result[0][0]) in [1,2,3,4]:
         sql=("SELECT MAX(enemy.id) FROM enemy")
         cur.execute(sql)
-        newId=(cur.fetchall()[0][0]+(random.randint(1,9999)))
+        res=cur.fetchall()
+        if len(res)>0:
+            print(res)
+            try:
+                newId=((res[0][0])+(random.randint(100,9999)))
+            except:
+                newId=1000
+        else:
+            newId=1
         spawn=random.randint(1,100)
         enemyTypeId=random.randint(1,10)
         
@@ -2144,24 +2299,24 @@ def enemySpawn():
         if (enemies[0][1]) in neutralEnemiesIds:
             action=random.randint(1,3)
             if action==1:
-                print("There is "+enemies[0][2]+" passing you")
+                print("There is a"+enemies[0][2]+" passing you")
             elif action==2:
                 if (enemies[0][1])!=10:
-                    print(enemies[0][2]+" is running away from you")
+                    print("a"+enemies[0][2]+" is running away from you")
                 else:
-                    print(enemies[0][2]+" is flying past you")
+                    print("a"+enemies[0][2]+" is flying past you")
             else:
-                print(enemies[0][2]+" is standing still and looking at you")
+                print("a"+enemies[0][2]+" is standing still and looking at you")
             
         else:
-            print(str(timeToReachPlayer)+"s")
-            print(str(distanceBetweenYou)+"m")
+            #print(str(timeToReachPlayer)+"s")
+            #print(str(distanceBetweenYou)+"m")
             
             if distanceBetweenYou<=15:
                 if seen>0:
-                    print(enemies[0][2]+" sees you")
+                    print("the"+enemies[0][2]+" sees you")
                 else:
-                    print(str(enemies[0][7])+" sees you")
+                    print("the"+str(enemies[0][7])+" sees you")
                 if timeToReachPlayer<=10:
                     if (enemies[0][1])!=3:
                         xxx=1
@@ -2174,7 +2329,7 @@ def enemySpawn():
                         for i in range(1,4):
                             time.sleep(1)
                             print(x*i)
-                        print("but thank god this creature fell to hole next to it")
+                        print("but thank god this creature fell in to a hole next to it")
                     else:   
                         combat(enemies[0][2])
                 else:
@@ -2188,12 +2343,12 @@ def enemySpawn():
                     print(str(enemies[0][7])+" is too far away from you to see")
     else:
         print("No enemy")
+        
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
     splitText = split_line(playerCaps)
     playerText = [c for c in splitText if c not in filter]
-    print(playerText)
     
     if len(playerText)<1:
         print("Are you an empty vessel?")
@@ -2219,9 +2374,16 @@ def parse(playerInput):
             look()
     elif playerText[0]=="TALK":
         if npc_check()==0:
-            print("Theres no-one to talk to.")
+            print("There's no-one to talk to.")
         else:
             talk(npc_check())
+    elif playerText[0]=="RING"and playerText[1]=="BELL":
+        if player_position[0][0]== -1 and player_position[0][1]==-2:
+            print("You ring the bell and it produces a deafening sound that must've been heard in a miles radius.")
+            sql="Update terrain_square set restriction='U',description=NULL where x=-5 and y=-4"
+            cur.execute(sql)
+            refresh_spawnrate(6)
+                   
     elif playerText[0]=="USE":
         if playerText[1]=="PLANK":
             fix_bridge(1)
@@ -2254,19 +2416,8 @@ def parse(playerInput):
                 else:
                     item+=(playerText[i])
         drop_item(item)
-    elif (playerText[0])=="KILL":
-        item=""
-        if len(playerText)>1:
-            for i in range(len(playerText)):
-                if i>=1:
-                    if i<(len(playerText)-1):
-                        item+=(playerText[i]+" ")
-                    else:
-                        item+=(playerText[i])
-            
-            combat(item)
-        else:
-            print("You meant attack enemy?")    
+    elif (playerText[0])=="KILL"or playerText[0]=="ATTACK" or playerText[0] =="FIGHT":
+        attack()  
     elif (playerText[0])=="COMBINE":
         if len(playerText)>1:
             item=""
@@ -2348,7 +2499,7 @@ def parse(playerInput):
                         item+=(playerText[i])
             eat(item)
         else:
-            print("You ment? eat 'name of item'")
+            print("You meant? eat 'name of item'")
     elif (playerText[0])=="SLEEP":
         if len(playerText)>1:
             
@@ -2364,9 +2515,9 @@ def parse(playerInput):
                         if i<(len(playerText)-3):
                             item+=(playerText[i]+" ")
                 item+=(playerText[len(playerText)-3])
-            
+                print(item)
                 if check_item_type(item)==True:
-                    retrieve(playerText[len(playerText)-1],item)
+                    retrieve(playerText[len(playerText)-1].lower(),item.lower())
                 else:
                     print("There isn't such an item")
             
@@ -2376,9 +2527,9 @@ def parse(playerInput):
                         if i<(len(playerText)-3):
                             item+=(playerText[i]+" ")
                 item+=(playerText[len(playerText)-3])
-        
+                print(item)
                 if check_item_type(item)==True:
-                    retrieve(playerText[len(playerText)-1],item)
+                    retrieve(playerText[len(playerText)-1].lower(),item.lower())
                 else:                   
                     print("There isn't such an item")
                 
@@ -2416,7 +2567,7 @@ def parse(playerInput):
         
             if check_item_type(item)==True:
                 if playerText[len(playerText)-1] in storables:
-                    store(playerText[len(playerText)-1],item)
+                    store(playerText[len(playerText)-1].lower(),item.lower())
                 else:
                     print("You can't store anything in there!")
             else:                   
@@ -2439,13 +2590,22 @@ def parse(playerInput):
     else:
         print("Not understood")
 def main():
+    sql="insert into item values(1000,50,0,-6,NULL,NULL,NULL)"
+    cur.execute(sql)
+    sql="insert into item values(1001,25,0,-6,NULL,NULL,NULL)"
+    cur.execute(sql)
+    sql="insert into item values(1002,36,0,-6,NULL,NULL,NULL)"
+    cur.execute(sql)
+    sql="insert into item values(1003,37,0,-6,NULL,NULL,NULL)"
+    cur.execute(sql)
+    sql="insert into item values(1004,37,0,-6,NULL,NULL,NULL)"
+    cur.execute(sql)
     while True:
         if gameOver==0:
             #out_of_breath()
             #print(player_carry())
             playerInput = input()
             parse(playerInput)
-            game_over()
         else:
             return  
 main()
