@@ -1,0 +1,44 @@
+1479
+	"and about %im away there is a small glimps of light"
+
+1481
+	"and light is glimpsing about %im away"
+
+1493 
+	"Forest gets thicker %im away"
+
+1495
+	"A thick Spruce Forest starts %im away"
+	
+1536
+	"There is %s blocking your vision"
+
+1608
+	"There is %s blocking your vision"
+	
+1792
+	"You need to have both items in your inventory to be able to craft"
+	
+1827
+	"There isn't such item(s)"
+	
+1915
+	"There is no-one to attack."
+	
+2607
+	print("a "+enemies[0][2]+" flew fast past you")
+	
+2609
+	 print("a "+enemies[0][2]+" is looking at you weirdly and is sitting on the branch ")
+	 
+2703
+	print(enemies[0][2]+" is too far away from you to see you")
+	
+2706
+	print(str(enemies[0][7])+" is too far away from you to see you")
+	
+2772
+	print("There is a lot of stuff in this area")
+
+3012
+		print("Where do you want me to store it in?")
