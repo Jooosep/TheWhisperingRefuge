@@ -1168,6 +1168,7 @@ def move_north():
                 else:
                     print("You can't go through the wall")
             else:
+                
                 add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
@@ -1175,6 +1176,7 @@ def move_north():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                print("You entered:", currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -1234,6 +1236,7 @@ def move_south():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                print("You entered:", currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -1283,6 +1286,8 @@ def move_east():
                         open_lockpickable(res,"E")
                     elif "E8" in res[0][1]:
                         pack_of_dogs()
+                    elif "E9" in res[0][1]:
+                        norlax_has_awakened()
                 else:
                     print("You can't go through the wall")
             else:
@@ -1293,6 +1298,7 @@ def move_east():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                print("You entered:", currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -1354,6 +1360,7 @@ def move_west():
                 cur.execute(sql)
                 res=cur.fetchall()
                 currentSquare = res[0][0]
+                print("You entered:", currentSquare)
                 enemySpawn()
                 if newAreaCode != None and oldAreaCode != newAreaCode:
                     if visitCounter[newAreaCode]<1:
@@ -3035,6 +3042,7 @@ def main():
             parse(playerInput)
             change_spawnrate()
             change_fatigue()
+            randomItemDrops()
         else:
             return  
 main()
