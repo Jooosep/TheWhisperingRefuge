@@ -42,3 +42,21 @@
 
 3012
 		print("Where do you want me to store it in?")
+def combineRp():
+print('''
+      arrow  + plant        = poison arrow
+      string + branches     = bow
+      knife  + branches     = spear
+      plant  + spear        = toxic spear
+       plant + axe          = toxic axe
+       sword + plant        = poisoned blade
+      shovel + plant        = poisoned shovel
+        rake + plant        = poisoned rake
+   duct tape + sharp rock   = paperweight
+  sharp rock + branches     = stone spear
+  rubber band + branches    = slingshot
+box of nails + baton        = spiked baton
+box of nails + baseball bat = spiked baseball bat
+
+
+''')
