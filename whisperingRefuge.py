@@ -53,6 +53,7 @@ objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
 locked=["BRIEFCASE","DRAWER"]
 buildings=[6,7,8,9,10,11]
+boatMissing=["engine","holefix","air"]
 
 
 #player max stats
@@ -102,7 +103,7 @@ def player_position():
     result=cur.fetchall()
     return result
     
-def game_over():
+def game_complete():
     global gameOver
     print("G",end = "")
     sys.stdout.flush()
@@ -119,19 +120,63 @@ def game_over():
     print(" ",end = "")
     sys.stdout.flush()
     time.sleep(0.5)
-    print("O",end = "")
+    print("c",end = "")
     sys.stdout.flush()
     time.sleep(0.5)
-    print("v",end = "")
+    print("o",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("m",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("p",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("l",end = "")
     sys.stdout.flush()
     time.sleep(0.5)
     print("e",end = "")
     sys.stdout.flush()
     time.sleep(0.5)
-    print("r",end = "")
+    print("t",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("e",end = "")
     sys.stdout.flush()
     gameOver=1
     time.sleep(2)
+    
+def game_over():
+    global gameOver
+    print("G",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("A",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("M",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("E",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print(" ",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("O",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("V",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("E",end = "")
+    sys.stdout.flush()
+    time.sleep(0.5)
+    print("R",end = "")
+    sys.stdout.flush()
+    gameOver=1
+    time.sleep(2)
+
     
 def timedelay(howMany,delay):
     x="."
@@ -793,9 +838,47 @@ def mangleWithObjects(command,useable):
                 print(locked)
                 sql="Update object set open=1 where id=4"
                 cur.execute(sql)
-                check_object("briefcase")
+                check_object("drawer")
             else:
                 print("Your asking for too much here!")
+                
+        elif res[0][0]==6:
+            if command[0] == "OPEN":
+                if res[0][5]==0:
+                    sql="Update object set open=6 where id=6"
+                    cur.execute(sql)
+                    print("You opened the %s."%useable)
+                    check_object("closet")
+                else:
+                    print("Looks like its already open!")
+            elif command[0] == "CLOSE":
+                if res[0][5]==1:
+                    sql="Update object set open=0 where id=1"
+                    cur.execute(sql)
+                    print("You closed the %s."%useable)
+                else:
+                    print("It seems to be closed already!")
+            else:
+                print("Your asking for too much here!")
+        elif res[0][0]==7:
+            if command[0] == "JUMP" or command[0] == "GO" or command[0] == "STEP":
+                if len(boatMissing)<1:
+                    while True:
+                        ans=input("Time to get out of this hellhole no?(y/n)")
+                        if ans=="n":
+                            timedelay(3,0.5)
+                            print("You jump out of the boat!")
+                            return
+                        elif ans!="y":
+                            print("Input \"y\" or \"n\"!")
+                        else:
+                            print("You start the engine and drive into the sunset not looking back.")
+                            game_complete()
+                            return
+                else:
+                    print("The boat is not repaired yet!")
+            else:
+                print("Can't do that")
     else:
         print("There is no %s here..."%useable.lower())
         
@@ -1075,6 +1158,73 @@ def fix_bridge(amount=4):
     else:
         print("You can't do that here")
     
+def fix_boat():
+    global boatMissing
+    if "fixhole" in boatMissing:
+        print("The boat is riddled with some holes, you can't inflate it, before you fix those.")
+    if "fixhole" not in boatMissing and "air" in boatMissing:
+        print("The boat is void of air, you need to inflate it.")
+    if "engine" in boatMissing:
+        print("You need to hook an engine on this boat to get anywhere.")
+    ans=input("What will you use/fix/add on the boat")
+    if quickParse(ans)[0]=="FIX":
+        if quickParse(ans)[1]=="HOLES":
+            if specific_item_check("duct tape"):
+                print("You fix the holes with some duct tape")
+                boatMissing.remove("fixhole")
+            else:
+                print("You don't have the duct tape needed to do this")
+        else:
+            print("The only thing to fix are the holes.")
+    elif quickParse(ans)[0]=="ADD" or quickParse(ans)[0]=="PUT":
+        if quickParse(ans)[1]=="ENGINE":
+            if specific_item_check("engine"):
+                if specific_item_check("superglue"):
+                    timedelay(3, 0.7)
+                    print("You make the engine stick with some superglue, nicely done!")
+                    item_delete("engine")
+                    boatMissing.remove("engine")
+                else:
+                    print("Your boat got badly damaged at sea, you need to use some quality glue to add the engine.")
+            else:
+                print("You don't have an engine.")
+        else:
+            print("You can't do that.")
+    elif quickParse(ans)[0]=="PUMP":
+        if specific_item_check("pump") and "fixhole" not in boatMissing:
+            timedelay(3, 0.7)
+            print("You fill the boat with air, nicely done!")
+            boatMissing.remove("air")
+        elif "fixhole" in boatMissing:
+            print("You can't inflate the boat before fixing the holes.")
+        else:
+            print("You don't have a pump.")
+    elif quickParse(ans)[0]=="USE":
+        if quickParse(ans)[1]=="PUMP":
+            if specific_item_check("pump") and "fixhole" not in boatMissing:
+                timedelay(3, 0.7)
+                print("You fill the boat with air, nicely done!")
+                boatMissing.remove("air")
+            elif "fixhole" in boatMissing:
+                print("You can't inflate the boat before fixing the holes.")
+            else:
+                print("You don't have a pump.")
+        else:
+            print("You can't do that.")
+    else:
+        print("You can't do that.")
+    if len(boatMissing)>0:
+        while True:
+            ans2=input("Will you continue repairing the boat?(y/n)")
+            if ans2=="n":
+                return
+            elif ans2!="y":
+                print("Input \"y\" or \"n\"!")
+            else:
+                break
+    else:
+        print("The boat is now in working condition!")
+        return
 def group_of_cannibals():
     timedelay(4,0.5)
     print("You approach the group of wild men feasting on the cow, but they take notice of you and attack you, you struggle but they are too many, you're dead!")
@@ -1135,6 +1285,50 @@ def pack_of_dogs():
             sql="Update terrain_square set description=NULL where y=-1 and (x=3 or x=1)"
             cur.execute(sql)  
             return
+def norlax_has_awakened():
+    print("You approach the sleeping giant")
+    timedelay(3, 0.6)
+    print("He seems to sleep very deeply.")
+    while True:
+        ans=input("What will you do?")
+        if quickParse(ans)[0]=="ATTACK" or quickParse(ans)[0]=="FIGHT" or quickParse(ans)[0]=="HIT":
+            timedelay(3,0.6)
+            print("The man awakened and sent you flying, but you couldn't fly, so you died.")
+            game_over()
+            return
+        elif quickParse(ans)[0]=="PLAY":
+            if quickParse(ans)[1]=="GUITAR":
+                timedelay(3,0.6)
+                print("You play quite loudly but the big man doesn't wake up")
+            elif quickParse(ans)[1]=="FLUTE":
+                timedelay(3,0.6)
+                print("You play a beautiful tune and the big man wakes up in bliss and greets you")
+                sql="update terrain_square set restriction=NW4S where x=11 and y=-2"
+                cur.execute(sql)
+                sql="update terrain_square set description='The big man is in front of his house enjoying the sun' where x=10 and y=-2"
+                cur.execute(sql)
+                sql="update npc set x=10,y=-2 where id=2"
+                cur.execute(sql)
+                return
+            else:
+                print("That had no effect.")
+        elif quickParse(ans)[0]=="TALK" or quickParse(ans)[0]=="YELL" or quickParse(ans)[0]=="SCREAM" or quickParse(ans)[0]=="SHOUT":
+            print("He is in deep sleep, hibernating perhaps, and can't hear you.")
+        elif quickParse(ans)[0]=="USE":
+            print("That had no effect.")
+        elif quickParse(ans)[0]=="LEAVE" or quickParse(ans)[0]=="WALK" or quickParse(ans)[0]=="RUN":
+            print("You left him alone")
+            return
+        else:
+            print("That didn't seem to work.")
+        while True:
+            ans2= input("Will you try something else?(y/n)")
+            if ans2=="y":
+                break
+            elif ans2=="n":
+                return
+            else:
+                print("input y or n ")
             
 def move_north():
     global visitCounter
@@ -1168,7 +1362,6 @@ def move_north():
                 else:
                     print("You can't go through the wall")
             else:
-                
                 add_time(square_side, res[0][0])
                 sql= "UPDATE player SET player.y = player.y +1"
                 cur.execute(sql)
@@ -1286,8 +1479,6 @@ def move_east():
                         open_lockpickable(res,"E")
                     elif "E8" in res[0][1]:
                         pack_of_dogs()
-                    elif "E9" in res[0][1]:
-                        norlax_has_awakened()
                 else:
                     print("You can't go through the wall")
             else:
@@ -2746,32 +2937,11 @@ def check_enemy_type(enemy_type):
     
     return False
 def randomItemDrops():
-    x=player_position()[0][0]
-    y=player_position()[0][1]
-    rand=random.randint(1,100)
-    howMany=random.randint(1,3)
-    rand2=random,randint(1,10)
-    if rand2==1 or rand2 ==2 or rand2==3:
-        for i in range(howMany):
-            if rand<=50:
-                trashItemIds=[58,86,38,17,13,11,10,4,3,2,1,89]
-                itemID=random.choice(trashItemIds)
-            elif rand<=65:
-                commonItemIds=[8,67,12,57,48,35,31,88,91,72,69,34,98,99,106,107,109,110,111]
-                itemID=random.choice(commonItemIds)
-            elif rand<=70:
-                rareItemIds=[6,9,71,47,44,37,76,22,20,50,5,92,93,95,103,105,108]
-                itemID=random.choice(rareItemIds)
-            elif rand==99:
-                legendaryItemIds=[25,19,9,90,49,42,97,100,101,102,104]
-                itemID=random.choice(legendaryItemIds)
-            else:
-                return 
-            itemDrop(itemID, x, y)
-            if howMany==3:
-                print("There a lot of stuff in this area")
-    else:
-        return    
+    x=player_position()
+    trashItemIds=[58,86,38,17,13,11,10,4,3,2,1,89]
+    commonItemIds=[8,67,12,57,48,35,31,88,91,72,69,34,98,99,106,107,109,110,111]
+    rareItemIds=[6,9,71,47,44,37,76,22,20,50,5,92,93,95,103,105,108]
+    legendaryItemIds=[25,19,9,90,49,42,97,100,101,102,104]     
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
@@ -3042,7 +3212,6 @@ def main():
             parse(playerInput)
             change_spawnrate()
             change_fatigue()
-            randomItemDrops()
         else:
             return  
 main()
