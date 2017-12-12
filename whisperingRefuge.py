@@ -8,12 +8,10 @@ import msvcrt
 import os
 
 
-msvcrt.setmode(sys.stdout.fileno(), os.O_BINARY)
-
 db = mysql.connector.connect(host="localhost",
                              user="dbuser",
                              passwd="dbpass",
-                             db="almostfinalrefuge",
+                             db="finalrefuge",
                              buffered=True)
 
 cur=db.cursor()
@@ -31,8 +29,8 @@ cur=db.cursor()
 #esto 5 on rikkinainen riippusilta
 #esto 6 on tiirikoitava ovi
 
-NewAreaDescription = [0,"You have arrived at some sort of village, there are multiple small buildings, but no-ones around", "area description","area description","You see a small church building nearby, it is in very poor condition."]
-KnownAreaDescription = [0,"You arrive at some kind of small village, you have been here before ","area description", "area description", "You have returned to a familiar area, there is a small church building nearby"]
+NewAreaDescription = [0,"You have arrived at some sort of village, there are multiple small buildings, but no-ones around", " "," ","You see a small church building nearby, it is in very poor condition."]
+KnownAreaDescription = [0,"You arrive at some kind of small village, you have been here before ","area description", " ", "You have returned to a familiar area, there is a small church building nearby"]
 visitCounter = [0,0,0,0,0,0]
 
 
@@ -45,12 +43,12 @@ infection_message=0
 missingPlanks=7
 gameOver=0
 itemDropChange=0.5
-enemySpawnRate=0 #%
-spawnReduction=5
+enemySpawnRate=50 #%
+spawnReduction=0
 despawnCount=2
 despawnCountX=0
-objects =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
-storables =["FREEZER","CHEST","BRIEFCASE","DRAWER"]
+objects =["FREEZER","CHEST","BRIEFCASE","DRAWER","SACK","CLOSET","BOAT"]
+storables =["FREEZER","CHEST","BRIEFCASE","DRAWER","SACK","CLOSET"]
 locked=["BRIEFCASE","DRAWER"]
 buildings=[6,7,8,9,10,11]
 boatMissing=["engine","holefix","air"]
@@ -77,6 +75,7 @@ LOOK <compass point>                    -Tells player about the area of compass 
 I, INVENTORY, BAG, ITEMS                -Prints a list of items player is currently carrying
 DROP <ITEM>                             -Drops the selected item
 COMBINE <ITEM> <ITEM>                   -Combines two items to create a new one
+COMBINE MENU                            -Displays all combine recipes
 TIME                                    -Tells time to player
 EQUIP <ITEM>                            -Player equips selected item for example equip shirt    
 UNEQUIP <ITEM>                          -Player unequips selected item for example unequip shirt
@@ -396,7 +395,7 @@ def update_player_healt(totalHealt):
         sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % totalHealt)
         cur.execute(sql)
     elif totalHealt<0:
-        print("You lost the game!")
+        game_over()
     else:
         sql=(("UPDATE player SET player.hp=%d WHERE player.ID=1") % player_max_healt)
         cur.execute(sql)
@@ -693,6 +692,12 @@ def talk(ID):
                 print("\"You intrude in my laboratory and disrespect me!? I will murder you!\"")
                 print()
                 print("Oh oh, the mad scientist is charging at you with some acid!")
+                sql="update npc set x=NULL where id=1"
+                cur.execute(sql)
+                sql="insert into enemy values(10000,12,-10,-6,NULL)"
+                cur.execute(sql)
+                time.sleep(2)
+                attack()
                 return
             elif ans=="4":
                 print("\"Yes, BY GETTING THE HELL OUT OF MY LABORATORY!\"")
@@ -845,7 +850,7 @@ def mangleWithObjects(command,useable):
         elif res[0][0]==6:
             if command[0] == "OPEN":
                 if res[0][5]==0:
-                    sql="Update object set open=6 where id=6"
+                    sql="Update object set open=1 where id=6"
                     cur.execute(sql)
                     print("You opened the %s."%useable)
                     check_object("closet")
@@ -854,6 +859,24 @@ def mangleWithObjects(command,useable):
             elif command[0] == "CLOSE":
                 if res[0][5]==1:
                     sql="Update object set open=0 where id=1"
+                    cur.execute(sql)
+                    print("You closed the %s."%useable)
+                else:
+                    print("It seems to be closed already!")
+            else:
+                print("Your asking for too much here!")
+        elif res[0][0]==8:
+            if command[0] == "OPEN":
+                if res[0][5]==0:
+                    sql="Update object set open=1 where id=8"
+                    cur.execute(sql)
+                    print("You opened the %s."%useable)
+                    check_object("closet")
+                else:
+                    print("Looks like its already open!")
+            elif command[0] == "CLOSE":
+                if res[0][5]==1:
+                    sql="Update object set open=0 where id=8"
                     cur.execute(sql)
                     print("You closed the %s."%useable)
                 else:
@@ -892,10 +915,12 @@ def window_enter(res,compasspoint):
             if quickParse(answer2)[0]=="USE":
                 if quickParse(answer2)[1]=="GLASSCUTTER" or (quickParse(answer2)[1]=="GLASS" and quickParse(answer2)[2]=="CUTTER"):
                     if specific_item_check("glass cutter"):
+                        timedelay(3, 0.7)
+                        
                         print("You manage to cut a sizeable hole into the window and proceed to slip in.")
                         if compasspoint=="N":
                             filtered=''.join([c for c in res[0][1] if c not in compasspoint and"4"])
-                            sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x and terrain_square.y=player.y+1"%filtered
+                            sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,player_position()[0][0],(player_position()[0][1])+1))
                             cur.execute(sql)
                             add_time(square_side, res[0][0])
                             sql= "UPDATE player SET player.y = player.y+1"
@@ -903,7 +928,7 @@ def window_enter(res,compasspoint):
                             
                         elif compasspoint=="S":
                             filtered=''.join([c for c in res[0][1] if c not in compasspoint and"4"])
-                            sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x and terrain_square.y=player.y-1"%filtered
+                            sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,player_position()[0][0],(player_position()[0][1])-1))
                             cur.execute(sql)
                             add_time(square_side, res[0][0])
                             sql= "UPDATE player SET player.y = player.y-1"
@@ -911,7 +936,7 @@ def window_enter(res,compasspoint):
                             
                         elif compasspoint=="W":  
                             filtered=''.join([c for c in res[0][1] if c not in compasspoint and"4"])
-                            sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x-1 and terrain_square.y=player.y"%filtered
+                            sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,(player_position()[0][0]-1),player_position()[0][1]))
                             cur.execute(sql)
                             add_time(square_side, res[0][0])
                             sql= "UPDATE player SET player.x = player.x-1"
@@ -919,7 +944,7 @@ def window_enter(res,compasspoint):
                         
                         elif compasspoint=="E":  
                             filtered=''.join([c for c in res[0][1] if c not in compasspoint and"4"])
-                            sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x+1 and terrain_square.y=player.y"%filtered
+                            sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,((player_position()[0][0])+1),player_position()[0][1]))
                             cur.execute(sql)
                             add_time(square_side, res[0][0])
                             sql= "UPDATE player SET player.x = player.x+1"
@@ -934,7 +959,7 @@ def window_enter(res,compasspoint):
                             sql=(("UPDATE terrain_square set visitcounter=visitcounter+1 where x=%i and y=%i")%(res[0][4],res[0][5]))
                             cur.execute(sql)
                             print(res[0][3])
-                        if res[0][1]!= None:
+                        elif res[0][1]!= None:
                             print(res[0][1])
                         if infected:
                             update_infection()
@@ -968,25 +993,26 @@ def open_lockpickable(res,compasspoint):
                         if specific_item_check("lockpick"):
                             rand=randrange(0,10)
                             if rand>2:
+                                timedelay(3, 0.5)
                                 print("It took you a while but you picked the lock, the door is now open!")
                                 if compasspoint=="N":
                                     filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
-                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x and terrain_square.y=player.y+1"%filtered
+                                    sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,player_position()[0][0],(player_position()[0][1])+1))
                                     cur.execute(sql)
                                     
                                 elif compasspoint=="S":
                                     filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
-                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x and terrain_square.y=player.y-1"%filtered
+                                    sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,player_position()[0][0],(player_position()[0][1])-1))
                                     cur.execute(sql)
                                     
                                 elif compasspoint=="W":  
                                     filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
-                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x-1 and terrain_square.y=player.y"%filtered
+                                    sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,(player_position()[0][0]-1),player_position()[0][1]))
                                     cur.execute(sql)
                                 
                                 elif compasspoint=="E":  
                                     filtered=''.join([c for c in res[0][1] if c not in compasspoint and"6"])
-                                    sql="Update terrain_square set restriction='%s' where terrain_square.x=player.x+1 and terrain_square.y=player.y"%filtered
+                                    sql=(("Update terrain_square set restriction='%s' where terrain_square.x=%i and terrain_square.y=%i")%(filtered,((player_position()[0][0])+1),player_position()[0][1]))
                                     cur.execute(sql)
                                 return
                             else:
@@ -1066,6 +1092,8 @@ def open_door1():
         else:
             print("Input \"y\" or \"n\"!")
             
+#def open_gate():
+    
 def open_door2():
     print("The door is closed with a big padlock")
     while True:
@@ -1191,7 +1219,7 @@ def fix_boat():
         else:
             print("You can't do that.")
     elif quickParse(ans)[0]=="PUMP":
-        if specific_item_check("pump") and "fixhole" not in boatMissing:
+        if specific_item_check("small pump") and "fixhole" not in boatMissing:
             timedelay(3, 0.7)
             print("You fill the boat with air, nicely done!")
             boatMissing.remove("air")
@@ -1201,7 +1229,7 @@ def fix_boat():
             print("You don't have a pump.")
     elif quickParse(ans)[0]=="USE":
         if quickParse(ans)[1]=="PUMP":
-            if specific_item_check("pump") and "fixhole" not in boatMissing:
+            if specific_item_check("small pump") and "fixhole" not in boatMissing:
                 timedelay(3, 0.7)
                 print("You fill the boat with air, nicely done!")
                 boatMissing.remove("air")
@@ -1380,11 +1408,13 @@ def move_north():
                 if res[0][2]==0:
                     sql=(("UPDATE terrain_square set visitcounter=visitcounter+1 where x=%i and y=%i")%(res[0][4],res[0][5]))
                     cur.execute(sql)
-                    print(res[0][3])
-                if res[0][1]!= None:
+                    if res[0][3]!=None:
+                        print(res[0][3])
+                elif res[0][1]!= None:
                     print(res[0][1])
                 if infected:
                     update_infection()
+                randomItemDrops()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -1440,11 +1470,13 @@ def move_south():
                 if res[0][2]==0:
                     sql=(("UPDATE terrain_square set visitcounter=visitcounter+1 where x=%i and y=%i")%(res[0][4],res[0][5]))
                     cur.execute(sql)
-                    print(res[0][3])
-                if res[0][1]!= None:        
+                    if res[0][3]!=None:
+                        print(res[0][3])
+                elif res[0][1]!= None:        
                     print(res[0][1])
                 if infected:
                     update_infection()
+                randomItemDrops()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -1500,11 +1532,13 @@ def move_east():
                 if res[0][2]==0:
                     sql=(("UPDATE terrain_square set visitcounter=visitcounter+1 where x=%i and y=%i")%(res[0][4],res[0][5]))
                     cur.execute(sql)
-                    print(res[0][3])
-                if res[0][1]!= None:
+                    if res[0][3]!=None:
+                        print(res[0][3])
+                elif res[0][1]!= None:
                     print(res[0][1])
                 if infected:
                     update_infection()
+                randomItemDrops()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -1562,11 +1596,13 @@ def move_west():
                 if res[0][2]==0:
                     sql=(("UPDATE terrain_square set visitcounter=visitcounter+1 where x=%i and y=%i")%(res[0][4],res[0][5]))
                     cur.execute(sql)
-                    print(res[0][3])
-                if res[0][1]!= None:
+                    if res[0][3]!=None:
+                        print(res[0][3])
+                elif res[0][1]!= None:
                     print(res[0][1])
                 if infected:
                     update_infection()  
+                randomItemDrops()
         else:
             print("The ocean is that way,it would be suicide!")
             
@@ -1654,8 +1690,10 @@ def examine_area():
     result=cur.fetchall()
     if len(result)>0:
         print("You found the following items when searching the area ")
-    for i in range(len(result)):
-        print(result[i][0])
+        for i in range(len(result)):
+            print(result[i][0])
+    else:
+        print("You found nothing interesting.")
         
 def extended_look_desription(terrainTypeId,distance,frontTerraintypeId):
     x=random.randint(1,2)
@@ -1961,11 +1999,11 @@ def combineITEMS(itemId1,itemId2):
         
     return False
 def combine(twoItems):
-    print(twoItems)
+    #print(twoItems)
     itemnames=[]
     for i in range(len(twoItems)):
         itemnames.append(twoItems[i].lower())
-    print(itemnames)
+    #print(itemnames)
     if (check_item_type(itemnames[0]))==True and (check_item_type(itemnames[1]))==True:
         
         sql=(("SELECT item_type.name,item_type.id FROM item_type,item WHERE item.type_id=item_type.id and item.player_ID>0 and item_type.name like '"+itemnames[0]+"%'"))
@@ -2008,7 +2046,7 @@ def combine(twoItems):
                 cur.execute(sql)
                 
                 totalWeight=(((player_carry_att_speed_hp_fatique()[0][0])-(fItemID[0][2]+sItemID[0][2]))+result[0][1])
-                print(totalWeight)
+                #print(totalWeight)
                 update_player_weight(totalWeight)
                 
                 print("You crafted",newItemsName)
@@ -2278,7 +2316,7 @@ def combat(enemyName):
                 pbodyHit=95*playerHitchangeTarget
                 plegsHit=70*playerHitchangeTarget
                 pfeetHit=20*playerHitchangeTarget
-                if enemyTypeID in [1,2,11]:
+                if enemyTypeID in [1,2,11,12]:
                     print(human)
                     hitlist=["head","hand","body","legs","feet","hands","leg"]
                     damageMultiplier=1
@@ -2531,7 +2569,6 @@ You wake up on the beach, hear the Ocean waves crashing in the shore.
                             enemyDrops(enemyTypeID)
                         else:
                             print("You died")
-                            game_over()
                         removeEnemy(enemyID)
                         update_player_healt(playerHP)
                         break
@@ -2711,13 +2748,13 @@ def enemySpawn():
                 maxDamage=50
                 
             if player_carry_att_speed_hp_fatique()[0][1]>=maxDamage:
-                print(maxDamage)
+                #print(maxDamage)
                 print('''
 You face the cannibal king, good Luck!                
                 ''')
                 attack()
             else:
-                print(maxDamage)
+                #print(maxDamage)
                 sql=(("UPDATE player SET player.x=-1, player.y=-2 WHERE player.ID=1"))
                 cur.execute(sql)
                 print('''
@@ -2778,7 +2815,7 @@ You wake up in the church with a headache, turns out the Cannibal King is a good
             action=random.randint(1,10)
             rand=random.choice([1,2,3,4])
             if action==1:
-                print("There is a"+enemies[0][2]+" passing you")
+                print("There is a "+enemies[0][2]+" passing you")
             elif action==2:
                 if (enemies[0][1])!=10:
                     print("a "+enemies[0][2]+" is running away from you")
@@ -2897,6 +2934,7 @@ You wake up in the church with a headache, turns out the Cannibal King is a good
                     print(str(enemies[0][7])+" is too far away from you to see")
     #else:
         #print("No enemy")
+                    
 def itemString(playerText):
     item=""
     for i in range(len(playerText)):
@@ -2918,7 +2956,7 @@ def examine_item(item):
         print("You don't have that kind of item in your inventory")
 def examine_enemy(enemy_type):
     sql=(("SELECT enemy_type.description FROM enemy_type WHERE enemy_type.name LIKE '"+enemy_type+"%'"))
-    print(sql)
+    #print(sql)
     cur.execute(sql)
     result=cur.fetchall()
     
@@ -2936,12 +2974,30 @@ def check_enemy_type(enemy_type):
             return True
     
     return False
+
+def combineRp():
+    print('''
+      arrow  + plant        = poison arrow
+      string + branches     = bow
+      knife  + branches     = spear
+      plant  + spear        = toxic spear
+       plant + axe          = toxic axe
+       sword + plant        = poisoned blade
+      shovel + plant        = poisoned shovel
+        rake + plant        = poisoned rake
+   duct tape + sharp rock   = paperweight
+  sharp rock + branches     = stone spear
+  rubber band + branches    = slingshot
+box of nails + baton        = spiked baton
+box of nails + baseball bat = spiked baseball bat
+''')
+
 def randomItemDrops():
     x=player_position()[0][0]
     y=player_position()[0][1]
     rand=random.randint(1,100)
     howMany=random.randint(1,3)
-    rand2=random,randint(1,10)
+    rand2=random.randint(1,10)
     if rand2==1 or rand2 ==2 or rand2==3:
         for i in range(howMany):
             if rand<=50:
@@ -2959,8 +3015,8 @@ def randomItemDrops():
             else:
                 return 
             itemDrop(itemID, x, y)
-            if howMany==3:
-                print("There a lot of stuff in this area")
+        if howMany==3:
+            print("There a lot of stuff in this area")
     else:
         return   
 def parse(playerInput):
@@ -2974,7 +3030,6 @@ def parse(playerInput):
     elif playerText[0]== "K":
         item_delete("branches")
     elif playerText[len(playerText)-2] != "FROM" and playerText[len(playerText)-2] != "IN" and playerText[len(playerText)-1] in objects:
-        print("we found an object")
         mangleWithObjects(playerText[:(len(playerText)-1)],playerText[len(playerText)-1].lower())
         
     elif playerText[0]== "N" or playerText[0]=="NORTH":
@@ -2997,7 +3052,7 @@ def parse(playerInput):
         else:
             talk(npc_check())
     elif playerText[0]=="RING"and playerText[1]=="BELL":
-        if player_position[0][0]== -1 and player_position[0][1]==-2:
+        if player_position()[0][0]== -1 and player_position()[0][1]==-2:
             print("You ring the bell and it produces a deafening sound that must've been heard in a miles radius.")
             sql="Update terrain_square set restriction='U',description=NULL where x=-5 and y=-4"
             cur.execute(sql)
@@ -3026,7 +3081,7 @@ def parse(playerInput):
             print("Can't fix that!")
     elif (playerText[0])=="I":
         inventory()
-    elif (playerText[0])=="DROP":
+    elif (playerText[0])=="DROP" or playerText[0]=="D":
         item=""
         if len(playerText)>1:
             print(playerText)
@@ -3039,39 +3094,41 @@ def parse(playerInput):
         attack()  
     elif (playerText[0])=="COMBINE":
         if len(playerText)>1:
-            item=""
-            item=itemString(playerText)
-                
-            pos=item.find("+")
-            if item[(pos-1)]==" " and item[(pos+1)]==" ":
-                newitem=item[:(pos-1)]+item[pos:]
-                print("newitem",newitem)
-                newitem2=newitem[:(pos)]+newitem[(pos+1):]
-            
-            elif item[(pos-1)]==" " and item[(pos+1)]!=" ":
-                newitem=item[:(pos-1)]+item[pos:]
-                print("newitem",newitem)
-                newitem2=newitem[:(pos)]+newitem[(pos):]
-            
-            elif item[(pos-1)]!=" " and item[(pos+1)]==" ":
-                newitem=item[:(pos)]+item[pos:]
-                print("newitem",newitem)
-                newitem2=newitem[:(pos+1)]+newitem[(pos+2):]
+            if playerText[1]=="RECIPES" or playerText[1]=="MENU":
+                combineRp()
             else:
-                newitem2=item
-            
-            pos2=newitem2.find("+")    
-            item1=newitem2[0:pos2]
-            item2=newitem2[(pos2+1):len(newitem2)]
-            
-            list=[item1,item2]
-            combine(list)
+                item=itemString(playerText)
+                    
+                pos=item.find("+")
+                if item[(pos-1)]==" " and item[(pos+1)]==" ":
+                    newitem=item[:(pos-1)]+item[pos:]
+                    print("newitem",newitem)
+                    newitem2=newitem[:(pos)]+newitem[(pos+1):]
+                
+                elif item[(pos-1)]==" " and item[(pos+1)]!=" ":
+                    newitem=item[:(pos-1)]+item[pos:]
+                    print("newitem",newitem)
+                    newitem2=newitem[:(pos)]+newitem[(pos):]
+                
+                elif item[(pos-1)]!=" " and item[(pos+1)]==" ":
+                    newitem=item[:(pos)]+item[pos:]
+                    print("newitem",newitem)
+                    newitem2=newitem[:(pos+1)]+newitem[(pos+2):]
+                else:
+                    newitem2=item
+                
+                pos2=newitem2.find("+")    
+                item1=newitem2[0:pos2]
+                item2=newitem2[(pos2+1):len(newitem2)]
+                
+                list=[item1,item2]
+                combine(list)
         else:
             print("You meant? combine <item>+<item>")
             
     elif (playerText[0])=="TIME":
         show_time()
-    elif (playerText[0])=="EQUIP":
+    elif (playerText[0])=="EQUIP"or playerText[0]=="EQ":
         item=""
         if len(playerText)>1:
             for i in range(len(playerText)):
@@ -3083,7 +3140,7 @@ def parse(playerInput):
             equip(item)
         else:
             print("You meant equip item?")
-    elif (playerText[0])=="UNEQUIP":
+    elif (playerText[0])=="UNEQUIP"or playerText[0]=="UNEQ":
         item=""
         if len(playerText)>1:
             for i in range(len(playerText)):
@@ -3095,7 +3152,7 @@ def parse(playerInput):
             unEquip(item)
         else:
             print("You meant unequip item?")
-    elif (playerText[0])== "EXAMINE":
+    elif (playerText[0])== "EXAMINE"or playerText[0]=="ANALYZE" or playerText[0]=="STUDY":
         if len(playerText)>1:
             if(playerText[1])== "AREA":
                 examine_area()
@@ -3109,9 +3166,9 @@ def parse(playerInput):
                     print("You meant examine <area>/<item>/<enemy>")
         else:
             print("You meant examine <area>/<item>/<enemy>")
-    elif (playerText[0])=="STATS":
+    elif (playerText[0])=="STATS"or playerText[0]=="PLAYER":
         player_stats()
-    elif (playerText[0])=="HELP":
+    elif (playerText[0])=="HELP" or playerText[0]=="INFO":
         help()
     elif (playerText[0])=="EAT":
         item=""
@@ -3131,7 +3188,7 @@ def parse(playerInput):
             sleep(int(playerText[1]))
         else:
             sleep(6)
-    elif playerText[0] == "TAKE" or playerText[0] =="PICK" or playerText[0] =="PICKUP" or playerText[0] =="GRAB":
+    elif playerText[0] == "TAKE" or playerText[0] =="PICK" or playerText[0] =="PICKUP" or playerText[0] =="GRAB" or playerText[0]=="T":
         item=""
         if playerText[len(playerText)-1] in objects and playerText[len(playerText)-2]== "FROM":
             if playerText[1] == "UP":
@@ -3208,32 +3265,39 @@ def parse(playerInput):
                 item+=(playerText[i]+" ")
             else:
                 item+=(playerText[i])
-        print(item)
         if check_item_type(item)==True:
             read(item)
             
     else:
         print("Not understood")
+print('''
+
+██╗    ██╗██╗  ██╗██╗███████╗██████╗ ███████╗██████╗ ██╗███╗   ██╗ ██████╗     ██████╗ ███████╗███████╗██╗   ██╗ ██████╗ ███████╗
+██║    ██║██║  ██║██║██╔════╝██╔══██╗██╔════╝██╔══██╗██║████╗  ██║██╔════╝     ██╔══██╗██╔════╝██╔════╝██║   ██║██╔════╝ ██╔════╝
+██║ █╗ ██║███████║██║███████╗██████╔╝█████╗  ██████╔╝██║██╔██╗ ██║██║  ███╗    ██████╔╝█████╗  █████╗  ██║   ██║██║  ███╗█████╗  
+██║███╗██║██╔══██║██║╚════██║██╔═══╝ ██╔══╝  ██╔══██╗██║██║╚██╗██║██║   ██║    ██╔══██╗██╔══╝  ██╔══╝  ██║   ██║██║   ██║██╔══╝  
+╚███╔███╔╝██║  ██║██║███████║██║     ███████╗██║  ██║██║██║ ╚████║╚██████╔╝    ██║  ██║███████╗██║     ╚██████╔╝╚██████╔╝███████╗
+ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝╚══════╝╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝     ╚═╝  ╚═╝╚══════╝╚═╝      ╚═════╝  ╚═════╝ ╚══════╝
+                                                                                                                                 
+Your ship sank in the Atlantic, but you managed to escape with an inflatable boat. You are washed into the shore of a mysterious island,
+and your inflatable boat was damaged heavily, so you must survive here for a while at least...
+    ''')
 def main():
-    sql="insert into item values(1000,50,0,-6,NULL,NULL,NULL)"
+    sql="update item set player_id=1"
     cur.execute(sql)
-    sql="insert into item values(1001,25,0,-6,NULL,NULL,NULL)"
-    cur.execute(sql)
-    sql="insert into item values(1002,36,0,-6,NULL,NULL,NULL)"
-    cur.execute(sql)
-    sql="insert into item values(1003,37,0,-6,NULL,NULL,NULL)"
-    cur.execute(sql)
-    sql="insert into item values(1004,37,0,-6,NULL,NULL,NULL)"
-    cur.execute(sql)
+
+    
     while True:
         if gameOver==0:
-            #out_of_breath()
-            #print(player_carry())
-            playerInput = input()
-            parse(playerInput)
-            change_spawnrate()
-            change_fatigue()
-            randomItemDrops()
+            try:
+                #out_of_breath()
+                #print(player_carry())
+                playerInput = input()
+                parse(playerInput)
+                change_spawnrate()
+                change_fatigue()
+            except:
+                main()
         else:
             return  
 main()
