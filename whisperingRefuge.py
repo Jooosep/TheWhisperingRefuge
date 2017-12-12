@@ -2937,11 +2937,32 @@ def check_enemy_type(enemy_type):
     
     return False
 def randomItemDrops():
-    x=player_position()
-    trashItemIds=[58,86,38,17,13,11,10,4,3,2,1,89]
-    commonItemIds=[8,67,12,57,48,35,31,88,91,72,69,34,98,99,106,107,109,110,111]
-    rareItemIds=[6,9,71,47,44,37,76,22,20,50,5,92,93,95,103,105,108]
-    legendaryItemIds=[25,19,9,90,49,42,97,100,101,102,104]     
+    x=player_position()[0][0]
+    y=player_position()[0][1]
+    rand=random.randint(1,100)
+    howMany=random.randint(1,3)
+    rand2=random,randint(1,10)
+    if rand2==1 or rand2 ==2 or rand2==3:
+        for i in range(howMany):
+            if rand<=50:
+                trashItemIds=[58,86,38,17,13,11,10,4,3,2,1,89]
+                itemID=random.choice(trashItemIds)
+            elif rand<=65:
+                commonItemIds=[8,67,12,57,48,35,31,88,91,72,69,34,98,99,106,107,109,110,111]
+                itemID=random.choice(commonItemIds)
+            elif rand<=70:
+                rareItemIds=[6,9,71,47,44,37,76,22,20,50,5,92,93,95,103,105,108]
+                itemID=random.choice(rareItemIds)
+            elif rand==99:
+                legendaryItemIds=[25,19,9,90,49,42,97,100,101,102,104]
+                itemID=random.choice(legendaryItemIds)
+            else:
+                return 
+            itemDrop(itemID, x, y)
+            if howMany==3:
+                print("There a lot of stuff in this area")
+    else:
+        return   
 def parse(playerInput):
     playerCaps = playerInput.upper()
     filter = [".", ",",":","AN","A","MOVE", "GO", "OUT", "THE", "AND", "TO","SOME","FOR","ON"]
@@ -3212,6 +3233,7 @@ def main():
             parse(playerInput)
             change_spawnrate()
             change_fatigue()
+            randomItemDrops()
         else:
             return  
 main()
