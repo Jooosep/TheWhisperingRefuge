@@ -447,7 +447,7 @@ def drop_item(item):
             sql=("UPDATE item SET item.x=%i, item.y=%i, item.player_ID=NULL WHERE item.id=%i" % (pos[0][0],pos[0][1],item_id))
             cur.execute(sql)
             
-            print("You dropped the ", result[i][0])
+            print("You dropped the", result[i][0])
             break
     if result[i][0].upper()!=item:
         print("You don't have that kind of item in your inventory")      
