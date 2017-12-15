@@ -2533,7 +2533,7 @@ def combat(enemyName):
                         else:
                             timedelay(3, 0.5)
                             print("You escaped from the ",enemyName)
-                        if enemyID==11:
+                        if enemyTypeID==11:
                             sql=(("UPDATE player SET player.x=4, player.y=7 WHERE player.ID=1"))
                             cur.execute(sql)
                             print('''But..
