@@ -3309,8 +3309,8 @@ Your ship sank in the Atlantic, but you managed to escape with an inflatable boa
 and your inflatable boat was damaged heavily, so you must survive here for a while at least...
     ''')
 def main():
-    sql="UPDATE item SET player_ID=1"
-    cur.execute(sql)
+    #sql="UPDATE item SET player_ID=1"
+    #cur.execute(sql)
     while True:
         if gameOver==0:
             #out_of_breath()
