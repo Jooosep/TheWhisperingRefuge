@@ -3318,7 +3318,7 @@ def main():
             parse(playerInput)
             change_spawnrate()
             change_fatigue()
-            main()
+            
         else:
             return  
 main()
