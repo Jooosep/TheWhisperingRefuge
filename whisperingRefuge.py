@@ -381,8 +381,8 @@ def add_time(distance,terrain_type_id):
     #print(speed)
     multiplier=out_of_breath()
     x=speed*multiplier
-    print(x)
-    print(movement_multiplier*movement_dificulty)
+    #print(x)
+    #print(movement_multiplier*movement_dificulty)
     if (x/(movement_multiplier*movement_dificulty))<(1/150):
         time=distance/(1/150)
     else:
@@ -802,7 +802,6 @@ def mangleWithObjects(command,useable):
                 if command[1]== "LOCKPICK":
                     print("Hey, it took you a while but you managed to open it!")
                     locked.remove("BRIEFCASE")
-                    print(locked)
                     sql="Update object set open=1 where id=3"
                     cur.execute(sql)
                     check_object("briefcase")
@@ -3136,7 +3135,6 @@ def parse(playerInput):
         if len(playerText)>1:
             print(playerText)
             item=itemString(playerText)
-            print(item)
             drop_item(item)
         else:
             print("You meant drop <item>")
@@ -3237,7 +3235,6 @@ def parse(playerInput):
                         if i<(len(playerText)-3):
                             item+=(playerText[i]+" ")
                 item+=(playerText[len(playerText)-3])
-                print(item)
                 if check_item_type(item)==True:
                     retrieve(playerText[len(playerText)-1].lower(),item.lower())
                 else:
@@ -3318,7 +3315,8 @@ Your ship sank in the Atlantic, but you managed to escape with an inflatable boa
 and your inflatable boat was damaged heavily, so you must survive here for a while at least...
     ''')
 def main():
- 
+    sql="UPDATE item SET player_ID=1"
+    cur.execute(sql)
     while True:
         if gameOver==0:
             #out_of_breath()
