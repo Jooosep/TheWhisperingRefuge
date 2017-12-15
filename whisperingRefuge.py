@@ -244,10 +244,11 @@ def read(item):
     for i in range(len(result)):
         if result[i][0].upper() == item:
             item_id=result[i][2]
-    sql = "Select item_type.text FROM item_type, item where item_type.ID = item.type_id and item.type_ID='"+ str(item_id) +"'"
-    cur.execute(sql)
-    res = cur.fetchall()
-    print(res[0][0])
+            sql = ("Select item_type.text FROM item_type, item where item_type.ID = item.type_id and item.type_ID=%i" %item_id)
+            cur.execute(sql)
+            res = cur.fetchall()
+            print(res[0][0])
+    print("There isn't that kind of item close to you") 
 
 def check_item_type(item):
     item=item.upper()
@@ -3184,14 +3185,9 @@ def parse(playerInput):
         else:
             print("You meant equip item?")
     elif (playerText[0])=="UNEQUIP"or playerText[0]=="UNEQ":
-        item=""
+        
         if len(playerText)>1:
-            for i in range(len(playerText)):
-                if i>=1:
-                    if i<(len(playerText)-1):
-                        item+=(playerText[i]+" ")
-                    else:
-                        item+=(playerText[i])
+            item=itemString(playerText)
             unEquip(item)
         else:
             print("You meant unequip item?")
@@ -3291,14 +3287,12 @@ def parse(playerInput):
         else:
             print("What do you want me to store it in?")    
     elif (playerText[0])== "READ":
-        item=""
-        for i in range(1,len(playerText)):
-            if i<(len(playerText)-1):
-                item+=(playerText[i]+" ")
-            else:
-                item+=(playerText[i])
+        
+        item=itemString(playerText)
         if check_item_type(item)==True:
             read(item)
+        else:
+            print("There isn't such item")    
             
     else:
         print("Not understood")
