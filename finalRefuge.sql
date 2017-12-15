@@ -11,10 +11,9 @@ use TheWhisperingRefuge;
 /*!50503 SET NAMES utf8mb4 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-
 CREATE USER 'dbuser04'@'localhost' IDENTIFIED BY 'dbpass';
 GRANT SELECT, INSERT, UPDATE, DELETE ON TheWhisperingRefuge.* TO dbuser04@localhost;
--- Dumping structure for taulu finalrefuge.enemy
+-- Dumping structure for taulu thewhisperingrefuge.enemy
 CREATE TABLE IF NOT EXISTS `enemy` (
   `id` int(11) NOT NULL,
   `type_id` int(11) NOT NULL,
@@ -28,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `enemy` (
   CONSTRAINT `enemy_ibfk_2` FOREIGN KEY (`x`, `y`) REFERENCES `terrain_square` (`x`, `y`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.enemy: ~40 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.enemy: ~40 rows (suunnilleen)
 /*!40000 ALTER TABLE `enemy` DISABLE KEYS */;
 INSERT INTO `enemy` (`id`, `type_id`, `x`, `y`, `spawned`) VALUES
 	(1, 2, -13, -4, NULL),
@@ -73,7 +72,7 @@ INSERT INTO `enemy` (`id`, `type_id`, `x`, `y`, `spawned`) VALUES
 	(10001, 11, 2, 8, NULL);
 /*!40000 ALTER TABLE `enemy` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.enemy_type
+-- Dumping structure for taulu thewhisperingrefuge.enemy_type
 CREATE TABLE IF NOT EXISTS `enemy_type` (
   `id` int(11) NOT NULL,
   `name` varchar(25) NOT NULL,
@@ -86,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `enemy_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.enemy_type: ~12 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.enemy_type: ~12 rows (suunnilleen)
 /*!40000 ALTER TABLE `enemy_type` DISABLE KEYS */;
 INSERT INTO `enemy_type` (`id`, `name`, `hp`, `att`, `speed`, `description`, `description2`, `seen`) VALUES
 	(1, 'cannibal', 70, 5, 8, 'beastly man, that looks like a cannibal', NULL, 0),
@@ -103,7 +102,7 @@ INSERT INTO `enemy_type` (`id`, `name`, `hp`, `att`, `speed`, `description`, `de
 	(12, 'Mad scientist', 100, 20, 50, 'crazy scientist, who is mad at you for disrespecting him', NULL, 0);
 /*!40000 ALTER TABLE `enemy_type` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.item
+-- Dumping structure for taulu thewhisperingrefuge.item
 CREATE TABLE IF NOT EXISTS `item` (
   `id` int(11) NOT NULL,
   `type_id` int(11) NOT NULL,
@@ -123,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `item` (
   CONSTRAINT `item_ibfk_4` FOREIGN KEY (`object_ID`) REFERENCES `object` (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.item: ~285 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.item: ~292 rows (suunnilleen)
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
 INSERT INTO `item` (`id`, `type_id`, `x`, `y`, `player_ID`, `equipped`, `object_ID`) VALUES
 	(1, 23, -12, 8, NULL, NULL, NULL),
@@ -161,7 +160,7 @@ INSERT INTO `item` (`id`, `type_id`, `x`, `y`, `player_ID`, `equipped`, `object_
 	(33, 27, -11, -3, NULL, NULL, NULL),
 	(34, 18, -11, -3, NULL, NULL, NULL),
 	(35, 17, -11, -3, NULL, NULL, NULL),
-	(36, 26, -12, -5, 1, NULL, NULL),
+	(36, 26, -12, -5, NULL, NULL, NULL),
 	(37, 41, -12, -5, NULL, NULL, NULL),
 	(38, 47, -12, -5, NULL, NULL, NULL),
 	(39, 35, -12, -5, NULL, NULL, NULL),
@@ -299,15 +298,15 @@ INSERT INTO `item` (`id`, `type_id`, `x`, `y`, `player_ID`, `equipped`, `object_
 	(171, 58, -5, -8, NULL, NULL, NULL),
 	(172, 58, -10, -9, NULL, NULL, NULL),
 	(173, 1, 3, 8, NULL, NULL, NULL),
-	(174, 2, -3, 7, 1, NULL, NULL),
+	(174, 2, -3, 7, NULL, NULL, NULL),
 	(175, 3, 1, 7, NULL, NULL, NULL),
 	(176, 4, 3, 7, NULL, NULL, NULL),
 	(177, 5, -5, 6, NULL, NULL, NULL),
 	(178, 5, -1, 6, NULL, NULL, NULL),
 	(179, 4, 11, 5, NULL, NULL, NULL),
 	(180, 3, -6, 4, NULL, NULL, NULL),
-	(181, 2, -3, 4, 1, NULL, NULL),
-	(182, 2, 0, 4, 1, NULL, NULL),
+	(181, 2, -3, 4, NULL, NULL, NULL),
+	(182, 2, 0, 4, NULL, NULL, NULL),
 	(183, 1, 10, 4, NULL, NULL, NULL),
 	(184, 3, 5, 3, NULL, NULL, NULL),
 	(185, 4, 6, 2, NULL, NULL, NULL),
@@ -318,9 +317,9 @@ INSERT INTO `item` (`id`, `type_id`, `x`, `y`, `player_ID`, `equipped`, `object_
 	(190, 4, -1, -1, NULL, NULL, NULL),
 	(191, 3, -4, -2, NULL, NULL, NULL),
 	(192, 3, 6, -2, NULL, NULL, NULL),
-	(193, 2, -8, -3, 1, NULL, NULL),
+	(193, 2, -8, -3, NULL, NULL, NULL),
 	(194, 1, -12, -4, NULL, NULL, NULL),
-	(195, 2, 1, -4, 1, NULL, NULL),
+	(195, 2, 1, -4, NULL, NULL, NULL),
 	(196, 3, 4, -4, NULL, NULL, NULL),
 	(197, 4, -13, -5, NULL, NULL, NULL),
 	(198, 4, -5, -5, NULL, NULL, NULL),
@@ -420,7 +419,7 @@ INSERT INTO `item` (`id`, `type_id`, `x`, `y`, `player_ID`, `equipped`, `object_
 	(299, 44, 0, -6, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `item` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.item_type
+-- Dumping structure for taulu thewhisperingrefuge.item_type
 CREATE TABLE IF NOT EXISTS `item_type` (
   `id` int(11) NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -434,7 +433,7 @@ CREATE TABLE IF NOT EXISTS `item_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.item_type: ~122 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.item_type: ~122 rows (suunnilleen)
 /*!40000 ALTER TABLE `item_type` DISABLE KEYS */;
 INSERT INTO `item_type` (`id`, `name`, `att`, `defense`, `healing`, `weight`, `part`, `description`, `text`) VALUES
 	(1, 'rabbit meat', 0, 0, 5, 0, NULL, 'Very nutritious piece of meat. High on protein and low on fat. Heals player for 5 hit points.', NULL),
@@ -561,7 +560,7 @@ INSERT INTO `item_type` (`id`, `name`, `att`, `defense`, `healing`, `weight`, `p
 	(124, 'titanium key', 0, 0, 0, 0, NULL, 'You found this in a locked briefcase, must be important...', '01000011 01001001 01000001');
 /*!40000 ALTER TABLE `item_type` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.npc
+-- Dumping structure for taulu thewhisperingrefuge.npc
 CREATE TABLE IF NOT EXISTS `npc` (
   `id` int(11) NOT NULL,
   `name` varchar(20) NOT NULL,
@@ -576,7 +575,7 @@ CREATE TABLE IF NOT EXISTS `npc` (
   CONSTRAINT `npc_ibfk_1` FOREIGN KEY (`x`, `y`) REFERENCES `terrain_square` (`x`, `y`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.npc: ~3 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.npc: ~3 rows (suunnilleen)
 /*!40000 ALTER TABLE `npc` DISABLE KEYS */;
 INSERT INTO `npc` (`id`, `name`, `att`, `hp`, `neutral`, `enemy`, `x`, `y`) VALUES
 	(1, 'Robert Zuul', 50, 200, 1, 0, -10, -6),
@@ -584,7 +583,7 @@ INSERT INTO `npc` (`id`, `name`, `att`, `hp`, `neutral`, `enemy`, `x`, `y`) VALU
 	(3, 'Martti', 20, 100, 1, 0, 0, -4);
 /*!40000 ALTER TABLE `npc` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.object
+-- Dumping structure for taulu thewhisperingrefuge.object
 CREATE TABLE IF NOT EXISTS `object` (
   `Id` int(11) NOT NULL,
   `name` varchar(50) DEFAULT NULL,
@@ -603,7 +602,7 @@ CREATE TABLE IF NOT EXISTS `object` (
   CONSTRAINT `object_ibfk_3` FOREIGN KEY (`player_id`) REFERENCES `player` (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.object: ~8 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.object: ~7 rows (suunnilleen)
 /*!40000 ALTER TABLE `object` DISABLE KEYS */;
 INSERT INTO `object` (`Id`, `name`, `x`, `y`, `key_item_id`, `open`, `storable`, `player_id`) VALUES
 	(1, 'freezer', -8, -6, NULL, 0, 1, NULL),
@@ -615,7 +614,7 @@ INSERT INTO `object` (`Id`, `name`, `x`, `y`, `key_item_id`, `open`, `storable`,
 	(8, 'sack', 2, 8, NULL, 0, 1, NULL);
 /*!40000 ALTER TABLE `object` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.player
+-- Dumping structure for taulu thewhisperingrefuge.player
 CREATE TABLE IF NOT EXISTS `player` (
   `ID` int(11) NOT NULL,
   `name` varchar(40) NOT NULL,
@@ -632,13 +631,13 @@ CREATE TABLE IF NOT EXISTS `player` (
   CONSTRAINT `player_ibfk_1` FOREIGN KEY (`x`, `y`) REFERENCES `terrain_square` (`x`, `y`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.player: ~1 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.player: ~1 rows (suunnilleen)
 /*!40000 ALTER TABLE `player` DISABLE KEYS */;
 INSERT INTO `player` (`ID`, `name`, `carry`, `att`, `speed`, `hp`, `fatigue`, `x`, `y`, `infection`) VALUES
 	(1, 'Unknown', 0, 3, 15, 100, 0, 0, -7, 0);
 /*!40000 ALTER TABLE `player` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.terrain_square
+-- Dumping structure for taulu thewhisperingrefuge.terrain_square
 CREATE TABLE IF NOT EXISTS `terrain_square` (
   `x` int(11) NOT NULL,
   `y` int(11) NOT NULL,
@@ -653,7 +652,7 @@ CREATE TABLE IF NOT EXISTS `terrain_square` (
   CONSTRAINT `terrain_square_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `terrain_type` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.terrain_square: ~388 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.terrain_square: ~388 rows (suunnilleen)
 /*!40000 ALTER TABLE `terrain_square` DISABLE KEYS */;
 INSERT INTO `terrain_square` (`x`, `y`, `type_id`, `restriction`, `area`, `description`, `visitcounter`, `1stvisit`) VALUES
 	(-13, -6, 2, 'U', NULL, 'You see a house to your northeast and the ocean to west.', 0, 'You see a house to your northeast and the ocean to west.'),
@@ -1046,7 +1045,7 @@ INSERT INTO `terrain_square` (`x`, `y`, `type_id`, `restriction`, `area`, `descr
 	(14, 6, 2, 'U', NULL, NULL, 0, NULL);
 /*!40000 ALTER TABLE `terrain_square` ENABLE KEYS */;
 
--- Dumping structure for taulu finalrefuge.terrain_type
+-- Dumping structure for taulu thewhisperingrefuge.terrain_type
 CREATE TABLE IF NOT EXISTS `terrain_type` (
   `id` int(11) NOT NULL,
   `name` varchar(25) NOT NULL,
@@ -1055,7 +1054,7 @@ CREATE TABLE IF NOT EXISTS `terrain_type` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table finalrefuge.terrain_type: ~12 rows (suunnilleen)
+-- Dumping data for table thewhisperingrefuge.terrain_type: ~12 rows (suunnilleen)
 /*!40000 ALTER TABLE `terrain_type` DISABLE KEYS */;
 INSERT INTO `terrain_type` (`id`, `name`, `movement_difficulty`, `description`) VALUES
 	(1, 'path', 2, 'a path, where you can travel with ease.'),
