@@ -2413,7 +2413,7 @@ def combat(enemyName):
                 if ammoName!="noammo":
                     playerCritChange+=25   
                 print()
-                
+                enemyAtt=enemyAtt*damageMultiplier
                 if len(inHand)>0:
                     if inHand[0][0]=="slingshot" or inHand[0][0]=="bow" and ammoName=="noammo" :
                         
