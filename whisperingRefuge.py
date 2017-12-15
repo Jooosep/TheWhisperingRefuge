@@ -7,9 +7,9 @@ import sys
 
 
 db = mysql.connector.connect(host="localhost",
-                             user="dbuser",
+                             user="dbuser04",
                              passwd="dbpass",
-                             db="finalrefuge",
+                             db="TheWhisperingRefuge",
                              buffered=True)
 
 cur=db.cursor()
