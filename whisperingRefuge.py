@@ -57,7 +57,6 @@ stringcode1= str(gateCode1)
 stringcode2= str(gateCode2)
 stringcode=stringcode2+stringcode1
 gateCode=int(stringcode)
-print(gateCode)
 sql=("update item_type set description='Paper with writing on it but first part of the paper is torn: %s. Keep in mind that these codes are personal, and misuse is a crime.' where id=16")%(stringcode1)
 cur.execute(sql)
 sql=("update item_type set description='Paper with writing on it, the text says: This is your new security code for the Northwest gate: %s. Code remains incomplete as rest of the paper is torn.' where id=15")%(stringcode2)
@@ -3266,7 +3265,7 @@ def parse(playerInput):
                 else:                   
                     print("There isn't such an item")
                 
-        elif playerText[1] == "UP":
+        elif len(playerText)>1 and playerText[1] == "UP":
             for i in range(len(playerText)):
                 if i>=2:
                     if i<(len(playerText)-1):
