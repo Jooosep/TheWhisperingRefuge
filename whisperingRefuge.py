@@ -3181,12 +3181,7 @@ def parse(playerInput):
     elif (playerText[0])=="EQUIP"or playerText[0]=="EQ":
         item=""
         if len(playerText)>1:
-            for i in range(len(playerText)):
-                if i>=1:
-                    if i<(len(playerText)-1):
-                        item+=(playerText[i]+" ")
-                    else:
-                        item+=(playerText[i])
+            item=itemString(playerText)
             equip(item)
         else:
             print("You meant equip item?")
@@ -3223,12 +3218,7 @@ def parse(playerInput):
     elif (playerText[0])=="EAT":
         item=""
         if len(playerText)>1:
-            for i in range(len(playerText)):
-                if i>=1:
-                    if i<(len(playerText)-1):
-                        item+=(playerText[i]+" ")
-                    else:
-                        item+=(playerText[i])
+            item=itemString(playerText)
             eat(item)
         else:
             print("You meant? eat 'name of item'")
@@ -3266,12 +3256,7 @@ def parse(playerInput):
                     print("There isn't such an item")
                 
         elif len(playerText)>1 and playerText[1] == "UP":
-            for i in range(len(playerText)):
-                if i>=2:
-                    if i<(len(playerText)-1):
-                        item+=(playerText[i]+" ")
-                    else:
-                        item+=(playerText[i])
+            item=itemString(playerText)
             
             if check_item_type(item)==True:
                 pick_up(item)
